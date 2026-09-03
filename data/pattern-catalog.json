@@ -1,0 +1,193 @@
+{
+  "$schemaVersion": "1.0.0",
+  "catalogVersion": "0.2.0",
+  "lastUpdated": "2026-08-03",
+  "_readme": "Standalone Linguistic Pattern Catalog. Edit this file to add/change detection rules without recompiling the extension. Each entry in `patterns` is matched independently by content/pattern-matcher.js; overlapping matches are resolved by content/conflict-resolver.js using `categories[].priority` and `confidenceWeight`. Optional `neutralAlternative` (pattern-level string) and/or `neutralAlternatives` (per-trigger-word override map) are shown in the highlight tooltip as a suggested, less-loaded rewording; omit either field if no good single-word substitute exists.",
+
+  "categories": {
+    "LOADED_LANGUAGE": {
+      "label": "Loaded Language",
+      "description": "Emotionally charged wording that goes beyond neutral, descriptive reporting.",
+      "priority": 1
+    },
+    "EVALUATIVE_MODIFIER": {
+      "label": "Evaluative Modifier",
+      "description": "Adjectives or adverbs that inject the writer's own evaluation rather than a neutral description.",
+      "priority": 2
+    },
+    "SPECULATIVE_CONSTRUCTION": {
+      "label": "Speculative Construction",
+      "description": "Claims attributed to vague, unnamed groups instead of a named, checkable source.",
+      "priority": 3
+    },
+    "ATTRIBUTION_FRAMING": {
+      "label": "Attribution Framing",
+      "description": "Evaluative framing of how a source's statement is characterized (the verb/adverb chosen to introduce a quote).",
+      "priority": 4
+    },
+    "PRESUPPOSITION": {
+      "label": "Presupposition Trigger",
+      "description": "Wording that implies an unproven or contested claim is already settled fact.",
+      "priority": 5
+    }
+  },
+
+  "patterns": [
+    {
+      "id": "LL-007",
+      "category": "LOADED_LANGUAGE",
+      "label": "Charged political labeling",
+      "triggerWords": ["radical", "hardline", "rabid"],
+      "pattern": "\\b(radical|hardline|rabid)\\b",
+      "posConstraints": {
+        "constraintType": "precedesNoun",
+        "requiredTag": "Adjective",
+        "mustPrecede": ["Noun", "Person", "Organization"],
+        "notes": "Only fires when the word modifies a person/group noun (e.g. 'radical faction'), not an unrelated noun. 'extremist(s)' moved to LL-008 - it behaves as a standalone noun label, not an adjective-before-noun word (see LL-008 notes)."
+      },
+      "contextExclusions": [
+        "surgery", "surgeon", "mastectomy", "prostatectomy", "honesty",
+        "transparency", "departure", "redesign", "overhaul", "rethink"
+      ],
+      "explanation": "This word casts the person or group in strongly negative, emotionally loaded terms rather than describing their position neutrally.",
+      "neutralAlternatives": {
+        "radical": "non-mainstream",
+        "hardline": "strict",
+        "rabid": "vocal"
+      },
+      "confidenceTier": "medium",
+      "confidenceWeight": 2
+    },
+    {
+      "id": "LL-008",
+      "category": "LOADED_LANGUAGE",
+      "label": "Dehumanizing group/actor label",
+      "triggerWords": ["extremist", "extremists", "terrorist", "terrorists", "racist", "racists"],
+      "pattern": "\\b(extremists?|terrorists?|racists?)\\b",
+      "posConstraints": {
+        "constraintType": "standaloneLabel",
+        "notes": "Compromise tags the singular attributive form ('a terrorist organization') as Adjective and the plural standalone form ('terrorists attacked...') as Noun - confirmed empirically. Rather than require adjacency to a following noun (LL-007's approach), this just requires the trigger itself be tagged Noun or Adjective and checks both neighboring words against contextExclusions, since these words are almost always loaded regardless of syntactic position."
+      },
+      "contextExclusions": [],
+      "explanation": "This term labels a person or group in starkly negative, delegitimizing terms rather than describing their actions or stated views neutrally.",
+      "neutralAlternatives": {
+        "extremist": "hardliner",
+        "extremists": "hardliners",
+        "terrorist": "militant",
+        "terrorists": "militants",
+        "racist": "person accused of racism",
+        "racists": "people accused of racism"
+      },
+      "confidenceTier": "medium",
+      "confidenceWeight": 2
+    },
+    {
+      "id": "LL-009",
+      "category": "LOADED_LANGUAGE",
+      "label": "Delegitimizing information label",
+      "triggerWords": ["propaganda"],
+      "pattern": "\\bpropaganda\\b",
+      "posConstraints": {
+        "constraintType": "standaloneLabel",
+        "notes": "Excludes the legitimate historical/artistic-genre sense ('propaganda poster/film') via a following-word check."
+      },
+      "contextExclusions": ["poster", "film", "art", "museum", "exhibit", "reel"],
+      "explanation": "Labeling information as 'propaganda' dismisses it as illegitimate persuasion rather than describing its content or sourcing neutrally.",
+      "neutralAlternative": "material",
+      "confidenceTier": "medium",
+      "confidenceWeight": 2
+    },
+    {
+      "id": "LL-010",
+      "category": "LOADED_LANGUAGE",
+      "label": "Delegitimizing government label",
+      "triggerWords": ["regime"],
+      "pattern": "\\bregime\\b",
+      "posConstraints": {
+        "constraintType": "standaloneLabel",
+        "notes": "Excludes the neutral lifestyle/medical sense ('exercise regime', 'diet regime') via a preceding-word check - same POS tag (Noun) in both senses, so the word itself can't disambiguate."
+      },
+      "contextExclusions": [
+        "exercise", "diet", "training", "skincare", "treatment",
+        "medication", "therapy", "beauty", "fitness", "workout", "supplement"
+      ],
+      "explanation": "'Regime' frames a government as illegitimate or authoritarian, in contrast to neutral terms like 'government' or 'administration'.",
+      "neutralAlternative": "government",
+      "confidenceTier": "medium",
+      "confidenceWeight": 2
+    },
+    {
+      "id": "EM-001",
+      "category": "EVALUATIVE_MODIFIER",
+      "label": "Reputational judgment modifier",
+      "triggerWords": ["notorious", "disgraced", "infamous"],
+      "pattern": "\\b(notorious|disgraced|infamous)\\b",
+      "posConstraints": {
+        "constraintType": "precedesNoun",
+        "notes": "Reuses LL-007's adjacency-to-noun gate: 'notorious'/'infamous' tag as Adjective, 'disgraced' tags as Verb/PastTense (same lexicon quirk seen with 'radical') but all three reliably precede the person/thing noun they're judging."
+      },
+      "contextExclusions": [],
+      "explanation": "This word injects the writer's own negative judgment about someone's reputation, rather than letting the reader draw that conclusion from neutrally reported facts.",
+      "neutralAlternatives": {
+        "notorious": "well-known",
+        "disgraced": "former",
+        "infamous": "widely reported"
+      },
+      "confidenceTier": "medium",
+      "confidenceWeight": 2
+    },
+    {
+      "id": "PS-003",
+      "category": "PRESUPPOSITION",
+      "label": "Guilt-presupposing reporting verb",
+      "triggerWords": ["admitted", "revealed", "confessed", "acknowledged"],
+      "pattern": "\\b(admitted|revealed|confessed|acknowledged)\\b",
+      "posConstraints": {
+        "constraintType": "reportingVerb",
+        "requiredTag": "PastTense",
+        "requiresPrecedingSubject": ["Person", "Organization", "Pronoun"],
+        "followedByClauseOrQuote": true,
+        "notes": "Only fires when used as a reporting verb introducing what a named subject said (e.g. 'the senator admitted that...'), not other senses (e.g. 'admitted to the hospital')."
+      },
+      "contextExclusions": ["hospital", "evidence", "court", "bar", "program", "university", "college"],
+      "explanation": "This verb frames the statement as if wrongdoing or a hidden truth is already established, rather than neutrally reporting what the source said (e.g. 'said' or 'stated').",
+      "neutralAlternative": "said",
+      "confidenceTier": "medium",
+      "confidenceWeight": 2
+    },
+    {
+      "id": "AF-001",
+      "category": "ATTRIBUTION_FRAMING",
+      "label": "Doubt-casting reporting verb",
+      "triggerWords": ["claimed", "claims", "claim"],
+      "pattern": "\\b(claimed|claims|claim)\\b",
+      "posConstraints": {
+        "constraintType": "reportingVerb",
+        "notes": "Same reporting-verb/clause-quote gate as PS-003, but semantically opposite: 'claimed' signals the WRITER doubts the statement, vs PS-003's trigger words which signal guilt is already established. The clause/quote gate incidentally also filters out 'claim' used as a noun ('filed a claim'), since that sense is never followed by 'that' or a quote."
+      },
+      "contextExclusions": [],
+      "explanation": "Using 'claim' instead of a neutral verb like 'said' can subtly cast doubt on a source's statement without the writer explicitly saying they doubt it.",
+      "neutralAlternative": "said",
+      "confidenceTier": "medium",
+      "confidenceWeight": 2
+    },
+    {
+      "id": "SC-012",
+      "category": "SPECULATIVE_CONSTRUCTION",
+      "label": "Unattributed collective claim",
+      "triggerWords": ["some say", "critics argue", "many believe", "observers note"],
+      "pattern": "\\b(some say|critics argue|many believe|observers note)\\b",
+      "posConstraints": {
+        "constraintType": "phraseLevel",
+        "requiredTag": null,
+        "phraseLevel": true,
+        "notes": "Matches the exact multi-word phrase; no single-token POS constraint needed since the phrase itself is the anchor."
+      },
+      "contextExclusions": [],
+      "explanation": "This attributes a claim to a vague, unnamed group instead of a specific, checkable source, making the claim difficult to verify.",
+      "neutralAlternative": "Name the specific source",
+      "confidenceTier": "high",
+      "confidenceWeight": 3
+    }
+  ]
+}

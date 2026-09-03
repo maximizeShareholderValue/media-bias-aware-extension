@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Media Bias-Aware</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <main id="mainView" class="view">
+    <header class="header">
+      <div class="header__brand">
+        <span class="header__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5l8-3z"/></svg>
+        </span>
+        <span>
+          <span class="header__title">Media Bias-Aware</span>
+          <span class="header__subtitle">Media Analysis</span>
+        </span>
+      </div>
+      <span id="statusPill" class="pill pill--muted">Loading&hellip;</span>
+    </header>
+
+    <section class="stats" id="statsRow">
+      <div class="stat">
+        <span class="stat__value" id="statPhrases">&ndash;</span>
+        <span class="stat__label">Phrases Found</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value" id="statBiasIndex">&ndash;</span>
+        <span class="stat__label">Bias Index</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value" id="statReliability">&ndash;</span>
+        <span class="stat__label">Reliability</span>
+      </div>
+    </section>
+
+    <section class="toggle-row">
+      <label class="toggle-row__label" for="highlightsToggle">
+        <span class="icon icon--muted" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        </span>
+        Show Bias Highlights
+      </label>
+      <button type="button" class="switch" id="highlightsToggle" role="switch" aria-checked="true">
+        <span class="switch__knob"></span>
+      </button>
+    </section>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab is-active" id="tabBtn-overview" role="tab" aria-selected="true" aria-controls="tabPanel-overview">Overview</button>
+      <button class="tab" id="tabBtn-source" role="tab" aria-selected="false" aria-controls="tabPanel-source">Source</button>
+      <button class="tab" id="tabBtn-compare" role="tab" aria-selected="false" aria-controls="tabPanel-compare">Compare</button>
+    </nav>
+
+    <div class="tab-content">
+      <section id="tabPanel-overview" class="tab-panel is-active" role="tabpanel" aria-labelledby="tabBtn-overview">
+        <div class="section">
+          <h2 class="section__title">Political Leaning</h2>
+          <div class="slider-labels">
+            <span>Left</span><span>Center</span><span>Right</span>
+          </div>
+          <div class="slider-track slider-track--leaning">
+            <span class="slider-knob" id="leaningKnob"></span>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section__title-row">
+            <h2 class="section__title">Factual Reliability</h2>
+            <span class="reliability-badge" id="reliabilityBadge">&ndash;</span>
+          </div>
+          <div class="slider-track slider-track--reliability">
+            <span class="slider-knob" id="reliabilityKnob"></span>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2 class="section__title">Bias Types Detected</h2>
+          <ul class="legend" id="categoryLegend"></ul>
+        </div>
+
+        <div class="note-box" id="analysisNote">
+          <span class="icon icon--warning" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </span>
+          <div>
+            <p class="note-box__title">Analysis Note</p>
+            <p class="note-box__text" id="analysisNoteText">Scanning page for linguistic bias&hellip;</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="tabPanel-source" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-source" hidden>
+        <div id="sourceContent">
+          <p class="card__loading">Loading outlet information&hellip;</p>
+        </div>
+      </section>
+
+      <section id="tabPanel-compare" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-compare" hidden>
+        <h2 class="section__title">Cross-Outlet Comparison</h2>
+        <p class="hint" id="compareSubtitle">Open this tab to look up how other outlets are covering this story.</p>
+        <div id="compareContent"></div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <button type="button" class="link-button" id="methodologyToggle">Learn Methodology</button>
+      <button type="button" class="icon-button" id="settingsToggle" aria-label="Open settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </footer>
+
+    <div class="methodology-panel" id="methodologyPanel" hidden>
+      <h3>How these numbers are computed</h3>
+      <p><b>Bias Index</b> = (sum of matched rules' confidence weights &divide; words analyzed) &times; 1000, capped at 100. It only reflects the rule-based phrase matches you can see highlighted in the article - it is not a machine-learned or opaque score.</p>
+      <p><b>Reliability %</b> is a fixed mapping from the outlet's factual-reliability tier (Very High=95, High=80, Mostly Factual=65, Mixed=45, Low=20), sourced from the bundled outlet dataset.</p>
+      <p>Every highlighted phrase in the article traces to a specific named rule ID - hover or focus any highlight to see it.</p>
+    </div>
+  </main>
+
+  <section id="settingsView" class="view" hidden>
+    <h2 class="card__title">Settings</h2>
+
+    <div class="card">
+      <label for="apiKeyInput" class="field-label">NewsAPI key (optional)</label>
+      <p class="hint">
+        Stored locally on this device only (<code>chrome.storage.local</code>), never hardcoded, and never sent anywhere
+        except directly to newsapi.org when you open the Compare tab. Get a free key at
+        <span class="muted">newsapi.org/register</span>.
+      </p>
+      <input type="password" id="apiKeyInput" class="text-input" placeholder="Paste your NewsAPI key" autocomplete="off" />
+      <div class="row row--gap">
+        <button id="saveKeyBtn" class="button">Save key</button>
+        <button id="clearKeyBtn" class="button button--secondary">Remove key</button>
+      </div>
+      <p class="status" id="keyStatus" role="status"></p>
+    </div>
+
+    <button id="backBtn" class="button button--secondary">Back</button>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>

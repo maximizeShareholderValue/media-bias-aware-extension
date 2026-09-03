@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Media Bias-Aware Browser Extension",
+  "version": "0.1.0",
+  "description": "Detects phrase-level linguistic bias in news articles in real time, entirely client-side, and shows outlet-level transparency metadata.",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "optional_permissions": [],
+  "optional_host_permissions": [
+    "https://newsapi.org/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "exclude_matches": ["*://*.google.com/search*"],
+      "js": [
+        "lib/Readability.js",
+        "lib/compromise.js",
+        "content/pattern-matcher.js",
+        "content/conflict-resolver.js",
+        "content/highlighter.js",
+        "content/content-script.js"
+      ],
+      "css": ["content/highlighter.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

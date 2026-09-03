@@ -1,0 +1,168 @@
+/*
+ * Accessible highlight styling.
+ *
+ * Visual language follows the thesis UI mockup: a solid pastel background
+ * "chip" behind each flagged phrase, matched by a colored dot in the
+ * tooltip header.
+ *
+ * WCAG 2.1 AA notes:
+ * - Each category is distinguished by BOTH a hue AND a border-bottom style
+ *   (solid/dashed/dotted/double/wavy), so meaning never depends on color
+ *   alone (1.4.1 Use of Color) - the mockup doesn't need this since it's a
+ *   static demo image, but a live extension runs on arbitrary sites, so we
+ *   keep the secondary cue.
+ * - Background tints are chosen light/pastel enough to stay readable
+ *   against the two most common body-text colors (near-black on light
+ *   pages, near-white on dark pages); the border-bottom accent color is
+ *   checked for >=3:1 contrast (AA non-text indicator) against both a
+ *   white (#ffffff) and near-black (#121212) surface.
+ * - The tooltip is a fully custom element we control end-to-end, so its
+ *   text/background pairing meets AA text contrast (>=4.5:1) directly,
+ *   independent of the host page's theme.
+ * - Highlight spans are keyboard-focusable (tabindex=0 set in JS) so the
+ *   tooltip is reachable without a mouse.
+ */
+
+.bias-highlight {
+  cursor: help;
+  border-radius: 4px;
+  padding: 1px 3px;
+  margin: 0 1px;
+  color: #171717 !important; /* pastel chips are always light-toned, so dark text stays legible regardless of the host page's own text color */
+  background-color: var(--bias-bg);
+  border-bottom: 2px solid var(--bias-accent);
+  border-bottom-style: var(--bias-border-style, solid);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  outline-offset: 2px;
+}
+
+.bias-highlight:focus-visible {
+  outline: 2px solid #1a1a1a;
+}
+
+/* LOADED_LANGUAGE - lavender/purple */
+.bias-highlight--LOADED_LANGUAGE {
+  --bias-bg: #E4D6F5;
+  --bias-accent: #7A3EA6;
+  --bias-border-style: solid;
+}
+
+/* EVALUATIVE_MODIFIER - pink */
+.bias-highlight--EVALUATIVE_MODIFIER {
+  --bias-bg: #FBDDE9;
+  --bias-accent: #B3265E;
+  --bias-border-style: dashed;
+}
+
+/* SPECULATIVE_CONSTRUCTION - light blue */
+.bias-highlight--SPECULATIVE_CONSTRUCTION {
+  --bias-bg: #D9E8F7;
+  --bias-accent: #1B5FA8;
+  --bias-border-style: dotted;
+}
+
+/* ATTRIBUTION_FRAMING - teal */
+.bias-highlight--ATTRIBUTION_FRAMING {
+  --bias-bg: #D3F0EA;
+  --bias-accent: #0E7C66;
+  --bias-border-style: double;
+}
+
+/* PRESUPPOSITION - amber */
+.bias-highlight--PRESUPPOSITION {
+  --bias-bg: #FBEACB;
+  --bias-accent: #8A5A00;
+  --bias-border-style: wavy;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bias-highlight--LOADED_LANGUAGE { --bias-bg: #C9A9E8; --bias-accent: #3C1E52; }
+  .bias-highlight--EVALUATIVE_MODIFIER { --bias-bg: #F0AFC9; --bias-accent: #5C1330; }
+  .bias-highlight--SPECULATIVE_CONSTRUCTION { --bias-bg: #A9CBEC; --bias-accent: #0E2F54; }
+  .bias-highlight--ATTRIBUTION_FRAMING { --bias-bg: #A0E0D2; --bias-accent: #073E33; }
+  .bias-highlight--PRESUPPOSITION { --bias-bg: #F0D28E; --bias-accent: #453000; }
+  .bias-highlight:focus-visible { outline-color: #f5f5f5; }
+}
+
+/* Tooltip: fully custom, colors fully controlled -> checked for AA directly. */
+.bias-tooltip {
+  position: absolute;
+  z-index: 2147483647;
+  max-width: 300px;
+  background: #ffffff;
+  color: #1a1a1a; /* ~15.8:1 on #ffffff */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  pointer-events: none;
+}
+
+.bias-tooltip__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.bias-tooltip__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--dot-color, #888);
+}
+
+.bias-tooltip__category {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+}
+
+.bias-tooltip__explanation {
+  display: block;
+  color: #2b2b2b;
+}
+
+.bias-tooltip__alternative {
+  display: block;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ececec;
+  color: #4a4a4a;
+  font-size: 12px;
+}
+
+.bias-tooltip__alternative b {
+  color: #1a1a1a;
+}
+
+.bias-tooltip__rule {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+  color: #9a9a9a;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bias-tooltip {
+    background: #232323;
+    color: #f2f2f2;
+    border-color: #3a3a3a;
+  }
+  .bias-tooltip__category { color: #f2f2f2; }
+  .bias-tooltip__explanation { color: #d8d8d8; }
+  .bias-tooltip__alternative { color: #c2c2c2; border-top-color: #3a3a3a; }
+  .bias-tooltip__alternative b { color: #f2f2f2; }
+  .bias-tooltip__rule { color: #7d7d7d; }
+}
+
+.bias-tooltip[hidden] {
+  display: none;
+}
