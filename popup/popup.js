@@ -3,27 +3,8 @@
 
   // --- Constants / lookup tables ---------------------------------------
 
-  var CATEGORY_META = {
-    LOADED_LANGUAGE: { label: "Loaded Language", color: "#7A3EA6" },
-    EVALUATIVE_MODIFIER: { label: "Evaluative Modifier", color: "#B3265E" },
-    SPECULATIVE_CONSTRUCTION: { label: "Speculative Construction", color: "#1B5FA8" },
-    ATTRIBUTION_FRAMING: { label: "Attribution Framing", color: "#0E7C66" },
-    PRESUPPOSITION: { label: "Presupposition Trigger", color: "#8A5A00" }
-  };
-
-  // Fixed, documented mapping from the bundled dataset's discrete
-  // factualReliability tier to a percentage shown in the UI (see the
-  // "Learn Methodology" panel for the same explanation shown to the user).
-  // "Very Low" was added when the dataset grew to include the full MBFC
-  // rating scale (previously only Very High..Low existed).
-  var RELIABILITY_TIER_TO_PERCENT = {
-    "Very High": 95,
-    High: 80,
-    "Mostly Factual": 65,
-    Mixed: 45,
-    Low: 20,
-    "Very Low": 5
-  };
+  // 14 SemEval-2020 Task 11 techniques; shared with the in-page tooltip (content/category-meta.js).
+  var CATEGORY_META = CategoryMeta;
 
   // Discrete ideology label -> position (0-100) along the Left/Right slider.
   // "Extreme Left"/"Extreme Right" were added alongside the full MBFC
@@ -40,24 +21,15 @@
     "Extreme Right": 100
   };
 
-  function reliabilityLevel(tier) {
-    if (tier === "Very High" || tier === "High") return "success";
-    if (tier === "Mostly Factual") return "warning";
-    return "danger"; // Mixed / Low / Very Low
-  }
-
   // --- DOM refs -----------------------------------------------------------
 
   var statusPill = document.getElementById("statusPill");
   var statPhrases = document.getElementById("statPhrases");
-  var statBiasIndex = document.getElementById("statBiasIndex");
-  var statReliability = document.getElementById("statReliability");
+  var statTechniques = document.getElementById("statTechniques");
 
   var highlightsToggle = document.getElementById("highlightsToggle");
 
   var leaningKnob = document.getElementById("leaningKnob");
-  var reliabilityKnob = document.getElementById("reliabilityKnob");
-  var reliabilityBadge = document.getElementById("reliabilityBadge");
   var categoryLegend = document.getElementById("categoryLegend");
   var analysisNoteText = document.getElementById("analysisNoteText");
 
@@ -135,23 +107,11 @@
     statusPill.textContent = state === "active" ? "Active" : state === "paused" ? "Paused" : state === "no-article" ? "No Article" : "Loading…";
   }
 
-  function renderStats(result, outlet) {
-    statPhrases.textContent = result && result.articleFound ? String(result.matchCount || 0) : "–";
-
-    if (result && result.articleFound && typeof result.biasIndex === "number") {
-      statBiasIndex.textContent = (result.biasIndex > 0 ? "+" : "") + result.biasIndex;
-    } else {
-      statBiasIndex.textContent = "–";
-    }
-
-    statReliability.className = "stat__value";
-    if (outlet && RELIABILITY_TIER_TO_PERCENT[outlet.factualReliability] != null) {
-      var pct = RELIABILITY_TIER_TO_PERCENT[outlet.factualReliability];
-      statReliability.textContent = pct + "%";
-      statReliability.classList.add("stat__value--" + reliabilityLevel(outlet.factualReliability));
-    } else {
-      statReliability.textContent = "–";
-    }
+  // FR-DET-05: only the number of flagged spans and how many techniques they cover.
+  function renderStats(result) {
+    var found = result && result.articleFound && !result.error;
+    statPhrases.textContent = found ? String(result.matchCount || 0) : "-";
+    statTechniques.textContent = found ? String(result.techniqueCount || 0) : "-";
   }
 
   // --- Overview tab ---------------------------------------------------------
@@ -161,48 +121,54 @@
     leaningKnob.style.left = pct + "%";
   }
 
-  function renderReliabilitySection(outlet) {
-    var tier = outlet ? outlet.factualReliability : null;
-    var pct = tier && RELIABILITY_TIER_TO_PERCENT[tier] != null ? RELIABILITY_TIER_TO_PERCENT[tier] : 50;
-    reliabilityKnob.style.left = pct + "%";
-
-    reliabilityBadge.className = "reliability-badge";
-    if (tier) {
-      reliabilityBadge.classList.add("reliability-badge--" + reliabilityLevel(tier));
-      reliabilityBadge.textContent = tier;
-    } else {
-      reliabilityBadge.textContent = "Unknown";
-    }
-  }
-
   function renderCategoryLegend(categoryCounts) {
     categoryLegend.innerHTML = "";
-    Object.keys(CATEGORY_META).forEach((cat) => {
+    // Only list techniques actually found: with 14 categories, showing all of them would be mostly zeros.
+    var found = Object.keys(CATEGORY_META).filter((cat) => categoryCounts && categoryCounts[cat] > 0);
+    if (!found.length) {
+      var none = document.createElement("li");
+      none.className = "legend__none";
+      none.textContent = "None detected";
+      categoryLegend.appendChild(none);
+      return;
+    }
+    found.forEach((cat) => {
       var meta = CATEGORY_META[cat];
-      var count = (categoryCounts && categoryCounts[cat]) || 0;
       var li = document.createElement("li");
       var swatch = document.createElement("span");
       swatch.className = "swatch";
       swatch.style.background = meta.color;
       li.appendChild(swatch);
-      li.appendChild(document.createTextNode(meta.label + (count ? " (" + count + ")" : "")));
+      li.appendChild(document.createTextNode(meta.label + " (" + categoryCounts[cat] + ")"));
       categoryLegend.appendChild(li);
     });
   }
 
   function renderAnalysisNote(result) {
-    if (!result || !result.articleFound) {
-      analysisNoteText.textContent = result && result.disabled
-        ? "Highlighting is turned off for this page."
-        : "No article detected on this page.";
+    if (result && result.disabled) {
+      analysisNoteText.textContent = "Highlighting is turned off for this page.";
+      return;
+    }
+    if (!result) {
+      analysisNoteText.textContent = "This page hasn't finished scanning yet. Close and reopen this popup in a moment.";
+      return;
+    }
+    if (!result.articleFound) {
+      analysisNoteText.textContent = result.reason === "no_matching_paragraphs"
+        ? "An article was found, but its paragraphs couldn't be matched on the page, so nothing was scanned."
+        : "No news article text detected. This works on a single article page, not a homepage or search results.";
       return;
     }
     if (result.error) {
-      analysisNoteText.textContent = "Bias detection unavailable (pattern catalog failed to load).";
+      analysisNoteText.textContent = result.error === "catalog_unavailable"
+        ? "Bias detection unavailable (pattern catalog failed to load). Try reloading the extension."
+        : "The scanner and its rule catalog are out of sync or hit an error. Reload the extension, then refresh this tab (F5).";
       return;
     }
     if (!result.matchCount) {
-      analysisNoteText.textContent = "No flagged phrases found in this article.";
+      analysisNoteText.textContent =
+        "Scanned " + (result.paragraphCount || 0) + " paragraphs (" + (result.wordCount || 0) + " words) against " +
+        (result.ruleCount || 0) + " rules: no flagged phrases found. That is a normal result for a neutrally written article.";
       return;
     }
     analysisNoteText.textContent =
@@ -214,15 +180,18 @@
     if (!tab) return;
     chrome.tabs.sendMessage(tab.id, { type: "GET_BIAS_SUMMARY" }, (response) => {
       if (chrome.runtime.lastError) {
-        renderAnalysisNote(null);
-        analysisNoteText.textContent = "This page can't be scanned (restricted or not yet loaded).";
-        renderStats(null, currentOutlet);
+        // Most common cause: the tab was already open when the extension was installed/reloaded,
+        // so it has no content script until refreshed. Also happens on chrome:// and store pages.
+        renderCategoryLegend(null);
+        analysisNoteText.textContent =
+          "Can't reach the page scanner. Refresh this tab (F5) - pages that were already open when the extension was installed or reloaded aren't scanned until refreshed. Browser-internal pages can't be scanned at all.";
+        renderStats(null);
         renderStatusPill("no-article");
         return;
       }
       var result = response && response.result;
       if (result && result.title) lastArticleTitle = result.title;
-      renderStats(result, currentOutlet);
+      renderStats(result);
       renderCategoryLegend(result && result.categoryCounts);
       renderAnalysisNote(result);
       renderStatusPill(!result || !result.articleFound ? "no-article" : result.disabled ? "paused" : "active");
@@ -248,7 +217,7 @@
       chrome.tabs.sendMessage(tab.id, { type: "TOGGLE_HIGHLIGHTS", enabled }, (response) => {
         if (chrome.runtime.lastError) return;
         var result = response && response.result;
-        renderStats(result, currentOutlet);
+        renderStats(result);
         renderCategoryLegend(result && result.categoryCounts);
         renderAnalysisNote(result);
         renderStatusPill(!result || !result.articleFound ? "no-article" : result.disabled ? "paused" : "active");
@@ -398,44 +367,107 @@
     }
   }
 
-  function runComparativeLookup() {
-    var query = lastArticleTitle || (activeTab && activeTab.title) || "";
-    compareSubtitle.textContent = query
-      ? "How other sources are covering: " + (query.length > 60 ? query.slice(0, 57) + "…" : query)
-      : "Open a news article to compare coverage.";
+  function currentDomain() {
+    if (currentOutlet) return currentOutlet.domain;
+    return activeTab && activeTab.url && /^https?:/.test(activeTab.url) ? registrableDomain(new URL(activeTab.url).hostname) : null;
+  }
 
-    if (!query) {
-      showComparePrompt("Open a news article, then reopen this tab to compare coverage.", false);
+  function requestKeywords() {
+    return new Promise((resolve) => {
+      if (!activeTab) return resolve([]);
+      chrome.tabs.sendMessage(activeTab.id, { type: "GET_KEYWORDS" }, (resp) => {
+        if (chrome.runtime.lastError || !resp || !resp.ok) return resolve([]);
+        resolve(CompareUtils.sanitizeKeywords(resp.keywords));
+      });
+    });
+  }
+
+  var BUCKETS = ["Left", "Center", "Right"];
+  var POPUP_PER_BUCKET = 2;
+
+  function openSplitScreen(data) {
+    var area = chrome.storage.session || chrome.storage.local;
+    area.set({ compareData: data }, () => chrome.tabs.create({ url: chrome.runtime.getURL("compare/compare.html") }));
+  }
+
+  function renderGroupedCompare(grouped, outlets, keywords) {
+    var total = BUCKETS.reduce((n, b) => n + grouped.groups[b].length, 0);
+    compareContent.innerHTML = "";
+    if (!total) {
+      showComparePrompt(
+        "No articles from rated outlets were found for this topic" +
+          (grouped.unrated ? " (" + grouped.unrated + " came from outlets we have no rating for)." : "."),
+        false
+      );
       return;
     }
 
-    chrome.storage.local.get({ newsApiKey: "" }, (data) => {
-      if (!data.newsApiKey) {
-        showComparePrompt("Add a NewsAPI key in Settings to enable cross-outlet comparison.", true);
+    BUCKETS.forEach((bucket) => {
+      var items = grouped.groups[bucket];
+      var section = document.createElement("section");
+      section.className = "compare-group";
+      var heading = document.createElement("h3");
+      heading.className = "compare-group__title";
+      heading.textContent = bucket + " (" + items.length + ")";
+      section.appendChild(heading);
+      if (!items.length) {
+        var empty = document.createElement("p");
+        empty.className = "compare-group__empty";
+        empty.textContent = "No " + bucket.toLowerCase() + "-rated coverage found.";
+        section.appendChild(empty);
+      }
+      items.slice(0, POPUP_PER_BUCKET).forEach((article) => {
+        section.appendChild(renderCompareCard(article, CompareUtils.findOutlet(outlets, article.url)));
+      });
+      compareContent.appendChild(section);
+    });
+
+    var btn = document.createElement("button");
+    btn.className = "button";
+    btn.textContent = "Open split-screen view";
+    btn.addEventListener("click", () =>
+      openSplitScreen({
+        keywords: keywords,
+        current: currentOutlet ? { name: currentOutlet.name, domain: currentOutlet.domain, ideology: currentOutlet.ideology } : { domain: currentDomain() },
+        groups: grouped.groups,
+        unrated: grouped.unrated,
+        sameOutlet: grouped.sameOutlet,
+        fetchedAt: new Date().toISOString()
+      })
+    );
+    compareContent.appendChild(btn);
+  }
+
+  function runComparativeLookup() {
+    compareState.loading = true;
+    requestKeywords().then((keywords) => {
+      if (!keywords.length) {
+        compareState.loading = false;
+        compareSubtitle.textContent = "Open a news article to compare coverage.";
+        showComparePrompt("Couldn't read this page's topic. Open a news article (refresh it if the extension was just reloaded), then reopen this tab.", false);
         return;
       }
+      compareSubtitle.textContent = "Searching by topic keywords only: " + keywords.slice(0, 3).join(", ") + ". Nothing else about this page is sent.";
 
-      compareState.loading = true;
-      compareContent.innerHTML = '<p class="hint">Looking up comparative coverage…</p>';
-
-      chrome.runtime.sendMessage({ type: "COMPARATIVE_LOOKUP", query }, async (response) => {
-        compareState.loading = false;
-        if (!response || !response.ok) {
-          compareState.loaded = false; // allow retry on next tab switch
-          showComparePrompt("Comparative Data Unavailable", false);
+      chrome.storage.local.get({ newsApiKey: "" }, (data) => {
+        if (!data.newsApiKey) {
+          compareState.loading = false;
+          showComparePrompt("Add a NewsAPI key in Settings to enable cross-outlet comparison.", true);
           return;
         }
-        compareState.loaded = true;
-        if (!response.articles || !response.articles.length) {
-          showComparePrompt("No comparative articles found for this story.", false);
-          return;
-        }
+        compareContent.innerHTML = '<p class="hint">Looking up comparative coverage…</p>';
 
-        compareContent.innerHTML = "";
-        for (const article of response.articles) {
-          const outlet = await findOutletByUrl(article.url);
-          compareContent.appendChild(renderCompareCard(article, outlet));
-        }
+        chrome.runtime.sendMessage({ type: "COMPARATIVE_LOOKUP", keywords }, async (response) => {
+          compareState.loading = false;
+          if (!response || !response.ok) {
+            compareState.loaded = false; // allow retry on next tab switch
+            showComparePrompt("Comparative Data Unavailable", false);
+            return;
+          }
+          compareState.loaded = true;
+          var outlets = await loadOutlets();
+          renderGroupedCompare(CompareUtils.groupByIdeology(response.articles, outlets, currentDomain()), outlets, response.keywords || keywords);
+        });
       });
     });
   }
@@ -506,6 +538,31 @@
     refreshKeyStatus();
   });
 
+  // --- Export detections (evaluation support) --------------------------------
+
+  var exportBtn = document.getElementById("exportBtn");
+  var exportStatus = document.getElementById("exportStatus");
+
+  exportBtn.addEventListener("click", () => {
+    if (!activeTab) return;
+    chrome.tabs.sendMessage(activeTab.id, { type: "GET_AUDIT_LOG" }, (resp) => {
+      if (chrome.runtime.lastError || !resp || !resp.ok) {
+        exportStatus.textContent = "Nothing to export: open an analyzed news article first (refresh it if the extension was just reloaded).";
+        return;
+      }
+      var host = "page";
+      try { host = new URL(activeTab.url).hostname.replace(/^www\./, ""); } catch (e) {}
+      var blob = new Blob([JSON.stringify(Object.assign({ exportedAt: new Date().toISOString() }, resp.log), null, 2)], { type: "application/json" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "detections-" + host + "-" + Date.now() + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      exportStatus.textContent = "Exported " + resp.log.detections.length + " detections (" + resp.log.suppressed.length + " suppressed overlaps).";
+    });
+  });
+
   // --- Methodology panel -----------------------------------------------
 
   methodologyToggle.addEventListener("click", () => {
@@ -521,8 +578,7 @@
     currentOutlet = await findOutletByUrl(tab && tab.url);
     renderSourceTab(currentOutlet, domain);
     renderPoliticalLeaning(currentOutlet);
-    renderReliabilitySection(currentOutlet);
-    renderStats(null, currentOutlet);
+    renderStats(null);
 
     initHighlightToggle(tab);
     requestBiasSummary(tab);

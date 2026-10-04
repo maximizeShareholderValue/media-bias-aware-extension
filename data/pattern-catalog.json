@@ -1,75 +1,160 @@
 {
-  "$schemaVersion": "1.0.0",
-  "catalogVersion": "0.2.0",
-  "lastUpdated": "2026-08-03",
-  "_readme": "Standalone Linguistic Pattern Catalog. Edit this file to add/change detection rules without recompiling the extension. Each entry in `patterns` is matched independently by content/pattern-matcher.js; overlapping matches are resolved by content/conflict-resolver.js using `categories[].priority` and `confidenceWeight`. Optional `neutralAlternative` (pattern-level string) and/or `neutralAlternatives` (per-trigger-word override map) are shown in the highlight tooltip as a suggested, less-loaded rewording; omit either field if no good single-word substitute exists.",
-
-  "categories": {
+  "$schemaVersion": "2.0.0",
+  "catalogVersion": "0.4.0",
+  "lastUpdated": "2026-10-04",
+  "_readme": "Linguistic Pattern Catalog. Each rule follows the ten fields of thesis Table 13 and is evaluated as D(s,r) = L(s,r) AND S(s,r) AND C(s,r) (FR-DET-03): the lexicalTrigger generates a candidate; it is flagged only if the linguisticCondition (structure/POS) and the contextCondition (local context) also hold. A lexical-only run (L alone) is the section 8.3 baseline. Overlaps are resolved by FR-DET-04: longest span, then higher confidenceTier, then earliest offset, then lowest id. Edit this file to change detection without rebuilding the extension. REPETITION has no rules: it needs a repeated-expression comparison rather than a lexical trigger. Rule ID prefixes of the original seed rules (LL/PS/SC/AF/EM) are legacy names; `technique` is authoritative. confidenceTier is currently authored, not yet calibrated on the development corpus (thesis Stage 5).",
+  "_schema": {
+    "Pattern ID": "id",
+    "SemEval Technique": "technique (key into `techniques`)",
+    "Reference Definition": "referenceDefinition",
+    "Lexical Trigger": "lexicalTrigger { words, pattern }",
+    "Linguistic Condition": "linguisticCondition { type, ... } (types: none, all, any, taggedAny, precedesNoun, followedByTag, precededByTag, followedByWord, reportingVerb, inQuestion)",
+    "Context Condition": "contextCondition { excludeNeighborWords, excludeWindowWords, excludeSentenceWords, requireSentenceWords, requireNoQuantity, excludeFollowingPattern }",
+    "Target Span": "targetSpan (\"trigger\": the matched word/phrase is the highlighted span)",
+    "Explanation": "explanation",
+    "Source Example": "sourceExample { text, source, triggerEvidence }",
+    "Confidence Tier": "confidenceTier (high | medium | low)"
+  },
+  "techniques": {
     "LOADED_LANGUAGE": {
       "label": "Loaded Language",
-      "description": "Emotionally charged wording that goes beyond neutral, descriptive reporting.",
-      "priority": 1
+      "description": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience."
     },
-    "EVALUATIVE_MODIFIER": {
-      "label": "Evaluative Modifier",
-      "description": "Adjectives or adverbs that inject the writer's own evaluation rather than a neutral description.",
-      "priority": 2
+    "NAME_CALLING_LABELING": {
+      "label": "Name Calling / Labeling",
+      "description": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor."
     },
-    "SPECULATIVE_CONSTRUCTION": {
-      "label": "Speculative Construction",
-      "description": "Claims attributed to vague, unnamed groups instead of a named, checkable source.",
-      "priority": 3
+    "REPETITION": {
+      "label": "Repetition",
+      "description": "Repeated use of a word, phrase, message, or idea to increase its persuasive effect."
     },
-    "ATTRIBUTION_FRAMING": {
-      "label": "Attribution Framing",
-      "description": "Evaluative framing of how a source's statement is characterized (the verb/adverb chosen to introduce a quote).",
-      "priority": 4
+    "EXAGGERATION_MINIMIZATION": {
+      "label": "Exaggeration / Minimization",
+      "description": "Presenting something as substantially greater or less important, serious, significant, or consequential than warranted by the context."
     },
-    "PRESUPPOSITION": {
-      "label": "Presupposition Trigger",
-      "description": "Wording that implies an unproven or contested claim is already settled fact.",
-      "priority": 5
+    "DOUBT": {
+      "label": "Doubt",
+      "description": "Questioning or undermining the credibility, legitimacy, truthfulness, or reliability of a person, claim, or institution."
+    },
+    "APPEAL_TO_FEAR_PREJUDICE": {
+      "label": "Appeal to Fear / Prejudice",
+      "description": "Attempting to influence an audience by invoking fear, anxiety, panic, or preconceived judgments."
+    },
+    "FLAG_WAVING": {
+      "label": "Flag-Waving",
+      "description": "Invoking national, cultural, religious, ideological, or group identity to encourage support for an action, position, or cause."
+    },
+    "CAUSAL_OVERSIMPLIFICATION": {
+      "label": "Causal Oversimplification",
+      "description": "Presenting a complex situation as having a single or substantially simplified cause, including forms of scapegoating."
+    },
+    "SLOGANS": {
+      "label": "Slogans",
+      "description": "Short, memorable, and striking expressions designed to convey or reinforce a particular message or position."
+    },
+    "APPEAL_TO_AUTHORITY": {
+      "label": "Appeal to Authority",
+      "description": "Presenting a claim as true or valid primarily because an authority, expert, institution, or other perceived source supports it."
+    },
+    "BLACK_AND_WHITE_FALLACY": {
+      "label": "Black-and-White Fallacy",
+      "description": "Presenting an issue as having only two alternatives or reducing a complex situation to opposing choices."
+    },
+    "THOUGHT_TERMINATING_CLICHES": {
+      "label": "Thought-Terminating Clichés",
+      "description": "Using familiar or simplified expressions that discourage further examination or critical consideration of an issue."
+    },
+    "BANDWAGON_REDUCTIO_AD_HITLERUM": {
+      "label": "Bandwagon / Reductio ad Hitlerum",
+      "description": "Using popularity, social acceptance, or association with a strongly rejected figure or group as a persuasive device."
+    },
+    "STRAW_MAN_WHATABOUTISM_RED_HERRING": {
+      "label": "Straw Men / Whataboutism / Red Herring",
+      "description": "Diverting attention from an issue through misrepresentation of an opposing position, accusations of hypocrisy, or irrelevant alternative issues."
     }
   },
-
   "patterns": [
     {
       "id": "LL-007",
-      "category": "LOADED_LANGUAGE",
+      "technique": "LOADED_LANGUAGE",
       "label": "Charged political labeling",
-      "triggerWords": ["radical", "hardline", "rabid"],
-      "pattern": "\\b(radical|hardline|rabid)\\b",
-      "posConstraints": {
-        "constraintType": "precedesNoun",
-        "requiredTag": "Adjective",
-        "mustPrecede": ["Noun", "Person", "Organization"],
-        "notes": "Only fires when the word modifies a person/group noun (e.g. 'radical faction'), not an unrelated noun. 'extremist(s)' moved to LL-008 - it behaves as a standalone noun label, not an adjective-before-noun word (see LL-008 notes)."
+      "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
+      "lexicalTrigger": {
+        "words": [
+          "radical",
+          "hardline",
+          "rabid"
+        ],
+        "pattern": "\\b(radical|hardline|rabid)\\b"
       },
-      "contextExclusions": [
-        "surgery", "surgeon", "mastectomy", "prostatectomy", "honesty",
-        "transparency", "departure", "redesign", "overhaul", "rethink"
-      ],
+      "linguisticCondition": {
+        "type": "precedesNoun",
+        "description": "The word directly modifies a following noun in the same sentence (e.g. 'radical faction')."
+      },
+      "contextCondition": {
+        "excludeNeighborWords": [
+          "surgery",
+          "surgeon",
+          "mastectomy",
+          "prostatectomy",
+          "honesty",
+          "transparency",
+          "departure",
+          "redesign",
+          "overhaul",
+          "rethink"
+        ],
+        "description": "Not a neutral technical collocation such as 'radical surgery' or 'radical honesty'."
+      },
+      "targetSpan": "trigger",
       "explanation": "This word casts the person or group in strongly negative, emotionally loaded terms rather than describing their position neutrally.",
+      "sourceExample": {
+        "text": "Outrage as Donald Trump suggests injecting disinfectant to kill virus.",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Named in thesis section 4.5 (radical/extremist/hardline); annotator-flagged in BABE/MBIC (docs/corpus-mined-bias-candidates.json)."
+      },
+      "confidenceTier": "medium",
       "neutralAlternatives": {
         "radical": "non-mainstream",
         "hardline": "strict",
         "rabid": "vocal"
-      },
-      "confidenceTier": "medium",
-      "confidenceWeight": 2
+      }
     },
     {
       "id": "LL-008",
-      "category": "LOADED_LANGUAGE",
+      "technique": "NAME_CALLING_LABELING",
       "label": "Dehumanizing group/actor label",
-      "triggerWords": ["extremist", "extremists", "terrorist", "terrorists", "racist", "racists"],
-      "pattern": "\\b(extremists?|terrorists?|racists?)\\b",
-      "posConstraints": {
-        "constraintType": "standaloneLabel",
-        "notes": "Compromise tags the singular attributive form ('a terrorist organization') as Adjective and the plural standalone form ('terrorists attacked...') as Noun - confirmed empirically. Rather than require adjacency to a following noun (LL-007's approach), this just requires the trigger itself be tagged Noun or Adjective and checks both neighboring words against contextExclusions, since these words are almost always loaded regardless of syntactic position."
+      "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
+      "lexicalTrigger": {
+        "words": [
+          "extremist",
+          "extremists",
+          "terrorist",
+          "terrorists",
+          "racist",
+          "racists"
+        ],
+        "pattern": "\\b(extremists?|terrorists?|racists?)\\b"
       },
-      "contextExclusions": [],
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Noun",
+          "Adjective"
+        ],
+        "description": "The trigger functions as a noun label or an attributive adjective (Compromise tags singular 'a terrorist organization' as Adjective, plural 'terrorists attacked' as Noun)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
       "explanation": "This term labels a person or group in starkly negative, delegitimizing terms rather than describing their actions or stated views neutrally.",
+      "sourceExample": {
+        "text": "These Hamas sympathizers are nothing but terrorist apologists.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Name Calling example); extremist/terrorist/racist also annotator-flagged in BABE/MBIC."
+      },
+      "confidenceTier": "medium",
       "neutralAlternatives": {
         "extremist": "hardliner",
         "extremists": "hardliners",
@@ -78,116 +163,1052 @@
         "racist": "person accused of racism",
         "racists": "people accused of racism"
       },
-      "confidenceTier": "medium",
-      "confidenceWeight": 2
+      "techniqueNote": "Moved from LOADED_LANGUAGE: assigning a group a feared/disliked label is Name Calling / Labeling in the SemEval taxonomy."
     },
     {
       "id": "LL-009",
-      "category": "LOADED_LANGUAGE",
+      "technique": "DOUBT",
       "label": "Delegitimizing information label",
-      "triggerWords": ["propaganda"],
-      "pattern": "\\bpropaganda\\b",
-      "posConstraints": {
-        "constraintType": "standaloneLabel",
-        "notes": "Excludes the legitimate historical/artistic-genre sense ('propaganda poster/film') via a following-word check."
+      "referenceDefinition": "Questioning or undermining the credibility, legitimacy, truthfulness, or reliability of a person, claim, or institution.",
+      "lexicalTrigger": {
+        "words": [
+          "propaganda"
+        ],
+        "pattern": "\\bpropaganda\\b"
       },
-      "contextExclusions": ["poster", "film", "art", "museum", "exhibit", "reel"],
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Noun",
+          "Adjective"
+        ],
+        "description": "The trigger is used as a label."
+      },
+      "contextCondition": {
+        "excludeNeighborWords": [
+          "poster",
+          "film",
+          "art",
+          "museum",
+          "exhibit",
+          "reel"
+        ],
+        "description": "Not the historical/artistic genre sense ('propaganda poster')."
+      },
+      "targetSpan": "trigger",
       "explanation": "Labeling information as 'propaganda' dismisses it as illegitimate persuasion rather than describing its content or sourcing neutrally.",
-      "neutralAlternative": "material",
+      "sourceExample": {
+        "text": "Can the same be said for the Obama Administration?",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Annotator-flagged in BABE/MBIC (propaganda); calling information 'propaganda' undermines its legitimacy."
+      },
       "confidenceTier": "medium",
-      "confidenceWeight": 2
+      "neutralAlternative": "material",
+      "techniqueNote": "Mapped to DOUBT: calling information 'propaganda' undermines its legitimacy/credibility."
     },
     {
       "id": "LL-010",
-      "category": "LOADED_LANGUAGE",
+      "technique": "NAME_CALLING_LABELING",
       "label": "Delegitimizing government label",
-      "triggerWords": ["regime"],
-      "pattern": "\\bregime\\b",
-      "posConstraints": {
-        "constraintType": "standaloneLabel",
-        "notes": "Excludes the neutral lifestyle/medical sense ('exercise regime', 'diet regime') via a preceding-word check - same POS tag (Noun) in both senses, so the word itself can't disambiguate."
+      "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
+      "lexicalTrigger": {
+        "words": [
+          "regime"
+        ],
+        "pattern": "\\bregime\\b"
       },
-      "contextExclusions": [
-        "exercise", "diet", "training", "skincare", "treatment",
-        "medication", "therapy", "beauty", "fitness", "workout", "supplement"
-      ],
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Noun"
+        ],
+        "description": "The trigger is a noun."
+      },
+      "contextCondition": {
+        "excludeNeighborWords": [
+          "exercise",
+          "diet",
+          "training",
+          "skincare",
+          "treatment",
+          "medication",
+          "therapy",
+          "beauty",
+          "fitness",
+          "workout",
+          "supplement"
+        ],
+        "description": "Not the neutral lifestyle/medical sense ('exercise regime')."
+      },
+      "targetSpan": "trigger",
       "explanation": "'Regime' frames a government as illegitimate or authoritarian, in contrast to neutral terms like 'government' or 'administration'.",
-      "neutralAlternative": "government",
+      "sourceExample": {
+        "text": "WHO: Coronavirus emergency is 'Public Enemy Number 1'",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Authored from the technique definition; the neutral sense is excluded by the context condition."
+      },
       "confidenceTier": "medium",
-      "confidenceWeight": 2
+      "neutralAlternative": "government",
+      "techniqueNote": "Mapped to NAME_CALLING_LABELING: 'regime' labels a government with a term the audience is primed to dislike."
+    },
+    {
+      "id": "LL-011",
+      "technique": "LOADED_LANGUAGE",
+      "label": "Combative reporting verb",
+      "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
+      "lexicalTrigger": {
+        "words": [
+          "slammed",
+          "slams",
+          "blasted",
+          "blasts",
+          "lambasted",
+          "eviscerated",
+          "lashed out"
+        ],
+        "pattern": "\\b(slammed|slams|blasted|blasts|lambasted|lambasts|eviscerated|eviscerates|lashed out|lashes out)\\b"
+      },
+      "linguisticCondition": {
+        "type": "all",
+        "of": [
+          {
+            "type": "precededByTag",
+            "tags": [
+              "Noun",
+              "Pronoun",
+              "Person",
+              "Organization",
+              "Acronym"
+            ],
+            "within": 4
+          },
+          {
+            "type": "followedByTag",
+            "tags": [
+              "Determiner",
+              "Noun",
+              "Pronoun",
+              "Adjective",
+              "Possessive",
+              "Preposition",
+              "Acronym",
+              "Person",
+              "Organization"
+            ],
+            "within": 1
+          }
+        ],
+        "description": "Has a subject before it and an object (or 'at') right after it, i.e. one party criticizing another."
+      },
+      "contextCondition": {
+        "excludeFollowingPattern": "\\s+(?:the )?(?:door|brakes?|shut|into|off|out|through)\\b",
+        "description": "Not the physical senses ('slammed the door', 'blasted off')."
+      },
+      "targetSpan": "trigger",
+      "explanation": "A combative verb that dramatizes disagreement instead of neutrally stating that someone criticized or disagreed.",
+      "sourceExample": {
+        "text": "Outrage as Donald Trump suggests injecting disinfectant to kill virus.",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Observed in a development article (Fox News, 2026-10-02: 'blasts'); 'slammed' (34) and 'blasted' (20) annotator-flagged in BABE/MBIC."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternatives": {
+        "slammed": "criticized",
+        "slams": "criticizes",
+        "blasted": "criticized",
+        "blasts": "criticizes",
+        "lambasted": "criticized",
+        "lambasts": "criticizes",
+        "eviscerated": "criticized",
+        "eviscerates": "criticizes",
+        "lashed out": "criticized",
+        "lashes out": "criticizes"
+      },
+      "neutralAlternative": "criticized"
+    },
+    {
+      "id": "LL-012",
+      "technique": "LOADED_LANGUAGE",
+      "label": "Evaluative adjective",
+      "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
+      "lexicalTrigger": {
+        "words": [
+          "bizarre",
+          "shocking",
+          "shameful",
+          "disgraceful",
+          "ridiculous",
+          "absurd",
+          "appalling",
+          "outrageous",
+          "pathetic",
+          "vicious",
+          "savage",
+          "horrific",
+          "heartless",
+          "barbaric",
+          "brutal"
+        ],
+        "pattern": "\\b(bizarre|shocking|shameful|disgraceful|ridiculous|absurd|appalling|outrageous|pathetic|vicious|savage|horrific|heartless|barbaric|brutal)\\b"
+      },
+      "linguisticCondition": {
+        "type": "all",
+        "of": [
+          {
+            "type": "taggedAny",
+            "tags": [
+              "Adjective"
+            ]
+          },
+          {
+            "type": "any",
+            "of": [
+              {
+                "type": "followedByTag",
+                "tags": [
+                  "Noun"
+                ],
+                "within": 1
+              },
+              {
+                "type": "precededByTag",
+                "tags": [
+                  "Copula"
+                ],
+                "within": 2
+              }
+            ]
+          }
+        ],
+        "description": "An evaluative adjective applied to something: attributive (before a noun) or predicative (after 'is/was')."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This word states the writer's own emotional judgment instead of describing what happened and letting the reader decide.",
+      "sourceExample": {
+        "text": "Israel must defend itself from the barbaric terrorists surrounding its borders.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Loaded Language example); 'bizarre' (22) annotator-flagged in BABE/MBIC."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "Describe the facts instead",
+      "neutralAlternatives": {
+        "barbaric": "violent",
+        "brutal": "violent"
+      }
     },
     {
       "id": "EM-001",
-      "category": "EVALUATIVE_MODIFIER",
+      "technique": "LOADED_LANGUAGE",
       "label": "Reputational judgment modifier",
-      "triggerWords": ["notorious", "disgraced", "infamous"],
-      "pattern": "\\b(notorious|disgraced|infamous)\\b",
-      "posConstraints": {
-        "constraintType": "precedesNoun",
-        "notes": "Reuses LL-007's adjacency-to-noun gate: 'notorious'/'infamous' tag as Adjective, 'disgraced' tags as Verb/PastTense (same lexicon quirk seen with 'radical') but all three reliably precede the person/thing noun they're judging."
+      "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
+      "lexicalTrigger": {
+        "words": [
+          "notorious",
+          "disgraced",
+          "infamous"
+        ],
+        "pattern": "\\b(notorious|disgraced|infamous)\\b"
       },
-      "contextExclusions": [],
+      "linguisticCondition": {
+        "type": "precedesNoun",
+        "description": "The reputational modifier directly precedes the noun it judges (Compromise tags 'disgraced' as a past-tense verb, so the rule keys on the following noun, not the trigger's own tag)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
       "explanation": "This word injects the writer's own negative judgment about someone's reputation, rather than letting the reader draw that conclusion from neutrally reported facts.",
+      "sourceExample": {
+        "text": "Outrage as Donald Trump suggests injecting disinfectant to kill virus.",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Cross-validated in BABE/MBIC annotator flags and WNC edit pairs (docs/corpus-mined-bias-candidates.json)."
+      },
+      "confidenceTier": "medium",
       "neutralAlternatives": {
         "notorious": "well-known",
         "disgraced": "former",
         "infamous": "widely reported"
-      },
-      "confidenceTier": "medium",
-      "confidenceWeight": 2
+      }
     },
     {
       "id": "PS-003",
-      "category": "PRESUPPOSITION",
+      "technique": "LOADED_LANGUAGE",
       "label": "Guilt-presupposing reporting verb",
-      "triggerWords": ["admitted", "revealed", "confessed", "acknowledged"],
-      "pattern": "\\b(admitted|revealed|confessed|acknowledged)\\b",
-      "posConstraints": {
-        "constraintType": "reportingVerb",
-        "requiredTag": "PastTense",
-        "requiresPrecedingSubject": ["Person", "Organization", "Pronoun"],
-        "followedByClauseOrQuote": true,
-        "notes": "Only fires when used as a reporting verb introducing what a named subject said (e.g. 'the senator admitted that...'), not other senses (e.g. 'admitted to the hospital')."
+      "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
+      "lexicalTrigger": {
+        "words": [
+          "admitted",
+          "revealed",
+          "confessed",
+          "acknowledged"
+        ],
+        "pattern": "\\b(admitted|revealed|confessed|acknowledged)\\b"
       },
-      "contextExclusions": ["hospital", "evidence", "court", "bar", "program", "university", "college"],
+      "linguisticCondition": {
+        "type": "reportingVerb",
+        "description": "Used as a reporting verb: followed by 'that' or an opening quotation mark."
+      },
+      "contextCondition": {
+        "excludeWindowWords": {
+          "words": [
+            "hospital",
+            "evidence",
+            "court",
+            "bar",
+            "program",
+            "university",
+            "college"
+          ],
+          "before": 2,
+          "after": 3
+        },
+        "description": "Not an unrelated sense ('admitted to the hospital', 'evidence admitted in court')."
+      },
+      "targetSpan": "trigger",
       "explanation": "This verb frames the statement as if wrongdoing or a hidden truth is already established, rather than neutrally reporting what the source said (e.g. 'said' or 'stated').",
-      "neutralAlternative": "said",
+      "sourceExample": {
+        "text": "Outrage as Donald Trump suggests injecting disinfectant to kill virus.",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Original thesis seed rule."
+      },
       "confidenceTier": "medium",
-      "confidenceWeight": 2
+      "neutralAlternative": "said",
+      "techniqueNote": "Mapped to LOADED_LANGUAGE: the SemEval taxonomy has no presupposition class; these reporting verbs carry evaluative implications."
+    },
+    {
+      "id": "NC-001",
+      "technique": "NAME_CALLING_LABELING",
+      "label": "Group/person label",
+      "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
+      "lexicalTrigger": {
+        "words": [
+          "illegal aliens",
+          "illegals",
+          "leftists",
+          "socialists",
+          "snowflakes",
+          "globalists",
+          "thugs",
+          "traitors",
+          "haters",
+          "radicals"
+        ],
+        "pattern": "\\b(illegal aliens?|illegals|leftists?|socialists|snowflakes?|globalists?|thugs?|traitors?|haters|radicals|radical left|radical right)\\b"
+      },
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Noun",
+          "Adjective"
+        ],
+        "description": "The label functions as a noun (or the leading adjective of a two-word label)."
+      },
+      "contextCondition": {
+        "excludeWindowWords": {
+          "words": [
+            "democratic",
+            "party",
+            "america"
+          ],
+          "before": 1,
+          "after": 2
+        },
+        "description": "Not the proper name of an organization ('Democratic Socialists of America', 'Socialist Party')."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This is a label for a person or group that the audience is likely to react to emotionally, rather than a neutral description of who they are or what they did.",
+      "sourceExample": {
+        "text": "WHO: Coronavirus emergency is 'Public Enemy Number 1'",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Observed in a development article (Breitbart, 2026-10-02: 'socialists', 'radicals', 'haters', 'Illegals'); illegal (47), aliens (34), leftist (31) annotator-flagged in BABE/MBIC."
+      },
+      "confidenceTier": "low",
+      "neutralAlternatives": {
+        "illegal alien": "undocumented immigrant",
+        "illegal aliens": "undocumented immigrants",
+        "illegals": "undocumented immigrants",
+        "leftist": "left-wing",
+        "leftists": "left-wing people",
+        "socialists": "socialist-aligned voters",
+        "radicals": "activists",
+        "radical left": "left-wing",
+        "radical right": "right-wing",
+        "thugs": "suspects",
+        "thug": "suspect"
+      }
+    },
+    {
+      "id": "EX-001",
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "label": "Exaggerating intensifier",
+      "referenceDefinition": "Presenting something as substantially greater or less important, serious, significant, or consequential than warranted by the context.",
+      "lexicalTrigger": {
+        "words": [
+          "skyrocketed",
+          "plummeted",
+          "catastrophic",
+          "staggering",
+          "enormous",
+          "unprecedented",
+          "devastating",
+          "crushing",
+          "massive",
+          "disastrous"
+        ],
+        "pattern": "\\b(skyrocket(?:ed|ing|s)?|plummet(?:ed|ing|s)?|catastrophic|staggering|enormous|unprecedented|devastating|crushing|massive|disastrous|colossal|monumental|astronomical)\\b"
+      },
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Adjective",
+          "Verb",
+          "Adverb"
+        ],
+        "description": "The intensifier is used as a descriptive word or verb, not as a name."
+      },
+      "contextCondition": {
+        "requireNoQuantity": true,
+        "description": "The sentence gives no figure (number, percent, money). A stated quantity substantiates the claim; the SemEval definition concerns magnitude 'greater than warranted by the context'."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This word makes something sound larger or more severe than the plain facts may justify. A specific figure is more informative.",
+      "sourceExample": {
+        "text": "Coronavirus 'risk to the American people remains very low', Trump said.",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Observed in a development article (BBC, 2026-10-02: 'skyrocketed'); enormous/crushing annotator-flagged in BABE/MBIC."
+      },
+      "confidenceTier": "low",
+      "neutralAlternatives": {
+        "skyrocketed": "rose sharply",
+        "skyrocket": "rise sharply",
+        "skyrockets": "rises sharply",
+        "skyrocketing": "rising sharply",
+        "plummeted": "fell sharply",
+        "plummet": "fall sharply",
+        "plummets": "falls sharply",
+        "plummeting": "falling sharply",
+        "massive": "large",
+        "enormous": "large",
+        "staggering": "large",
+        "devastating": "damaging",
+        "catastrophic": "severe"
+      },
+      "neutralAlternative": "Use the specific figure instead"
+    },
+    {
+      "id": "EX-002",
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "label": "Downplaying phrase",
+      "referenceDefinition": "Presenting something as substantially greater or less important, serious, significant, or consequential than warranted by the context.",
+      "lexicalTrigger": {
+        "words": [
+          "a mere",
+          "nothing more than",
+          "merely",
+          "barely worth"
+        ],
+        "pattern": "\\b(a mere|nothing more than|merely|barely worth)\\b"
+      },
+      "linguisticCondition": {
+        "type": "followedByTag",
+        "tags": [
+          "Noun",
+          "Value",
+          "Adjective",
+          "Determiner",
+          "Cardinal",
+          "Percent"
+        ],
+        "within": 2,
+        "description": "The downplaying word is followed by the thing being minimized."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This phrasing shrinks the importance of something instead of letting the facts show how significant it is.",
+      "sourceExample": {
+        "text": "Coronavirus 'risk to the American people remains very low', Trump said.",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Authored from the technique definition (minimization)."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "Use the actual figure or fact"
+    },
+    {
+      "id": "EX-003",
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "label": "Downplaying phrase (fixed)",
+      "referenceDefinition": "Presenting something as substantially greater or less important, serious, significant, or consequential than warranted by the context.",
+      "lexicalTrigger": {
+        "words": [
+          "no big deal",
+          "not a big deal",
+          "barely matters"
+        ],
+        "pattern": "\\b(no big deal|not a big deal|barely matters)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "A stock phrase that waves away an issue's importance instead of showing why it matters little.",
+      "sourceExample": {
+        "text": "Coronavirus 'risk to the American people remains very low', Trump said.",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Authored from the technique definition (minimization)."
+      },
+      "confidenceTier": "high",
+      "neutralAlternative": "Give the facts and let readers judge"
+    },
+    {
+      "id": "DB-001",
+      "technique": "DOUBT",
+      "label": "Doubt-casting qualifier",
+      "referenceDefinition": "Questioning or undermining the credibility, legitimacy, truthfulness, or reliability of a person, claim, or institution.",
+      "lexicalTrigger": {
+        "words": [
+          "so-called",
+          "self-proclaimed",
+          "self-styled",
+          "purported",
+          "dubious"
+        ],
+        "pattern": "\\b(so-called|self-proclaimed|self-styled|purported|dubious)\\b"
+      },
+      "linguisticCondition": {
+        "type": "followedByTag",
+        "tags": [
+          "Noun",
+          "Adjective",
+          "Person"
+        ],
+        "within": 1,
+        "description": "The qualifier modifies a following noun ('so-called experts')."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This qualifier signals the writer doubts a person, claim, or title without presenting evidence for that doubt.",
+      "sourceExample": {
+        "text": "Can the same be said for the Obama Administration?",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Authored from the technique definition."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "Name the person or claim directly"
+    },
+    {
+      "id": "DB-002",
+      "technique": "DOUBT",
+      "label": "Doubt-casting adverb",
+      "referenceDefinition": "Questioning or undermining the credibility, legitimacy, truthfulness, or reliability of a person, claim, or institution.",
+      "lexicalTrigger": {
+        "words": [
+          "allegedly",
+          "purportedly",
+          "supposedly"
+        ],
+        "pattern": "\\b(allegedly|purportedly|supposedly)\\b"
+      },
+      "linguisticCondition": {
+        "type": "followedByTag",
+        "tags": [
+          "Verb",
+          "Adjective",
+          "Noun"
+        ],
+        "within": 2,
+        "description": "The adverb qualifies a verb, adjective or noun that follows."
+      },
+      "contextCondition": {
+        "excludeSentenceWords": [
+          "court",
+          "police",
+          "prosecutor",
+          "prosecutors",
+          "charged",
+          "arrested",
+          "suspect",
+          "suspects",
+          "indicted",
+          "trial",
+          "lawsuit",
+          "investigators",
+          "authorities",
+          "detained",
+          "custody",
+          "accused"
+        ],
+        "description": "Not legal hedging: no police/court/charge vocabulary in the same sentence."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This adverb casts doubt on a claim without saying why. In crime reporting it is a standard legal hedge, so it is skipped when legal terms appear in the same sentence.",
+      "sourceExample": {
+        "text": "Can the same be said for the Obama Administration?",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Observed in a development article (Fox News, 2026-10-02: 'allegedly linked')."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "State who alleges it and what the evidence is"
+    },
+    {
+      "id": "DB-003",
+      "technique": "DOUBT",
+      "label": "Insinuating rhetorical question",
+      "referenceDefinition": "Questioning or undermining the credibility, legitimacy, truthfulness, or reliability of a person, claim, or institution.",
+      "lexicalTrigger": {
+        "words": [
+          "really",
+          "secretly"
+        ],
+        "pattern": "\\b(really|secretly)\\b"
+      },
+      "linguisticCondition": {
+        "type": "inQuestion",
+        "description": "The word sits in an interrogative sentence."
+      },
+      "contextCondition": {
+        "requireSentenceWords": [
+          "or"
+        ],
+        "description": "The question poses a contrast ('X, or are they secretly Y?'), which distinguishes insinuation from a plain question."
+      },
+      "targetSpan": "trigger",
+      "explanation": "A question that insinuates hidden motives ('... or are they secretly ...?') raises suspicion without presenting evidence.",
+      "sourceExample": {
+        "text": "Are these protesters really demanding human rights, or are they secretly supporting Hamas?",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Doubt example); SemEval Table 1 also gives a rhetorical question as the Doubt example."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "Report the evidence for or against the motive"
     },
     {
       "id": "AF-001",
-      "category": "ATTRIBUTION_FRAMING",
+      "technique": "DOUBT",
       "label": "Doubt-casting reporting verb",
-      "triggerWords": ["claimed", "claims", "claim"],
-      "pattern": "\\b(claimed|claims|claim)\\b",
-      "posConstraints": {
-        "constraintType": "reportingVerb",
-        "notes": "Same reporting-verb/clause-quote gate as PS-003, but semantically opposite: 'claimed' signals the WRITER doubts the statement, vs PS-003's trigger words which signal guilt is already established. The clause/quote gate incidentally also filters out 'claim' used as a noun ('filed a claim'), since that sense is never followed by 'that' or a quote."
+      "referenceDefinition": "Questioning or undermining the credibility, legitimacy, truthfulness, or reliability of a person, claim, or institution.",
+      "lexicalTrigger": {
+        "words": [
+          "claimed",
+          "claims",
+          "claim"
+        ],
+        "pattern": "\\b(claimed|claims|claim)\\b"
       },
-      "contextExclusions": [],
+      "linguisticCondition": {
+        "type": "reportingVerb",
+        "description": "Used as a reporting verb ('claimed that ...'); the noun sense ('filed a claim') is never followed by 'that' or a quote."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
       "explanation": "Using 'claim' instead of a neutral verb like 'said' can subtly cast doubt on a source's statement without the writer explicitly saying they doubt it.",
-      "neutralAlternative": "said",
+      "sourceExample": {
+        "text": "Can the same be said for the Obama Administration?",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Annotator-flagged in BABE/MBIC (claim 53, claimed 46, claims 40)."
+      },
       "confidenceTier": "medium",
-      "confidenceWeight": 2
+      "neutralAlternative": "said",
+      "techniqueNote": "Mapped to DOUBT: 'claimed' undermines the credibility of the quoted statement."
+    },
+    {
+      "id": "FE-001",
+      "technique": "APPEAL_TO_FEAR_PREJUDICE",
+      "label": "Fear-invoking phrase",
+      "referenceDefinition": "Attempting to influence an audience by invoking fear, anxiety, panic, or preconceived judgments.",
+      "lexicalTrigger": {
+        "words": [
+          "existential threat",
+          "threat to democracy",
+          "under siege",
+          "crime wave",
+          "terrifying",
+          "ticking time bomb"
+        ],
+        "pattern": "\\b(existential threat|threat to democracy|under siege|crime wave|wave of crime|climate of fear|grave danger|mortal danger|deadly threat|terrifying|ticking time bomb|never be safe again|will never be safe)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This wording is meant to provoke fear or alarm rather than inform; the underlying risk is stated in dramatic terms.",
+      "sourceExample": {
+        "text": "If Hamas is not completely defeated, Israeli families will never be safe again.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Appeal to Fear example); other phrases authored from the technique definition."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "State the specific risk and its evidence"
+    },
+    {
+      "id": "FW-001",
+      "technique": "FLAG_WAVING",
+      "label": "Identity-appeal phrase",
+      "referenceDefinition": "Invoking national, cultural, religious, ideological, or group identity to encourage support for an action, position, or cause.",
+      "lexicalTrigger": {
+        "words": [
+          "true patriots",
+          "real americans",
+          "our way of life",
+          "our great nation",
+          "freedom-loving"
+        ],
+        "pattern": "\\b(true patriots?|real americans?|real patriots?|true supporters?|our way of life|american way of life|our great nation|freedom-loving|god-fearing|for god and country)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This invokes national or group identity to win support, implying that agreeing is what a loyal member of the group does.",
+      "sourceExample": {
+        "text": "True supporters of Israel stand with the IDF.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Flag-Waving example); other phrases authored from the technique definition."
+      },
+      "confidenceTier": "high",
+      "neutralAlternative": "Describe the policy or position itself"
+    },
+    {
+      "id": "CO-001",
+      "technique": "CAUSAL_OVERSIMPLIFICATION",
+      "label": "Single-cause claim",
+      "referenceDefinition": "Presenting a complex situation as having a single or substantially simplified cause, including forms of scapegoating.",
+      "lexicalTrigger": {
+        "words": [
+          "the only reason",
+          "the sole reason",
+          "solely responsible",
+          "entirely to blame",
+          "all because of"
+        ],
+        "pattern": "\\b(the only reason|the sole reason|the sole cause|solely responsible|entirely to blame|entirely responsible|single cause|all because of|the one reason)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This presents a complicated situation as having one cause. Most real events have several contributing factors.",
+      "sourceExample": {
+        "text": "If France had not have declared war on Germany then World War II would have never happened.",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Authored from the technique definition (single-cause wording)."
+      },
+      "confidenceTier": "high",
+      "neutralAlternative": "Describe the contributing factors"
+    },
+    {
+      "id": "SL-001",
+      "technique": "SLOGANS",
+      "label": "Campaign slogan",
+      "referenceDefinition": "Short, memorable, and striking expressions designed to convey or reinforce a particular message or position.",
+      "lexicalTrigger": {
+        "words": [
+          "make america great again",
+          "build the wall",
+          "lock her up",
+          "drain the swamp",
+          "defund the police",
+          "stop the steal"
+        ],
+        "pattern": "\\b(make america great again|build the wall|lock her up|drain the swamp|defund the police|stop the steal|yes we can|hope and change)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "A short, memorable slogan designed to rally support. Quoting it is not wrong, but it carries persuasive framing rather than explanation.",
+      "sourceExample": {
+        "text": "\"BUILD THE WALL!\" Trump tweeted.",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "SemEval Table 1 gives 'BUILD THE WALL!' as the Slogans example; other slogans are well-known campaign slogans."
+      },
+      "confidenceTier": "high",
+      "neutralAlternative": "Explain the policy behind the slogan"
+    },
+    {
+      "id": "SL-002",
+      "technique": "SLOGANS",
+      "label": "Rallying phrase",
+      "referenceDefinition": "Short, memorable, and striking expressions designed to convey or reinforce a particular message or position.",
+      "lexicalTrigger": {
+        "words": [
+          "at all costs",
+          "by any means necessary"
+        ],
+        "pattern": "\\b(at all costs|by any means necessary)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "A short, forceful phrase designed to rally support rather than explain a position.",
+      "sourceExample": {
+        "text": "Israel must win at all costs.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Slogans example)."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "Explain the position and its trade-offs"
+    },
+    {
+      "id": "AA-001",
+      "technique": "APPEAL_TO_AUTHORITY",
+      "label": "Unnamed expert or study",
+      "referenceDefinition": "Presenting a claim as true or valid primarily because an authority, expert, institution, or other perceived source supports it.",
+      "lexicalTrigger": {
+        "words": [
+          "experts say",
+          "experts warn",
+          "scientists say",
+          "studies show",
+          "research shows",
+          "analysts say",
+          "sources say"
+        ],
+        "pattern": "\\b(experts (?:say|agree|warn|believe|claim)|scientists (?:say|agree|warn)|studies show|research shows|analysts (?:say|agree)|insiders say|sources say)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This leans on an unnamed authority to make a claim sound settled. Naming the expert or study lets readers check it.",
+      "sourceExample": {
+        "text": "...confirmed that 'Vigan said the truth. That's all.'",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Observed in a development article (BBC, 2026-10-02: 'experts warn')."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "Name the specific expert or study"
     },
     {
       "id": "SC-012",
-      "category": "SPECULATIVE_CONSTRUCTION",
+      "technique": "APPEAL_TO_AUTHORITY",
       "label": "Unattributed collective claim",
-      "triggerWords": ["some say", "critics argue", "many believe", "observers note"],
-      "pattern": "\\b(some say|critics argue|many believe|observers note)\\b",
-      "posConstraints": {
-        "constraintType": "phraseLevel",
-        "requiredTag": null,
-        "phraseLevel": true,
-        "notes": "Matches the exact multi-word phrase; no single-token POS constraint needed since the phrase itself is the anchor."
+      "referenceDefinition": "Presenting a claim as true or valid primarily because an authority, expert, institution, or other perceived source supports it.",
+      "lexicalTrigger": {
+        "words": [
+          "some say",
+          "critics argue",
+          "many believe",
+          "observers note"
+        ],
+        "pattern": "\\b(some say|critics argue|many believe|observers note)\\b"
       },
-      "contextExclusions": [],
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
       "explanation": "This attributes a claim to a vague, unnamed group instead of a specific, checkable source, making the claim difficult to verify.",
-      "neutralAlternative": "Name the specific source",
+      "sourceExample": {
+        "text": "...confirmed that 'Vigan said the truth. That's all.'",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Original thesis seed rule."
+      },
       "confidenceTier": "high",
-      "confidenceWeight": 3
+      "neutralAlternative": "Name the specific source",
+      "techniqueNote": "Mapped to APPEAL_TO_AUTHORITY (vague/unnamed authority). 'many believe' is arguably Bandwagon; kept in one rule to preserve the original seed phrases."
+    },
+    {
+      "id": "BF-001",
+      "technique": "BLACK_AND_WHITE_FALLACY",
+      "label": "Either/or framing",
+      "referenceDefinition": "Presenting an issue as having only two alternatives or reducing a complex situation to opposing choices.",
+      "lexicalTrigger": {
+        "words": [
+          "with us or against us",
+          "either you are",
+          "no middle ground",
+          "only two options",
+          "there is no alternative"
+        ],
+        "pattern": "\\b(with us or against us|no middle ground|only two (?:options|choices|sides)|there is no alternative|no other choice)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This frames the issue as having only two sides, leaving out the range of positions in between.",
+      "sourceExample": {
+        "text": "Francis said these words: 'Everyone is guilty for the good he could have done and did not do ... If we do not oppose evil, we tacitly feed it.'",
+        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
+        "triggerEvidence": "Authored from the technique definition."
+      },
+      "confidenceTier": "high",
+      "neutralAlternative": "Describe the range of positions"
+    },
+    {
+      "id": "BF-002",
+      "technique": "BLACK_AND_WHITE_FALLACY",
+      "label": "Either/or demand",
+      "referenceDefinition": "Presenting an issue as having only two alternatives or reducing a complex situation to opposing choices.",
+      "lexicalTrigger": {
+        "words": [
+          "you either",
+          "you are either",
+          "either you"
+        ],
+        "pattern": "\\b(?:you(?:['’]re| are)? either|either you(?:['’]re| are)?)\\b"
+      },
+      "linguisticCondition": {
+        "type": "followedByWord",
+        "words": [
+          "or"
+        ],
+        "within": 12,
+        "description": "An 'or' follows within the sentence, completing the either/or construction."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This frames the issue as having only two sides, leaving out the range of positions in between.",
+      "sourceExample": {
+        "text": "You either support Israel or you support terrorism.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Black-and-White example)."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "Describe the range of positions"
+    },
+    {
+      "id": "TT-001",
+      "technique": "THOUGHT_TERMINATING_CLICHES",
+      "label": "Thought-terminating cliché",
+      "referenceDefinition": "Using familiar or simplified expressions that discourage further examination or critical consideration of an issue.",
+      "lexicalTrigger": {
+        "words": [
+          "end of story",
+          "it is what it is",
+          "case closed",
+          "nothing to see here",
+          "enough said",
+          "boys will be boys"
+        ],
+        "pattern": "\\b(end of story|end of discussion|it['’]s what it is|it is what it is|case closed|nothing to see here|enough said|that['’]s just the way it is|everything happens for a reason|boys will be boys)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "A stock phrase that signals the discussion is over, discouraging the reader from examining the issue further.",
+      "sourceExample": {
+        "text": "Israel has the right to defend itself. End of discussion.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Thought-Terminating Cliche example)."
+      },
+      "confidenceTier": "high",
+      "neutralAlternative": "Give the reasoning instead"
+    },
+    {
+      "id": "BW-001",
+      "technique": "BANDWAGON_REDUCTIO_AD_HITLERUM",
+      "label": "Popularity or Hitler comparison",
+      "referenceDefinition": "Using popularity, social acceptance, or association with a strongly rejected figure or group as a persuasive device.",
+      "lexicalTrigger": {
+        "words": [
+          "everyone knows",
+          "everybody knows",
+          "most people agree",
+          "like hitler",
+          "new hitler"
+        ],
+        "pattern": "\\b(everyone knows|everybody knows|most people agree|most people believe|the majority agree|millions of (?:people|americans) agree|wrong side of history|like hitler|new hitler|hitler-like|nazi-like)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This persuades through popularity ('everyone agrees') or by linking someone to a universally rejected figure, rather than through evidence.",
+      "sourceExample": {
+        "text": "The whole world now stands with Israel, and anyone who still questions the operation is on the wrong side of history.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Bandwagon example)."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "Cite the evidence or the actual survey"
+    },
+    {
+      "id": "SM-001",
+      "technique": "STRAW_MAN_WHATABOUTISM_RED_HERRING",
+      "label": "Whataboutism / diversion",
+      "referenceDefinition": "Diverting attention from an issue through misrepresentation of an opposing position, accusations of hypocrisy, or irrelevant alternative issues.",
+      "lexicalTrigger": {
+        "words": [
+          "but what about",
+          "whataboutism",
+          "red herring",
+          "straw man"
+        ],
+        "pattern": "\\b(but what about|and what about|whataboutism|red herring|straw man|why aren['’]t you (?:talking|asking))\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "description": "No additional local context condition."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This redirects attention to a different issue or accusation instead of answering the point being discussed.",
+      "sourceExample": {
+        "text": "Instead of criticizing Israel, why aren't you talking about what Hamas did?",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Whataboutism example)."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "Address the original point"
     }
   ]
 }

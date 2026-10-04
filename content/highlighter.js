@@ -14,16 +14,12 @@
   var activeTarget = null;
   var hideTimer = null;
 
-  // Mirrors the category colors defined in highlighter.css; used only for
-  // the tooltip's small identifying dot (a purely decorative echo of the
-  // border-accent color already on the highlight span itself).
-  var CATEGORY_DOT_COLOR = {
-    LOADED_LANGUAGE: "#7A3EA6",
-    EVALUATIVE_MODIFIER: "#B3265E",
-    SPECULATIVE_CONSTRUCTION: "#1B5FA8",
-    ATTRIBUTION_FRAMING: "#0E7C66",
-    PRESUPPOSITION: "#8A5A00"
-  };
+  // Category label + accent color come from content/category-meta.js (shared
+  // with the popup legend so they can't drift apart).
+  function categoryMeta(category) {
+    var all = root.CategoryMeta || {};
+    return all[category] || { label: category, color: "#888" };
+  }
 
   function ensureTooltip() {
     if (tooltipEl) return tooltipEl;
@@ -51,10 +47,11 @@
     header.className = "bias-tooltip__header";
     var dot = document.createElement("span");
     dot.className = "bias-tooltip__dot";
-    dot.style.background = CATEGORY_DOT_COLOR[category] || "#888";
+    var meta = categoryMeta(category);
+    dot.style.background = meta.color;
     var categoryLabel = document.createElement("span");
     categoryLabel.className = "bias-tooltip__category";
-    categoryLabel.textContent = (label || category).toUpperCase();
+    categoryLabel.textContent = meta.label.toUpperCase();
     header.appendChild(dot);
     header.appendChild(categoryLabel);
     tip.appendChild(header);
@@ -79,7 +76,7 @@
     // rather than something a general reader needs to act on.
     var ruleLine = document.createElement("span");
     ruleLine.className = "bias-tooltip__rule";
-    ruleLine.textContent = "Rule " + ruleId;
+    ruleLine.textContent = "Rule " + ruleId + (label && label !== ruleId ? " · " + label : "");
     tip.appendChild(ruleLine);
 
     tip.hidden = false;

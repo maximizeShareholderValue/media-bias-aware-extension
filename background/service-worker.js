@@ -1,18 +1,19 @@
 /**
  * Background service worker.
  *
- * Responsibilities:
- *  - Serve the bundled pattern catalog to content scripts via message
- *    passing (kept out of web_accessible_resources so an arbitrary web
- *    page cannot fetch it directly and fingerprint the extension).
- *  - Perform the ONE optional network call in the whole extension: a
- *    comparative-reporting lookup against NewsAPI, and only when the user
- *    has supplied their own API key in the popup's settings view.
+ *  - Serves the bundled pattern catalog to content scripts via message
+ *    passing (kept out of web_accessible_resources so a web page cannot
+ *    fetch it and fingerprint the extension).
+ *  - Performs the ONE optional network call: a comparative-reporting lookup
+ *    against NewsAPI, only when the user has saved their own API key.
  *
- * No article text, page content, or browsing history is ever part of any
- * message this file sends over the network - only a short search query
- * (the article title) that the user's own click explicitly triggered.
+ * Privacy (FR-AVD-01 / NFR-PRIV-01): the request carries ONLY short topic
+ * keywords. CompareUtils.sanitizeKeywords drops anything that looks like a
+ * title or sentence, so article text, titles, highlights and reading history
+ * cannot be sent even if a caller passes them by mistake.
  */
+
+importScripts("../shared/compare-utils.js");
 
 const NEWSAPI_TIMEOUT_MS = 1500;
 const NEWSAPI_BASE = "https://newsapi.org/v2/everything";
@@ -21,40 +22,20 @@ let catalogCache = null;
 
 async function loadCatalog() {
   if (catalogCache) return catalogCache;
-  const url = chrome.runtime.getURL("data/pattern-catalog.json");
-  const res = await fetch(url);
+  const res = await fetch(chrome.runtime.getURL("data/pattern-catalog.json"));
   catalogCache = await res.json();
   return catalogCache;
 }
 
-async function handleComparativeLookup(query) {
-  const { newsApiKey } = await chrome.storage.local.get({ newsApiKey: "" });
-  if (!newsApiKey) {
-    return { ok: false, reason: "no_api_key" };
-  }
-
-  const hasPermission = await chrome.permissions.contains({
-    origins: ["https://newsapi.org/*"]
-  });
-  if (!hasPermission) {
-    console.warn("[bias-aware] comparative lookup blocked: newsapi.org host permission not granted");
-    return { ok: false, reason: "no_permission" };
-  }
-
+async function queryNewsApi(apiKey, query) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), NEWSAPI_TIMEOUT_MS);
-
   try {
     const url =
       NEWSAPI_BASE +
-      "?q=" +
-      encodeURIComponent(query) +
-      "&pageSize=5&sortBy=relevancy";
-
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: { "X-Api-Key": newsApiKey }
-    });
+      "?q=" + encodeURIComponent(query) +
+      "&language=en&searchIn=title,description&sortBy=relevancy&pageSize=50";
+    const res = await fetch(url, { signal: controller.signal, headers: { "X-Api-Key": apiKey } });
 
     if (res.status === 429) {
       console.warn("[bias-aware] comparative lookup rate-limited (429) by newsapi.org");
@@ -62,12 +43,9 @@ async function handleComparativeLookup(query) {
     }
     if (!res.ok) {
       const bodyText = await res.text().catch(() => "");
-      console.warn(
-        "[bias-aware] comparative lookup failed: HTTP " + res.status + " from newsapi.org - " + bodyText.slice(0, 300)
-      );
+      console.warn("[bias-aware] comparative lookup failed: HTTP " + res.status + " from newsapi.org - " + bodyText.slice(0, 300));
       return { ok: false, reason: "http_error", status: res.status };
     }
-
     const data = await res.json();
     const articles = (data.articles || []).map((a) => ({
       title: a.title,
@@ -88,17 +66,41 @@ async function handleComparativeLookup(query) {
   }
 }
 
+async function handleComparativeLookup(rawKeywords) {
+  const keywords = CompareUtils.sanitizeKeywords(rawKeywords);
+  if (!keywords.length) return { ok: false, reason: "no_keywords" };
+
+  const { newsApiKey } = await chrome.storage.local.get({ newsApiKey: "" });
+  if (!newsApiKey) return { ok: false, reason: "no_api_key" };
+
+  const hasPermission = await chrome.permissions.contains({ origins: ["https://newsapi.org/*"] });
+  if (!hasPermission) {
+    console.warn("[bias-aware] comparative lookup blocked: newsapi.org host permission not granted");
+    return { ok: false, reason: "no_permission" };
+  }
+
+  let used = Math.min(3, keywords.length);
+  let result = await queryNewsApi(newsApiKey, CompareUtils.buildQuery(keywords, used));
+  // Three ANDed keywords can be too narrow: retry once with the two strongest.
+  if (result.ok && !result.articles.length && used > 2) {
+    used = 2;
+    result = await queryNewsApi(newsApiKey, CompareUtils.buildQuery(keywords, used));
+  }
+  if (result.ok) result.keywords = keywords.slice(0, used);
+  return result;
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "GET_PATTERN_CATALOG") {
     loadCatalog()
       .then((catalog) => sendResponse({ ok: true, catalog }))
       .catch((err) => sendResponse({ ok: false, error: String(err) }));
-    return true; // async
+    return true;
   }
 
   if (message.type === "COMPARATIVE_LOOKUP") {
-    handleComparativeLookup(message.query || "").then(sendResponse);
-    return true; // async
+    handleComparativeLookup(message.keywords).then(sendResponse);
+    return true;
   }
 
   return false;

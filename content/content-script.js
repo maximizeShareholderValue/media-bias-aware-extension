@@ -42,8 +42,25 @@
     });
   }
 
-  function normalizeWhitespace(s) {
-    return (s || "").replace(/\s+/g, " ").trim();
+  var normalizeWhitespace = ArticleMatcher.normalizeWhitespace;
+  var textBelongsToArticle = ArticleMatcher.textBelongsToArticle;
+
+  // Readability turns <div>s that hold plain text into paragraphs, so on many sites (news
+  // aggregators, React-built pages) the article text is NOT in <p> tags. Treat any block element
+  // that contains no other block as a candidate "paragraph"; textBelongsToArticle then keeps only
+  // the ones that actually match Readability's article text.
+  var BLOCK_SELECTOR = "p,div,li,ul,ol,blockquote,section,article,header,footer,table,h1,h2,h3,h4,h5,h6,pre,figure,aside,nav,form";
+
+  function collectTextBlocks() {
+    var blocks = [];
+    var all = document.querySelectorAll("p,li,blockquote,div,section,td,dd");
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      if (el.textContent.length < 40) continue;
+      if (el.querySelector(BLOCK_SELECTOR)) continue;
+      blocks.push(el);
+    }
+    return blocks;
   }
 
   /**
@@ -56,7 +73,7 @@
    * highlighting inside the real, visible DOM (not a disconnected clone).
    */
   function extractArticle() {
-    if (typeof Readability !== "function") return null;
+    if (typeof Readability !== "function") return { reason: "readability_unavailable", paragraphs: [] };
 
     var clone = document.cloneNode(true);
     var reader = new Readability(clone, { charThreshold: 200 });
@@ -64,20 +81,31 @@
     try {
       parsed = reader.parse();
     } catch (e) {
-      return null;
+      console.warn("[bias-aware] Readability threw on " + location.href + ": " + e.message);
+      return { reason: "readability_error", paragraphs: [] };
     }
     if (!parsed || !parsed.textContent || parsed.textContent.trim().length < 200) {
-      return null;
+      return { reason: "no_article", paragraphs: [] };
     }
 
     var cleanedArticleText = normalizeWhitespace(parsed.textContent);
-    var liveParagraphs = Array.prototype.slice.call(document.querySelectorAll("p"));
+    var liveParagraphs = collectTextBlocks();
 
     var articleParagraphs = liveParagraphs.filter(function (p) {
       var t = normalizeWhitespace(p.textContent);
       if (t.length < 40) return false; // skip captions/bylines/trivial fragments
-      return cleanedArticleText.indexOf(t) !== -1;
+      return textBelongsToArticle(t, cleanedArticleText);
     });
+
+    if (!articleParagraphs.length) {
+      console.warn(
+        "[bias-aware] Readability found " + cleanedArticleText.length +
+          " chars of article text on " + location.href +
+          ", but none of the " + liveParagraphs.length +
+          " live text blocks matched it - live-DOM paragraph matching failed, not just a narrow catalog."
+      );
+      return { reason: "no_matching_paragraphs", title: parsed.title, paragraphs: [] };
+    }
 
     return {
       title: parsed.title,
@@ -86,16 +114,14 @@
     };
   }
 
-  function computeCategoryPriority(catalog) {
-    var map = {};
-    Object.keys(catalog.categories).forEach(function (name) {
-      map[name] = catalog.categories[name].priority;
-    });
-    return map;
-  }
+  // Kept in memory for the popup's keyword lookup and the detection export (FR-DET-04 audit log).
+  var lastArticle = null;
+  var auditLog = null;
+  var keywordsCache = null;
 
   async function run() {
     var startedAt = performance.now();
+    keywordsCache = null;
 
     var settings = await getSettings();
     if (!settings.highlightsEnabled) {
@@ -104,10 +130,11 @@
     }
 
     var article = extractArticle();
-    if (!article || !article.paragraphs.length) {
-      lastRunResult = { articleFound: false };
+    if (!article.paragraphs.length) {
+      lastRunResult = { articleFound: false, reason: article.reason || "no_article" };
       return lastRunResult;
     }
+    lastArticle = article;
 
     var catalog;
     try {
@@ -118,25 +145,50 @@
       return lastRunResult;
     }
 
-    var categoryPriority = computeCategoryPriority(catalog);
-    var categoryCounts = {};
-    var totalMatches = 0;
-    var totalConfidenceWeight = 0;
-    var wordCount = 0;
+    // A script from one version reading a catalog from another (e.g. the extension was reloaded
+    // but this tab was not refreshed) must fail visibly, not crash.
+    if (!catalog || !Array.isArray(catalog.patterns) || !catalog.techniques) {
+      console.warn("[bias-aware] pattern catalog has an unexpected format; reload the extension and refresh this tab.");
+      lastRunResult = { articleFound: true, error: "catalog_schema" };
+      return lastRunResult;
+    }
 
-    article.paragraphs.forEach(function (p) {
+    var techniqueCounts = {};
+    var totalMatches = 0;
+    var wordCount = 0;
+    var errorCount = 0;
+    auditLog = {
+      url: location.href,
+      title: article.title,
+      catalogVersion: catalog.catalogVersion,
+      paragraphs: [],
+      detections: [],
+      suppressed: []
+    };
+
+    article.paragraphs.forEach(function (p, paragraphIndex) {
       var text = p.textContent;
+      auditLog.paragraphs.push(text);
       wordCount += text.split(/\s+/).filter(Boolean).length;
 
-      var raw = PatternMatcher.findMatches(text, catalog.patterns, categoryPriority);
-      var resolved = ConflictResolver.resolve(raw);
-      if (!resolved.length) return;
-      Highlighter.renderHighlights(p, text, resolved);
-      resolved.forEach(function (m) {
-        categoryCounts[m.category] = (categoryCounts[m.category] || 0) + 1;
-        totalMatches++;
-        totalConfidenceWeight += m.confidenceWeight || 0;
-      });
+      // One malformed paragraph must not abort the scan of the rest of the article.
+      try {
+        var candidates = PatternMatcher.findMatches(text, catalog.patterns, catalog.techniques);
+        var resolved = ConflictResolver.resolveWithAudit(candidates);
+        resolved.suppressed.forEach(function (m) {
+          auditLog.suppressed.push(Object.assign({ paragraphIndex: paragraphIndex }, m));
+        });
+        if (!resolved.active.length) return;
+        Highlighter.renderHighlights(p, text, resolved.active);
+        resolved.active.forEach(function (m) {
+          techniqueCounts[m.category] = (techniqueCounts[m.category] || 0) + 1;
+          totalMatches++;
+          auditLog.detections.push(Object.assign({ paragraphIndex: paragraphIndex }, m));
+        });
+      } catch (e) {
+        errorCount++;
+        console.warn("[bias-aware] skipped a paragraph on " + location.href + ": " + e.message);
+      }
     });
 
     var elapsed = performance.now() - startedAt;
@@ -146,29 +198,37 @@
       );
     }
 
-    // Bias Index: a transparent, documented aggregate (NOT an opaque score -
-    // it's fully derived from the same per-match confidenceWeight values
-    // shown in each highlight's tooltip). Defined as the sum of matched
-    // rules' confidence weights, normalized to "per 1,000 words" of
-    // analyzed article text so a short article with a couple of loaded
-    // phrases doesn't score the same as a long, mostly-neutral one, then
-    // capped at 100. This is a deliberately simple, auditable formula for
-    // a thesis prototype - not a validated bias metric.
-    var biasIndex = wordCount > 0
-      ? Math.min(100, Math.round((totalConfidenceWeight / wordCount) * 1000))
-      : 0;
-
+    // FR-DET-05: report the number of flagged spans and the number per technique only.
+    // No article-level score, percentage or density, and no biased/unbiased verdict.
     lastRunResult = {
       articleFound: true,
       title: article.title,
       matchCount: totalMatches,
-      categoryCounts: categoryCounts,
+      categoryCounts: techniqueCounts,
+      techniqueCount: Object.keys(techniqueCounts).length,
+      paragraphCount: article.paragraphs.length,
+      errorCount: errorCount,
+      ruleCount: catalog.patterns.length,
       wordCount: wordCount,
-      totalConfidenceWeight: totalConfidenceWeight,
-      biasIndex: biasIndex,
+      suppressedCount: auditLog.suppressed.length,
       elapsedMs: Math.round(elapsed)
     };
     return lastRunResult;
+  }
+
+  // Topic keywords for comparative reporting (FR-AVD-01). Computed on demand so the
+  // detection pipeline stays fast, and only these keywords ever leave the page.
+  function getKeywords() {
+    if (!lastArticle) return [];
+    if (!keywordsCache) {
+      var body = lastArticle.paragraphs
+        .map(function (p) {
+          return p.textContent;
+        })
+        .join(" ");
+      keywordsCache = KeywordExtractor.extract(lastArticle.title, body, 4);
+    }
+    return keywordsCache;
   }
 
   chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
@@ -176,11 +236,26 @@
       sendResponse({ ok: true, result: lastRunResult });
       return false;
     }
+    if (message.type === "GET_KEYWORDS") {
+      sendResponse({ ok: true, keywords: getKeywords(), title: lastArticle && lastArticle.title });
+      return false;
+    }
+    if (message.type === "GET_AUDIT_LOG") {
+      sendResponse({ ok: !!auditLog, log: auditLog });
+      return false;
+    }
     if (message.type === "TOGGLE_HIGHLIGHTS") {
       if (message.enabled) {
-        run().then(function (result) {
-          sendResponse({ ok: true, result: result });
-        });
+        run().then(
+          function (result) {
+            sendResponse({ ok: true, result: result });
+          },
+          function (e) {
+            console.warn("[bias-aware] scan failed on " + location.href + ": " + (e && e.message));
+            lastRunResult = { articleFound: true, error: "internal_error" };
+            sendResponse({ ok: true, result: lastRunResult });
+          }
+        );
       } else {
         Highlighter.removeAllHighlights();
         lastRunResult = { articleFound: lastRunResult ? lastRunResult.articleFound : false, disabled: true };
@@ -191,5 +266,8 @@
     return false;
   });
 
-  run();
+  run().catch(function (e) {
+    console.warn("[bias-aware] scan failed on " + location.href + ": " + (e && e.message));
+    lastRunResult = { articleFound: true, error: "internal_error" };
+  });
 })();

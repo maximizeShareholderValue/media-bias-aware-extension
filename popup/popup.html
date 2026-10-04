@@ -21,18 +21,14 @@
       <span id="statusPill" class="pill pill--muted">Loading&hellip;</span>
     </header>
 
-    <section class="stats" id="statsRow">
+    <section class="stats stats--two" id="statsRow">
       <div class="stat">
         <span class="stat__value" id="statPhrases">&ndash;</span>
         <span class="stat__label">Phrases Found</span>
       </div>
       <div class="stat">
-        <span class="stat__value" id="statBiasIndex">&ndash;</span>
-        <span class="stat__label">Bias Index</span>
-      </div>
-      <div class="stat">
-        <span class="stat__value" id="statReliability">&ndash;</span>
-        <span class="stat__label">Reliability</span>
+        <span class="stat__value" id="statTechniques">&ndash;</span>
+        <span class="stat__label">Techniques</span>
       </div>
     </section>
 
@@ -63,16 +59,6 @@
           </div>
           <div class="slider-track slider-track--leaning">
             <span class="slider-knob" id="leaningKnob"></span>
-          </div>
-        </div>
-
-        <div class="section">
-          <div class="section__title-row">
-            <h2 class="section__title">Factual Reliability</h2>
-            <span class="reliability-badge" id="reliabilityBadge">&ndash;</span>
-          </div>
-          <div class="slider-track slider-track--reliability">
-            <span class="slider-knob" id="reliabilityKnob"></span>
           </div>
         </div>
 
@@ -113,10 +99,10 @@
     </footer>
 
     <div class="methodology-panel" id="methodologyPanel" hidden>
-      <h3>How these numbers are computed</h3>
-      <p><b>Bias Index</b> = (sum of matched rules' confidence weights &divide; words analyzed) &times; 1000, capped at 100. It only reflects the rule-based phrase matches you can see highlighted in the article - it is not a machine-learned or opaque score.</p>
-      <p><b>Reliability %</b> is a fixed mapping from the outlet's factual-reliability tier (Very High=95, High=80, Mostly Factual=65, Mixed=45, Low=20), sourced from the bundled outlet dataset.</p>
-      <p>Every highlighted phrase in the article traces to a specific named rule ID - hover or focus any highlight to see it.</p>
+      <h3>How to read these results</h3>
+      <p><b>Phrases Found</b> is the number of highlighted spans; <b>Techniques</b> is how many of the 14 SemEval-2020 propaganda techniques they cover. The popup does not rate an article as biased or unbiased, and it gives no bias score.</p>
+      <p>A phrase is highlighted only when a rule's lexical trigger, its grammatical condition and its local-context condition all hold. Every highlight names its rule ID: hover or focus it to see why it was flagged.</p>
+      <p>Highlights are cues about wording, not verdicts. A flagged phrase can be legitimate in context.</p>
     </div>
   </main>
 
@@ -138,9 +124,18 @@
       <p class="status" id="keyStatus" role="status"></p>
     </div>
 
+    <div class="card">
+      <h3 class="field-label">Evaluation (optional)</h3>
+      <p class="hint">Download this page's detections as JSON (rule IDs, character spans, techniques, suppressed overlaps) so validators can judge them. Stays on your device.</p>
+      <button id="exportBtn" class="button button--secondary">Export detections (JSON)</button>
+      <p class="status" id="exportStatus" role="status"></p>
+    </div>
+
     <button id="backBtn" class="button button--secondary">Back</button>
   </section>
 
+  <script src="../content/category-meta.js"></script>
+  <script src="../shared/compare-utils.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

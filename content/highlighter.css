@@ -8,7 +8,7 @@
  * WCAG 2.1 AA notes:
  * - Each category is distinguished by BOTH a hue AND a border-bottom style
  *   (solid/dashed/dotted/double/wavy), so meaning never depends on color
- *   alone (1.4.1 Use of Color) - the mockup doesn't need this since it's a
+ *   alone (1.4.1 Use of Color) - with 14 categories only 4 border styles exist, so the tooltip always names the category in text too - the mockup doesn't need this since it's a
  *   static demo image, but a live extension runs on arbitrary sites, so we
  *   keep the secondary cue.
  * - Background tints are chosen light/pastel enough to stay readable
@@ -41,47 +41,119 @@
   outline: 2px solid #1a1a1a;
 }
 
-/* LOADED_LANGUAGE - lavender/purple */
+/* LOADED_LANGUAGE - Loaded Language */
 .bias-highlight--LOADED_LANGUAGE {
   --bias-bg: #E4D6F5;
   --bias-accent: #7A3EA6;
   --bias-border-style: solid;
 }
 
-/* EVALUATIVE_MODIFIER - pink */
-.bias-highlight--EVALUATIVE_MODIFIER {
+/* NAME_CALLING_LABELING - Name Calling / Labeling */
+.bias-highlight--NAME_CALLING_LABELING {
   --bias-bg: #FBDDE9;
   --bias-accent: #B3265E;
   --bias-border-style: dashed;
 }
 
-/* SPECULATIVE_CONSTRUCTION - light blue */
-.bias-highlight--SPECULATIVE_CONSTRUCTION {
-  --bias-bg: #D9E8F7;
-  --bias-accent: #1B5FA8;
+/* REPETITION - Repetition */
+.bias-highlight--REPETITION {
+  --bias-bg: #E3E7EA;
+  --bias-accent: #5B6770;
   --bias-border-style: dotted;
 }
 
-/* ATTRIBUTION_FRAMING - teal */
-.bias-highlight--ATTRIBUTION_FRAMING {
-  --bias-bg: #D3F0EA;
-  --bias-accent: #0E7C66;
+/* EXAGGERATION_MINIMIZATION - Exaggeration / Minimization */
+.bias-highlight--EXAGGERATION_MINIMIZATION {
+  --bias-bg: #FCE3CF;
+  --bias-accent: #C2570C;
   --bias-border-style: double;
 }
 
-/* PRESUPPOSITION - amber */
-.bias-highlight--PRESUPPOSITION {
+/* DOUBT - Doubt */
+.bias-highlight--DOUBT {
+  --bias-bg: #D3F0EA;
+  --bias-accent: #0E7C66;
+  --bias-border-style: solid;
+}
+
+/* APPEAL_TO_FEAR_PREJUDICE - Appeal to Fear / Prejudice */
+.bias-highlight--APPEAL_TO_FEAR_PREJUDICE {
+  --bias-bg: #FADAD7;
+  --bias-accent: #B3261E;
+  --bias-border-style: dashed;
+}
+
+/* FLAG_WAVING - Flag-Waving */
+.bias-highlight--FLAG_WAVING {
+  --bias-bg: #D6E2F7;
+  --bias-accent: #1B4F9C;
+  --bias-border-style: dotted;
+}
+
+/* CAUSAL_OVERSIMPLIFICATION - Causal Oversimplification */
+.bias-highlight--CAUSAL_OVERSIMPLIFICATION {
   --bias-bg: #FBEACB;
   --bias-accent: #8A5A00;
-  --bias-border-style: wavy;
+  --bias-border-style: double;
+}
+
+/* SLOGANS - Slogans */
+.bias-highlight--SLOGANS {
+  --bias-bg: #EAF1C4;
+  --bias-accent: #6B7F00;
+  --bias-border-style: solid;
+}
+
+/* APPEAL_TO_AUTHORITY - Appeal to Authority */
+.bias-highlight--APPEAL_TO_AUTHORITY {
+  --bias-bg: #D9E8F7;
+  --bias-accent: #1B5FA8;
+  --bias-border-style: dashed;
+}
+
+/* BLACK_AND_WHITE_FALLACY - Black-and-White Fallacy */
+.bias-highlight--BLACK_AND_WHITE_FALLACY {
+  --bias-bg: #E2E2E2;
+  --bias-accent: #333333;
+  --bias-border-style: dotted;
+}
+
+/* THOUGHT_TERMINATING_CLICHES - Thought-Terminating Clichés */
+.bias-highlight--THOUGHT_TERMINATING_CLICHES {
+  --bias-bg: #EFDCCF;
+  --bias-accent: #7C4A2D;
+  --bias-border-style: double;
+}
+
+/* BANDWAGON_REDUCTIO_AD_HITLERUM - Bandwagon / Reductio ad Hitlerum */
+.bias-highlight--BANDWAGON_REDUCTIO_AD_HITLERUM {
+  --bias-bg: #F6D9EE;
+  --bias-accent: #A3257F;
+  --bias-border-style: solid;
+}
+
+/* STRAW_MAN_WHATABOUTISM_RED_HERRING - Straw Men / Whataboutism / Red Herring */
+.bias-highlight--STRAW_MAN_WHATABOUTISM_RED_HERRING {
+  --bias-bg: #D8EFD9;
+  --bias-accent: #2E7D32;
+  --bias-border-style: dashed;
 }
 
 @media (prefers-color-scheme: dark) {
-  .bias-highlight--LOADED_LANGUAGE { --bias-bg: #C9A9E8; --bias-accent: #3C1E52; }
-  .bias-highlight--EVALUATIVE_MODIFIER { --bias-bg: #F0AFC9; --bias-accent: #5C1330; }
-  .bias-highlight--SPECULATIVE_CONSTRUCTION { --bias-bg: #A9CBEC; --bias-accent: #0E2F54; }
-  .bias-highlight--ATTRIBUTION_FRAMING { --bias-bg: #A0E0D2; --bias-accent: #073E33; }
-  .bias-highlight--PRESUPPOSITION { --bias-bg: #F0D28E; --bias-accent: #453000; }
+  .bias-highlight--LOADED_LANGUAGE { --bias-bg: #CCB6DD; --bias-accent: #311942; }
+  .bias-highlight--NAME_CALLING_LABELING { --bias-bg: #E2ADC2; --bias-accent: #480F26; }
+  .bias-highlight--REPETITION { --bias-bg: #C1C5C9; --bias-accent: #24292D; }
+  .bias-highlight--EXAGGERATION_MINIMIZATION { --bias-bg: #E8BFA3; --bias-accent: #4E2305; }
+  .bias-highlight--DOUBT { --bias-bg: #A3CDC5; --bias-accent: #063229; }
+  .bias-highlight--APPEAL_TO_FEAR_PREJUDICE { --bias-bg: #E2ADAA; --bias-accent: #480F0C; }
+  .bias-highlight--FLAG_WAVING { --bias-bg: #A8BCD9; --bias-accent: #0B203E; }
+  .bias-highlight--CAUSAL_OVERSIMPLIFICATION { --bias-bg: #D3C09E; --bias-accent: #372400; }
+  .bias-highlight--SLOGANS { --bias-bg: #C7CE9E; --bias-accent: #2B3300; }
+  .bias-highlight--APPEAL_TO_AUTHORITY { --bias-bg: #A8C2DE; --bias-accent: #0B2643; }
+  .bias-highlight--BLACK_AND_WHITE_FALLACY { --bias-bg: #B1B1B1; --bias-accent: #141414; }
+  .bias-highlight--THOUGHT_TERMINATING_CLICHES { --bias-bg: #CDBAAF; --bias-accent: #321E12; }
+  .bias-highlight--BANDWAGON_REDUCTIO_AD_HITLERUM { --bias-bg: #DCACCE; --bias-accent: #410F33; }
+  .bias-highlight--STRAW_MAN_WHATABOUTISM_RED_HERRING { --bias-bg: #B0CEB1; --bias-accent: #123214; }
   .bias-highlight:focus-visible { outline-color: #f5f5f5; }
 }
 

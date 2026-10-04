@@ -29,17 +29,27 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "exclude_matches": ["*://*.google.com/search*"],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "exclude_matches": [
+        "*://*.google.com/search*"
+      ],
       "js": [
         "lib/Readability.js",
         "lib/compromise.js",
         "content/pattern-matcher.js",
         "content/conflict-resolver.js",
+        "content/article-matcher.js",
+        "content/keyword-extractor.js",
+        "content/category-meta.js",
         "content/highlighter.js",
         "content/content-script.js"
       ],
-      "css": ["content/highlighter.css"],
+      "css": [
+        "content/highlighter.css"
+      ],
       "run_at": "document_idle"
     }
   ]
