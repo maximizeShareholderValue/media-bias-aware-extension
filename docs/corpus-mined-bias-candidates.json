@@ -1,0 +1,800 @@
+[
+  {
+    "word": "claim",
+    "annotatorFlags": 53,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "claimed",
+    "annotatorFlags": 46,
+    "wncEdits": 4,
+    "suggestedNeutral": "said"
+  },
+  {
+    "word": "claims",
+    "annotatorFlags": 40,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "propaganda",
+    "annotatorFlags": 24,
+    "wncEdits": 4,
+    "suggestedNeutral": "documentary"
+  },
+  {
+    "word": "bizarre",
+    "annotatorFlags": 22,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "false",
+    "annotatorFlags": 20,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "extreme",
+    "annotatorFlags": 18,
+    "wncEdits": 3,
+    "suggestedNeutral": "various"
+  },
+  {
+    "word": "abortion",
+    "annotatorFlags": 16,
+    "wncEdits": 2,
+    "suggestedNeutral": "choice"
+  },
+  {
+    "word": "death",
+    "annotatorFlags": 15,
+    "wncEdits": 2,
+    "suggestedNeutral": "estate"
+  },
+  {
+    "word": "killing",
+    "annotatorFlags": 11,
+    "wncEdits": 5,
+    "suggestedNeutral": "death"
+  },
+  {
+    "word": "destroy",
+    "annotatorFlags": 13,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "cult",
+    "annotatorFlags": 12,
+    "wncEdits": 2,
+    "suggestedNeutral": "religion"
+  },
+  {
+    "word": "supremacist",
+    "annotatorFlags": 11,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "forced",
+    "annotatorFlags": 10,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "enormous",
+    "annotatorFlags": 10,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "great",
+    "annotatorFlags": 6,
+    "wncEdits": 5,
+    "suggestedNeutral": "player"
+  },
+  {
+    "word": "good",
+    "annotatorFlags": 9,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "aggressive",
+    "annotatorFlags": 9,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "brutal",
+    "annotatorFlags": 9,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "crushing",
+    "annotatorFlags": 8,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "extremists",
+    "annotatorFlags": 8,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "man",
+    "annotatorFlags": 7,
+    "wncEdits": 2,
+    "suggestedNeutral": "officer"
+  },
+  {
+    "word": "dictator",
+    "annotatorFlags": 6,
+    "wncEdits": 3,
+    "suggestedNeutral": "leader"
+  },
+  {
+    "word": "myth",
+    "annotatorFlags": 7,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "infamous",
+    "annotatorFlags": 4,
+    "wncEdits": 4,
+    "suggestedNeutral": "bugged"
+  },
+  {
+    "word": "failed",
+    "annotatorFlags": 7,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "smear",
+    "annotatorFlags": 7,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "unfortunately",
+    "annotatorFlags": 1,
+    "wncEdits": 7,
+    "suggestedNeutral": "however"
+  },
+  {
+    "word": "obvious",
+    "annotatorFlags": 7,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "mainstream",
+    "annotatorFlags": 5,
+    "wncEdits": 2,
+    "suggestedNeutral": "many"
+  },
+  {
+    "word": "racists",
+    "annotatorFlags": 6,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "notorious",
+    "annotatorFlags": 5,
+    "wncEdits": 2,
+    "suggestedNeutral": "prominent"
+  },
+  {
+    "word": "praised",
+    "annotatorFlags": 6,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "disgraced",
+    "annotatorFlags": 6,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "regime",
+    "annotatorFlags": 4,
+    "wncEdits": 3,
+    "suggestedNeutral": "union"
+  },
+  {
+    "word": "failure",
+    "annotatorFlags": 6,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "argued",
+    "annotatorFlags": 6,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "incompetent",
+    "annotatorFlags": 5,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "state",
+    "annotatorFlags": 5,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "tragedy",
+    "annotatorFlags": 3,
+    "wncEdits": 3,
+    "suggestedNeutral": "disaster"
+  },
+  {
+    "word": "endless",
+    "annotatorFlags": 5,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "attack",
+    "annotatorFlags": 5,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "myths",
+    "annotatorFlags": 3,
+    "wncEdits": 3,
+    "suggestedNeutral": "legends"
+  },
+  {
+    "word": "sadly",
+    "annotatorFlags": 4,
+    "wncEdits": 2,
+    "suggestedNeutral": "happily"
+  },
+  {
+    "word": "terrorist",
+    "annotatorFlags": 3,
+    "wncEdits": 3,
+    "suggestedNeutral": "militant"
+  },
+  {
+    "word": "poor",
+    "annotatorFlags": 3,
+    "wncEdits": 2,
+    "suggestedNeutral": "basic"
+  },
+  {
+    "word": "abysmal",
+    "annotatorFlags": 4,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "destruction",
+    "annotatorFlags": 4,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "luxury",
+    "annotatorFlags": 4,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "control",
+    "annotatorFlags": 4,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "rich",
+    "annotatorFlags": 4,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "vehemently",
+    "annotatorFlags": 4,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "outrageous",
+    "annotatorFlags": 4,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "worse",
+    "annotatorFlags": 2,
+    "wncEdits": 2,
+    "suggestedNeutral": "further"
+  },
+  {
+    "word": "objectionable",
+    "annotatorFlags": 2,
+    "wncEdits": 2,
+    "suggestedNeutral": "controversial"
+  },
+  {
+    "word": "triggered",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "undermine",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "legendary",
+    "annotatorFlags": 1,
+    "wncEdits": 3,
+    "suggestedNeutral": "famous"
+  },
+  {
+    "word": "murdering",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "superior",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "disgust",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "rule",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "forces",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "haunting",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "refugees",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "destroyed",
+    "annotatorFlags": 2,
+    "wncEdits": 2,
+    "suggestedNeutral": "defeated"
+  },
+  {
+    "word": "even",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "fantastic",
+    "annotatorFlags": 2,
+    "wncEdits": 2,
+    "suggestedNeutral": "speculative"
+  },
+  {
+    "word": "assassination",
+    "annotatorFlags": 1,
+    "wncEdits": 3,
+    "suggestedNeutral": "killing"
+  },
+  {
+    "word": "act",
+    "annotatorFlags": 3,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "fact",
+    "annotatorFlags": 2,
+    "wncEdits": 2,
+    "suggestedNeutral": "idea"
+  },
+  {
+    "word": "murder",
+    "annotatorFlags": 1,
+    "wncEdits": 3,
+    "suggestedNeutral": "assassinate"
+  },
+  {
+    "word": "threats",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "spectacular",
+    "annotatorFlags": 1,
+    "wncEdits": 2,
+    "suggestedNeutral": "extensive"
+  },
+  {
+    "word": "stolen",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "activist",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "horrible",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "moral",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "objectively",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "attempts",
+    "annotatorFlags": 1,
+    "wncEdits": 2,
+    "suggestedNeutral": "efforts"
+  },
+  {
+    "word": "charged",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "refused",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "middle",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "speculated",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "abuse",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "abandoned",
+    "annotatorFlags": 1,
+    "wncEdits": 2,
+    "suggestedNeutral": "left"
+  },
+  {
+    "word": "world",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "hero",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "guise",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "scandal",
+    "annotatorFlags": 1,
+    "wncEdits": 2,
+    "suggestedNeutral": "controversy"
+  },
+  {
+    "word": "dystopian",
+    "annotatorFlags": 2,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "master",
+    "annotatorFlags": 1,
+    "wncEdits": 2,
+    "suggestedNeutral": "teacher"
+  },
+  {
+    "word": "boasts",
+    "annotatorFlags": 1,
+    "wncEdits": 2,
+    "suggestedNeutral": "contains"
+  },
+  {
+    "word": "god",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "vulnerable",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "defending",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "exploited",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "high",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "modern",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "exploitation",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "decried",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "hopefully",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "celebrated",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "soaring",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "anger",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "suffered",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "mistreatment",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "major",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "very",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "massacre",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "child",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "skinheads",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "law",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "saints",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "admits",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "nemesis",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "men",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "prestigious",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "muslim",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "steal",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "former",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "misuse",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "crushed",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "holy",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "believed",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "signature",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "star",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "lovers",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "demonstrated",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "occasionally",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "crackpot",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "stunning",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  },
+  {
+    "word": "appease",
+    "annotatorFlags": 1,
+    "wncEdits": 1,
+    "suggestedNeutral": null
+  }
+]
