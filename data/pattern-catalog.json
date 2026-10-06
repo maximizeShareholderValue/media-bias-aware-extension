@@ -1,6 +1,6 @@
 {
   "$schemaVersion": "2.0.0",
-  "catalogVersion": "0.4.0",
+  "catalogVersion": "0.4.2",
   "lastUpdated": "2026-10-04",
   "_readme": "Linguistic Pattern Catalog. Each rule follows the ten fields of thesis Table 13 and is evaluated as D(s,r) = L(s,r) AND S(s,r) AND C(s,r) (FR-DET-03): the lexicalTrigger generates a candidate; it is flagged only if the linguisticCondition (structure/POS) and the contextCondition (local context) also hold. A lexical-only run (L alone) is the section 8.3 baseline. Overlaps are resolved by FR-DET-04: longest span, then higher confidenceTier, then earliest offset, then lowest id. Edit this file to change detection without rebuilding the extension. REPETITION has no rules: it needs a repeated-expression comparison rather than a lexical trigger. Rule ID prefixes of the original seed rules (LL/PS/SC/AF/EM) are legacy names; `technique` is authoritative. confidenceTier is currently authored, not yet calibrated on the development corpus (thesis Stage 5).",
   "_schema": {
@@ -8,12 +8,13 @@
     "SemEval Technique": "technique (key into `techniques`)",
     "Reference Definition": "referenceDefinition",
     "Lexical Trigger": "lexicalTrigger { words, pattern }",
-    "Linguistic Condition": "linguisticCondition { type, ... } (types: none, all, any, taggedAny, precedesNoun, followedByTag, precededByTag, followedByWord, reportingVerb, inQuestion)",
+    "Linguistic Condition": "linguisticCondition { type, ... } (types: none, all, any, not, taggedAny, precedesNoun, followedByTag, precededByTag, followedByWord, reportingVerb, inQuestion)",
     "Context Condition": "contextCondition { excludeNeighborWords, excludeWindowWords, excludeSentenceWords, requireSentenceWords, requireNoQuantity, excludeFollowingPattern }",
     "Target Span": "targetSpan (\"trigger\": the matched word/phrase is the highlighted span)",
     "Explanation": "explanation",
     "Source Example": "sourceExample { text, source, triggerEvidence }",
-    "Confidence Tier": "confidenceTier (high | medium | low)"
+    "Confidence Tier": "confidenceTier (high | medium | low)",
+    "Quoted Speech": "optional `flagInsideQuotes` (true = still flag when inside quotation marks; default false). Quoted speech is otherwise skipped."
   },
   "techniques": {
     "LOADED_LANGUAGE": {
@@ -104,7 +105,8 @@
           "overhaul",
           "rethink"
         ],
-        "description": "Not a neutral technical collocation such as 'radical surgery' or 'radical honesty'."
+        "description": "Not a neutral technical collocation such as 'radical surgery' or 'radical honesty'. Not part of a capitalized proper name ('Radical Republicans').",
+        "excludeMidSentenceCapital": true
       },
       "targetSpan": "trigger",
       "explanation": "This word casts the person or group in strongly negative, emotionally loaded terms rather than describing their position neutrally.",
@@ -383,7 +385,16 @@
         "description": "An evaluative adjective applied to something: attributive (before a noun) or predicative (after 'is/was')."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "description": "Not a fixed idiom or a weather description ('vicious cycle', 'brutal heat wave').",
+        "excludeNeighborWords": [
+          "cycle",
+          "circle",
+          "heat",
+          "winter",
+          "cold",
+          "weather",
+          "storm"
+        ]
       },
       "targetSpan": "trigger",
       "explanation": "This word states the writer's own emotional judgment instead of describing what happened and letting the reader decide.",
@@ -417,7 +428,8 @@
         "description": "The reputational modifier directly precedes the noun it judges (Compromise tags 'disgraced' as a past-tense verb, so the rule keys on the following noun, not the trigger's own tag)."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "description": "Not part of a capitalized name ('The Notorious B.I.G.').",
+        "excludeMidSentenceCapital": true
       },
       "targetSpan": "trigger",
       "explanation": "This word injects the writer's own negative judgment about someone's reputation, rather than letting the reader draw that conclusion from neutrally reported facts.",
@@ -516,7 +528,8 @@
           "before": 1,
           "after": 2
         },
-        "description": "Not the proper name of an organization ('Democratic Socialists of America', 'Socialist Party')."
+        "description": "Not the proper name of an organization ('Democratic Socialists of America', 'Socialist Party'). Not a capitalized party or group name ('Spain's Socialists', 'Thug Life').",
+        "excludeMidSentenceCapital": true
       },
       "targetSpan": "trigger",
       "explanation": "This is a label for a person or group that the audience is likely to react to emotionally, rather than a neutral description of who they are or what they did.",
@@ -746,9 +759,10 @@
           "authorities",
           "detained",
           "custody",
-          "accused"
+          "accused",
+          "according"
         ],
-        "description": "Not legal hedging: no police/court/charge vocabulary in the same sentence."
+        "description": "Not legal hedging: no police/court/charge vocabulary in the same sentence. Also skipped when the claim is attributed ('according to a neighbor')."
       },
       "targetSpan": "trigger",
       "explanation": "This adverb casts doubt on a claim without saying why. In crime reporting it is a standard legal hedge, so it is skipped when legal terms appear in the same sentence.",
@@ -806,8 +820,32 @@
         "pattern": "\\b(claimed|claims|claim)\\b"
       },
       "linguisticCondition": {
-        "type": "reportingVerb",
-        "description": "Used as a reporting verb ('claimed that ...'); the noun sense ('filed a claim') is never followed by 'that' or a quote."
+        "type": "all",
+        "of": [
+          {
+            "type": "reportingVerb"
+          },
+          {
+            "type": "taggedAny",
+            "tags": [
+              "Verb"
+            ]
+          },
+          {
+            "type": "not",
+            "of": {
+              "type": "precededByTag",
+              "tags": [
+                "Determiner",
+                "Possessive",
+                "Adjective",
+                "Preposition"
+              ],
+              "within": 1
+            }
+          }
+        ],
+        "description": "Used as a reporting VERB ('X claimed that ...'): followed by 'that' or a quote, tagged as a verb, and not directly after a determiner, possessive, adjective or preposition. This excludes the noun use ('rejected claims that ...', 'the claims that ...', 'false claims that ...')."
       },
       "contextCondition": {
         "description": "No additional local context condition."
@@ -832,12 +870,11 @@
         "words": [
           "existential threat",
           "threat to democracy",
-          "under siege",
           "crime wave",
           "terrifying",
           "ticking time bomb"
         ],
-        "pattern": "\\b(existential threat|threat to democracy|under siege|crime wave|wave of crime|climate of fear|grave danger|mortal danger|deadly threat|terrifying|ticking time bomb|never be safe again|will never be safe)\\b"
+        "pattern": "\\b(existential threat|threat to democracy|crime wave|wave of crime|climate of fear|grave danger|mortal danger|deadly threat|terrifying|ticking time bomb|never be safe again|will never be safe)\\b"
       },
       "linguisticCondition": {
         "type": "none",
@@ -855,6 +892,48 @@
       },
       "confidenceTier": "medium",
       "neutralAlternative": "State the specific risk and its evidence"
+    },
+    {
+      "id": "FE-002",
+      "technique": "APPEAL_TO_FEAR_PREJUDICE",
+      "label": "Fear-invoking figure of speech",
+      "referenceDefinition": "Attempting to influence an audience by invoking fear, anxiety, panic, or preconceived judgments.",
+      "lexicalTrigger": {
+        "words": [
+          "under siege"
+        ],
+        "pattern": "\\bunder siege\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor."
+      },
+      "contextCondition": {
+        "excludeSentenceWords": [
+          "war",
+          "army",
+          "troops",
+          "forces",
+          "military",
+          "soldiers",
+          "city",
+          "town",
+          "village",
+          "capital",
+          "besieged",
+          "airport"
+        ],
+        "description": "Figurative use only: skipped when the sentence is about an actual military siege ('a village under siege during the war')."
+      },
+      "targetSpan": "trigger",
+      "explanation": "Describing something as 'under siege' casts it as being attacked, to provoke alarm, rather than stating what actually happened.",
+      "sourceExample": {
+        "text": "If Hamas is not completely defeated, Israeli families will never be safe again.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Authored from the technique definition; the literal military sense is excluded by the context condition."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "State specifically what is happening"
     },
     {
       "id": "FW-001",
@@ -951,7 +1030,8 @@
         "triggerEvidence": "SemEval Table 1 gives 'BUILD THE WALL!' as the Slogans example; other slogans are well-known campaign slogans."
       },
       "confidenceTier": "high",
-      "neutralAlternative": "Explain the policy behind the slogan"
+      "neutralAlternative": "Explain the policy behind the slogan",
+      "flagInsideQuotes": true
     },
     {
       "id": "SL-002",
@@ -980,7 +1060,8 @@
         "triggerEvidence": "Thesis Table 12 (Slogans example)."
       },
       "confidenceTier": "medium",
-      "neutralAlternative": "Explain the position and its trade-offs"
+      "neutralAlternative": "Explain the position and its trade-offs",
+      "flagInsideQuotes": true
     },
     {
       "id": "AA-001",
@@ -1004,7 +1085,15 @@
         "description": "The multi-word expression is itself the anchor (phrase-level condition)."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "description": "Not already attributed to a named source in the same sentence ('according to ...', 'the journal reported').",
+        "excludeSentenceWords": [
+          "according",
+          "journal",
+          "university",
+          "institute",
+          "professor",
+          "published"
+        ]
       },
       "targetSpan": "trigger",
       "explanation": "This leans on an unnamed authority to make a claim sound settled. Naming the expert or study lets readers check it.",
@@ -1064,8 +1153,15 @@
         "pattern": "\\b(with us or against us|no middle ground|only two (?:options|choices|sides)|there is no alternative|no other choice)\\b"
       },
       "linguisticCondition": {
-        "type": "none",
-        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+        "type": "not",
+        "of": {
+          "type": "followedByTag",
+          "tags": [
+            "Noun"
+          ],
+          "within": 1
+        },
+        "description": "The phrase is not immediately followed by a noun ('there is no alternative route' is literal; 'there is no alternative.' is the fallacy)."
       },
       "contextCondition": {
         "description": "No additional local context condition."

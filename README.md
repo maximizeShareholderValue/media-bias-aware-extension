@@ -16,7 +16,7 @@ named rule in `data/pattern-catalog.json`.
    many rules.
 
 ```
-node --test test/pattern-matcher.test.js test/article-matcher.test.js test/compare-utils.test.js test/eval-metrics.test.js
+node --test test/*.test.js
 ```
 
 ## How detection works
@@ -49,7 +49,7 @@ section 8.3; the full pipeline's detections are always a subset of it.
 | Reference Definition | `referenceDefinition` |
 | Lexical Trigger | `lexicalTrigger` `{words, pattern}` |
 | Linguistic Condition | `linguisticCondition` `{type, ...}` |
-| Context Condition | `contextCondition` `{excludeNeighborWords, excludeWindowWords, excludeSentenceWords, requireSentenceWords, requireNoQuantity, excludeFollowingPattern}` |
+| Context Condition | `contextCondition` `{excludeNeighborWords, excludeWindowWords, excludeSentenceWords, requireSentenceWords, requireNoQuantity, excludeFollowingPattern, excludeMidSentenceCapital}`; plus top-level `flagInsideQuotes` |
 | Target Span | `targetSpan` (`"trigger"`) |
 | Explanation | `explanation` |
 | Source Example | `sourceExample` `{text, source, triggerEvidence}` |
@@ -90,9 +90,11 @@ flagged on a live page.
 | FR-DET-06 highlights + tooltip (technique, rule ID, explanation) | Done |
 | FR-AVD-01 keywords only to NewsAPI | Done. Keywords are extracted locally; a privacy guard in the service worker drops anything that looks like a title or sentence |
 | FR-AVD-02 split-screen Left / Center / Right | Done (popup groups results; "Open split-screen view" opens `compare/compare.html`) |
+| Compare tab reliability | Lookups search a list of ~60 rated outlets first (`PRIORITY_DOMAINS` in `shared/compare-utils.js`), then loosen the query (3 attempts max, `buildAttempts`), merge the results and cache them for 30 minutes. NewsAPI's free plan delays articles by about 24 hours, so a story from today usually has no matches yet; the popup says so and names the reason when a lookup fails (timeout, rate limit, bad key). Tests stub `fetch` (`test/comparative-lookup.test.js`) |
+| How-it-works page | `about/about.html` (opened from **Learn Methodology** and from each technique in the legend) lists the 14 techniques straight from the catalog, the L/S/C method, quoted-speech handling, privacy table and limits |
 | FR-CHK-01 offline outlet lookup | Done, but with **8,849** outlets (full MBFC + AllSides), not 200 - update the thesis text or subset the file |
 | FR-CHK-02 ideology + reliability | **Partial by decision**: ideology is shown; the reliability tier was removed from the popup at the team's request (the data is still in `outlet-metadata.json`). The thesis requirement needs updating |
-| FR-CHK-03 ownership from MOM | **Gap**: `ownershipType` is "Unknown" for nearly all outlets; Media Ownership Monitor data is not integrated |
+| FR-CHK-03 ownership from MOM | **Partial**: the Source tab shows leaning, media type, country and a **Learn about ownership** button that opens the outlet's Media Bias/Fact Check review in a new tab. Parent company and ownership type are filled for ~43 major outlets from `data/ownership-curated.json` (hand-curated by the authors; verify before the defense). MBFC's dataset has no ownership column and Media Ownership Monitor data is not integrated, so other outlets show "Ownership not recorded". Re-run `node scripts/enrich-outlet-metadata.js <mbfc-data.json>` after editing |
 | FR-SYS-01 / NFR-PRIV-01 encrypted key, activeTab + storage only | **Gap**: the NewsAPI key is stored unencrypted in `chrome.storage.local` (readable by content scripts), and content scripts match all http(s) pages instead of using only `activeTab` |
 | NFR-PERF-01 < 3 s | Met: about 0.4 s average over 12 saved pages (real articles + test page) |
 | NFR-RELI-01 precision / FPR / kappa | **Not yet measurable**: needs the 30-article corpus and three validators |
@@ -138,6 +140,26 @@ repeated-expression detector rather than a lexical trigger, so `REPETITION` has 
 - **Privacy**: article text never leaves the page. The only network call is the optional,
   user-triggered NewsAPI request, and it carries only topic keywords. Highlights, titles and
   reading history are never sent.
-- **Known limitation**: keyword rules are heuristics, so some flags are legitimate uses in
-  context (e.g. "extremist views" in a factual report). The tooltip explains the rule so the
-  reader can judge; the thesis frames highlights as cues, not verdicts.
+- **False positives**: a keyword alone is not evidence, so each rule carries conditions that
+  separate the biased use from the neutral one. Example: "claims" is flagged only as a *verb*
+  ("he claims that ..."), never as a noun ("rejected claims that ..."); capitalized names
+  ("Spain's Socialists", "Radical Republicans") are not name-calling; "under siege" is skipped in
+  a war context. Condition types: `none, all, any, not, taggedAny, precedesNoun, followedByTag,
+  precededByTag, followedByWord, reportingVerb, inQuestion`.
+- **Quoted speech**: a candidate entirely inside quotation marks (curly, straight, or
+  single-quoted headline style) is what a source said, not the outlet's own wording, so it is not
+  flagged. A quote left open runs to the end of the paragraph. Slogan rules set
+  `flagInsideQuotes: true` because slogans are usually quoted. The keyword baseline still counts
+  quoted candidates, and `includeQuotes: true` turns the check off.
+- **How a wrong flag gets fixed**: add the sentence to `test/false-positive-cases.json` under
+  `mustNotFire` (plus a `mustFire` companion so the rule cannot be silently disabled), tighten
+  the rule's S or C condition in the catalog, and run `node --test`. During evaluation, the
+  validators' "Not Valid" verdicts are the measured false-positive rate (FPR = 1 - precision).
+- **Known limitations**: where the phrase itself is the cue ("sources say", "everyone knows",
+  "merely"), a keyword rule cannot tell a neutral use from a loaded one. These are listed as
+  `knownLimitations` in the same file (shown as `todo` tests) and disclosed in the thesis. The
+  tooltip explains the rule so the reader can judge; highlights are cues, not verdicts.
+
+## Icon
+
+`icons/` holds the toolbar icon (a shield with a highlighted line of text, matching the popup header). Regenerate the PNGs and `icon.svg` with `node scripts/generate-icons.js`.

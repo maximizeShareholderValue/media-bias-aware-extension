@@ -8,6 +8,12 @@
  * options.mode = "lexicalOnly" skips S and C and returns every candidate. That
  * is the thesis' section 8.3 keyword baseline: Candidate(s, r) = L(s, r).
  *
+ * Quoted speech: a candidate that lies entirely inside quotation marks is what
+ * a source said, not the outlet's own wording, so it is not flagged
+ * (failedAt = "quoted"). A rule can opt back in with `flagInsideQuotes: true`
+ * (slogans are usually quoted), and options.includeQuotes = true disables the
+ * check. The keyword baseline (mode "lexicalOnly") is unaffected.
+ *
  * Pure function module (no DOM, no chrome.*) so it is unit-testable under Node.
  */
 (function (root, factory) {
@@ -35,7 +41,7 @@
   var TIER_RANK = { high: 3, medium: 2, low: 1 };
   var QUANTITY_TAGS = ["Value", "Percent", "Money"];
   var LINGUISTIC_TYPES = [
-    "none", "all", "any", "taggedAny", "precedesNoun", "followedByTag",
+    "none", "all", "any", "not", "taggedAny", "precedesNoun", "followedByTag",
     "precededByTag", "followedByWord", "reportingVerb", "inQuestion"
   ];
 
@@ -123,6 +129,8 @@
       case "any":
         for (k = 0; k < cond.of.length; k++) if (evalLinguistic(cond.of[k], ctx)) return true;
         return false;
+      case "not":
+        return !evalLinguistic(cond.of, ctx);
       case "taggedAny":
         return hasAnyTag(t[a], cond.tags);
       case "precedesNoun":
@@ -159,6 +167,45 @@
     }
   }
 
+  var SINGLE_QUOTE_RE = /(^|[\s(\[\u2014\u2013-])(['\u2018])(?=\S)((?:[^'\u2018\u2019\n]|['\u2019](?=\w)){2,200}?)(?<=\S)(['\u2019])(?=$|[\s.,;:!?)\]\u2014\u2013-])/g;
+
+  /**
+   * [start, end) character ranges that lie inside quotation marks (marks excluded).
+   * Double quotes: curly open/close or straight toggle. A quote opened and not closed
+   * runs to the end of the paragraph (the news convention for multi-paragraph quotes).
+   * Single quotes (headline style) count only where they open a word and close one.
+   */
+  function quotedSpans(text) {
+    var spans = [];
+    var open = false;
+    var from = 0;
+    var sawOpener = false;
+    for (var i = 0; i < text.length; i++) {
+      var ch = text.charAt(i);
+      if (ch === "\u201C" || (ch === '"' && !open)) {
+        if (!open) { open = true; from = i + 1; sawOpener = true; }
+      } else if (ch === "\u201D" || (ch === '"' && open)) {
+        if (open) { spans.push([from, i]); open = false; }
+        else if (!sawOpener && !spans.length) spans.push([0, i]); // closes a quote opened in an earlier paragraph
+      }
+    }
+    if (open) spans.push([from, text.length]);
+    var re = new RegExp(SINGLE_QUOTE_RE.source, "g");
+    var m;
+    while ((m = re.exec(text)) !== null) {
+      var s = m.index + m[1].length + 1;
+      var e = s + m[3].length;
+      var overlaps = spans.some(function (x) { return s < x[1] && e > x[0]; });
+      if (!overlaps) spans.push([s, e]);
+    }
+    return spans;
+  }
+
+  function insideQuote(spans, start, end) {
+    for (var i = 0; i < spans.length; i++) if (start >= spans[i][0] && end <= spans[i][1]) return true;
+    return false;
+  }
+
   /** C(s, r): local contextual condition. Every key present must hold. */
   function evalContext(cond, ctx) {
     if (!cond) return true;
@@ -187,6 +234,13 @@
         if (cond.requireNoQuantity && hasAnyTag(term, QUANTITY_TAGS) && !hasTag(term, "Date")) return false;
       }
       if (!foundRequired) return false;
+    }
+    if (cond.excludeMidSentenceCapital) {
+      // A Capitalized word is a proper name if it is mid-sentence, or if the next word is Capitalized too ("Radical Republicans", "Thug Life").
+      if (/^[A-Z][a-z]/.test(ctx.text.slice(ctx.start, ctx.end))) {
+        var nextTerm = t[b + 1];
+        if (a !== ctx.sentence.first || (nextTerm && sameSentence(t, b, b + 1) && /^[A-Z][a-z]/.test(nextTerm.text))) return false;
+      }
     }
     if (cond.excludeFollowingPattern) {
       var re = new RegExp("^" + spaced(cond.excludeFollowingPattern), "i");
@@ -229,10 +283,11 @@
    * Every lexical candidate for every rule, each tagged with whether it
    * passed S and C (failedAt = "linguistic" | "context" | null).
    */
-  function evaluate(text, patterns, categories) {
+  function evaluate(text, patterns, categories, options) {
     var records = [];
     if (!text || !patterns || !patterns.length) return records;
     var terms = flattenTerms(text);
+    var quotes = options && options.includeQuotes ? [] : quotedSpans(text);
 
     for (var p = 0; p < patterns.length; p++) {
       var pattern = patterns[p];
@@ -260,6 +315,10 @@
             failedAt = "context";
           }
         }
+        if (passed && !pattern.flagInsideQuotes && insideQuote(quotes, cand.start, cand.end)) {
+          passed = false;
+          failedAt = "quoted";
+        }
         records.push(buildRecord(pattern, categories, cand, range, passed, failedAt));
       }
     }
@@ -273,12 +332,12 @@
    * @param {string} text - plain-text paragraph to scan.
    * @param {Array} patterns - `patterns` array from pattern-catalog.json.
    * @param {Object} categories - `techniques` map from pattern-catalog.json (for technique labels).
-   * @param {{mode?: "full"|"lexicalOnly"}} [options]
+   * @param {{mode?: "full"|"lexicalOnly", includeQuotes?: boolean}} [options]
    * @returns {Array<Match>} matches sorted by start; overlap resolution is a separate stage.
    */
   function findMatches(text, patterns, categories, options) {
     var lexicalOnly = !!options && options.mode === "lexicalOnly";
-    return evaluate(text, patterns, categories).filter(function (r) {
+    return evaluate(text, patterns, categories, options).filter(function (r) {
       return lexicalOnly || r.passed;
     });
   }
@@ -286,6 +345,7 @@
   return {
     findMatches: findMatches,
     evaluate: evaluate,
+    quotedSpans: quotedSpans,
     LINGUISTIC_TYPES: LINGUISTIC_TYPES,
     _internals: { flattenTerms: flattenTerms, termRange: termRange, evalLinguistic: evalLinguistic, evalContext: evalContext }
   };

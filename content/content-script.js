@@ -216,6 +216,30 @@
     return lastRunResult;
   }
 
+  // Publication date, read locally from page metadata (or a /YYYY/MM/DD/ URL). It is never sent anywhere:
+  // the popup only uses it to tell the reader whether NewsAPI's free plan can still have the story.
+  function getPublishedAt() {
+    var selectors = [
+      'meta[property="article:published_time"]',
+      'meta[name="article:published_time"]',
+      'meta[name="date"]',
+      'meta[name="pubdate"]',
+      'meta[itemprop="datePublished"]',
+      'meta[property="og:article:published_time"]'
+    ];
+    for (var i = 0; i < selectors.length; i++) {
+      var m = document.querySelector(selectors[i]);
+      var t = m && Date.parse(m.getAttribute("content"));
+      if (t) return new Date(t).toISOString();
+    }
+    var timeEl = document.querySelector("time[datetime]");
+    var tt = timeEl && Date.parse(timeEl.getAttribute("datetime"));
+    if (tt) return new Date(tt).toISOString();
+    var u = /\/(20\d\d)\/(\d\d?)\/(\d\d?)(?:\/|$)/.exec(location.pathname);
+    if (u) return new Date(Date.UTC(+u[1], +u[2] - 1, +u[3])).toISOString();
+    return null;
+  }
+
   // Topic keywords for comparative reporting (FR-AVD-01). Computed on demand so the
   // detection pipeline stays fast, and only these keywords ever leave the page.
   function getKeywords() {
@@ -237,7 +261,7 @@
       return false;
     }
     if (message.type === "GET_KEYWORDS") {
-      sendResponse({ ok: true, keywords: getKeywords(), title: lastArticle && lastArticle.title });
+      sendResponse({ ok: true, keywords: getKeywords(), title: lastArticle && lastArticle.title, publishedAt: getPublishedAt() });
       return false;
     }
     if (message.type === "GET_AUDIT_LOG") {

@@ -35,7 +35,9 @@
     "saturday sunday january february march april may june july august september october november december " +
     "people person man men woman women thing things way lot part number percent report reports statement news story " +
     "state states country government official officials president minister spokesperson source sources comment comments " +
-    "while after before during since until over under between among according inc corp ltd llc co").split(" ").forEach(function (w) {
+    "while after before during since until over under between among according inc corp ltd llc co " +
+    "here there getty images image photo photos via senior correspondent editor reporter writer staff video watch read " +
+    "click subscribe copyright ap afp reuters video footage clip picture claim claims head").split(" ").forEach(function (w) {
     STOP[w] = true;
   });
 

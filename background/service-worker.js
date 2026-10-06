@@ -8,17 +8,25 @@
  *    against NewsAPI, only when the user has saved their own API key.
  *
  * Privacy (FR-AVD-01 / NFR-PRIV-01): the request carries ONLY short topic
- * keywords. CompareUtils.sanitizeKeywords drops anything that looks like a
- * title or sentence, so article text, titles, highlights and reading history
- * cannot be sent even if a caller passes them by mistake.
+ * keywords (plus a list of public outlet domains to search within or skip).
+ * CompareUtils.sanitizeKeywords drops anything that looks like a title or
+ * sentence, so article text, titles, highlights and reading history cannot be
+ * sent even if a caller passes them by mistake.
+ *
+ * Lookup strategy: up to three queries, each looser than the last
+ * (CompareUtils.buildAttempts), stopping as soon as enough rated articles are
+ * found. Results are cached for 30 minutes so reopening the tab does not spend
+ * the free plan's 100-requests-a-day quota.
  */
 
 importScripts("../shared/compare-utils.js");
 
 const NEWSAPI_TIMEOUT_MS = 1500;
 const NEWSAPI_BASE = "https://newsapi.org/v2/everything";
+const CACHE_TTL_MS = 30 * 60 * 1000;
 
 let catalogCache = null;
+let outletsCache = null;
 
 async function loadCatalog() {
   if (catalogCache) return catalogCache;
@@ -27,14 +35,21 @@ async function loadCatalog() {
   return catalogCache;
 }
 
-async function queryNewsApi(apiKey, query) {
+async function loadOutlets() {
+  if (outletsCache) return outletsCache;
+  const res = await fetch(chrome.runtime.getURL("data/outlet-metadata.json"));
+  outletsCache = (await res.json()).outlets || [];
+  return outletsCache;
+}
+
+async function queryNewsApi(apiKey, params) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), NEWSAPI_TIMEOUT_MS);
   try {
-    const url =
-      NEWSAPI_BASE +
-      "?q=" + encodeURIComponent(query) +
-      "&language=en&searchIn=title,description&sortBy=relevancy&pageSize=50";
+    let url = NEWSAPI_BASE + "?q=" + encodeURIComponent(params.query) + "&language=en&sortBy=relevancy&pageSize=100";
+    if (params.searchIn) url += "&searchIn=" + params.searchIn;
+    if (params.domains && params.domains.length) url += "&domains=" + params.domains.join(",");
+    if (params.excludeDomains && params.excludeDomains.length) url += "&excludeDomains=" + params.excludeDomains.join(",");
     const res = await fetch(url, { signal: controller.signal, headers: { "X-Api-Key": apiKey } });
 
     if (res.status === 429) {
@@ -44,7 +59,7 @@ async function queryNewsApi(apiKey, query) {
     if (!res.ok) {
       const bodyText = await res.text().catch(() => "");
       console.warn("[bias-aware] comparative lookup failed: HTTP " + res.status + " from newsapi.org - " + bodyText.slice(0, 300));
-      return { ok: false, reason: "http_error", status: res.status };
+      return { ok: false, reason: res.status === 401 ? "bad_api_key" : "http_error", status: res.status };
     }
     const data = await res.json();
     const articles = (data.articles || []).map((a) => ({
@@ -66,7 +81,29 @@ async function queryNewsApi(apiKey, query) {
   }
 }
 
-async function handleComparativeLookup(rawKeywords) {
+function cacheKey(attempts, currentDomain) {
+  return "cmp:" + (currentDomain || "") + ":" + attempts.map((a) => a.query).join("|");
+}
+
+async function readCache(key) {
+  try {
+    if (!chrome.storage.session) return null;
+    const entry = (await chrome.storage.session.get(key))[key];
+    return entry && Date.now() - entry.at < CACHE_TTL_MS ? entry.response : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function writeCache(key, response) {
+  try {
+    if (chrome.storage.session) await chrome.storage.session.set({ [key]: { at: Date.now(), response } });
+  } catch (e) {
+    /* cache is best-effort */
+  }
+}
+
+async function handleComparativeLookup(rawKeywords, rawCurrentDomain) {
   const keywords = CompareUtils.sanitizeKeywords(rawKeywords);
   if (!keywords.length) return { ok: false, reason: "no_keywords" };
 
@@ -79,15 +116,50 @@ async function handleComparativeLookup(rawKeywords) {
     return { ok: false, reason: "no_permission" };
   }
 
-  let used = Math.min(3, keywords.length);
-  let result = await queryNewsApi(newsApiKey, CompareUtils.buildQuery(keywords, used));
-  // Three ANDed keywords can be too narrow: retry once with the two strongest.
-  if (result.ok && !result.articles.length && used > 2) {
-    used = 2;
-    result = await queryNewsApi(newsApiKey, CompareUtils.buildQuery(keywords, used));
+  const currentDomain = /^[a-z0-9.-]{3,80}$/i.test(rawCurrentDomain || "") ? rawCurrentDomain.toLowerCase() : null;
+  const attempts = CompareUtils.buildAttempts(keywords);
+  const key = cacheKey(attempts, currentDomain);
+  const cached = await readCache(key);
+  if (cached) return Object.assign({}, cached, { cached: true });
+
+  const outlets = await loadOutlets();
+  const priority = CompareUtils.PRIORITY_DOMAINS.filter((d) => !currentDomain || !CompareUtils.hostnameMatchesDomain(currentDomain, d));
+  const merged = [];
+  const seen = {};
+  const tried = [];
+  let usable = 0;
+  let failure = null;
+  let usedKeywords = attempts[0].keywords;
+
+  for (const attempt of attempts) {
+    const result = await queryNewsApi(newsApiKey, {
+      query: attempt.query,
+      searchIn: attempt.searchIn,
+      domains: attempt.scope === "priority" ? priority : null,
+      excludeDomains: attempt.scope === "any" && currentDomain ? [currentDomain] : null
+    });
+    if (!result.ok) {
+      failure = result;
+      tried.push({ id: attempt.id, failed: result.reason });
+      break; // a rate limit, bad key or timeout will not improve with a looser query
+    }
+    result.articles.forEach((a) => {
+      if (a.url && !seen[a.url]) {
+        seen[a.url] = true;
+        merged.push(a);
+      }
+    });
+    const grouped = CompareUtils.groupByIdeology(merged, outlets, currentDomain);
+    usable = grouped.groups.Left.length + grouped.groups.Center.length + grouped.groups.Right.length;
+    tried.push({ id: attempt.id, found: result.articles.length, usable: usable });
+    usedKeywords = attempt.keywords;
+    if (usable >= CompareUtils.ENOUGH_RESULTS) break;
   }
-  if (result.ok) result.keywords = keywords.slice(0, used);
-  return result;
+
+  if (failure && !merged.length) return failure;
+  const response = { ok: true, articles: merged, keywords: usedKeywords, tried: tried };
+  await writeCache(key, response);
+  return response;
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -99,7 +171,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === "COMPARATIVE_LOOKUP") {
-    handleComparativeLookup(message.keywords).then(sendResponse);
+    handleComparativeLookup(message.keywords, message.currentDomain)
+      .then(sendResponse)
+      .catch((err) => {
+        console.warn("[bias-aware] comparative lookup crashed:", err && err.message);
+        sendResponse({ ok: false, reason: "internal_error" });
+      });
     return true;
   }
 

@@ -65,6 +65,7 @@
         <div class="section">
           <h2 class="section__title">Bias Types Detected</h2>
           <ul class="legend" id="categoryLegend"></ul>
+          <button type="button" class="link-button" id="techniquesLink">What do these 14 techniques mean? &#8599;</button>
         </div>
 
         <div class="note-box" id="analysisNote">
@@ -98,12 +99,7 @@
       </button>
     </footer>
 
-    <div class="methodology-panel" id="methodologyPanel" hidden>
-      <h3>How to read these results</h3>
-      <p><b>Phrases Found</b> is the number of highlighted spans; <b>Techniques</b> is how many of the 14 SemEval-2020 propaganda techniques they cover. The popup does not rate an article as biased or unbiased, and it gives no bias score.</p>
-      <p>A phrase is highlighted only when a rule's lexical trigger, its grammatical condition and its local-context condition all hold. Every highlight names its rule ID: hover or focus it to see why it was flagged.</p>
-      <p>Highlights are cues about wording, not verdicts. A flagged phrase can be legitimate in context.</p>
-    </div>
+
   </main>
 
   <section id="settingsView" class="view" hidden>

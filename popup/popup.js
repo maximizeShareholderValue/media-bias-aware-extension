@@ -47,7 +47,7 @@
   var keyStatus = document.getElementById("keyStatus");
 
   var methodologyToggle = document.getElementById("methodologyToggle");
-  var methodologyPanel = document.getElementById("methodologyPanel");
+  var techniquesLink = document.getElementById("techniquesLink");
 
   var activeTab = null;
   var lastArticleTitle = null;
@@ -80,24 +80,11 @@
     return outletsCache;
   }
 
-  // Matches on a "hostname IS or ENDS WITH the known domain" basis (e.g.
-  // "news.abs-cbn.com" and "www.abs-cbn.com" both match a stored
-  // "abs-cbn.com" entry) rather than an exact strip-www comparison, since
-  // outlets commonly serve from subdomains other than "www." (e.g. ABS-CBN's
-  // real site is "news.abs-cbn.com"). This isn't full eTLD+1 parsing (no
-  // public-suffix-list handling for multi-part TLDs like .co.uk), but it's
-  // safe here because we're matching against our OWN known domain strings,
-  // not deriving a registrable domain from an arbitrary hostname.
-  function hostnameMatchesDomain(hostname, domain) {
-    var h = hostname.toLowerCase();
-    var d = domain.toLowerCase();
-    return h === d || h.endsWith("." + d);
-  }
-
+  // CompareUtils.findOutlet matches "hostname IS or ENDS WITH a known domain" (so
+  // "news.abs-cbn.com" matches "abs-cbn.com") and prefers the longest matching domain.
   function findOutletByUrl(url) {
     if (!url || !/^https?:/.test(url)) return Promise.resolve(null);
-    var hostname = new URL(url).hostname;
-    return loadOutlets().then((outlets) => outlets.find((o) => hostnameMatchesDomain(hostname, o.domain)) || null);
+    return loadOutlets().then((outlets) => CompareUtils.findOutlet(outlets, url));
   }
 
   // --- Status pill + stats -------------------------------------------------
@@ -139,7 +126,15 @@
       swatch.className = "swatch";
       swatch.style.background = meta.color;
       li.appendChild(swatch);
-      li.appendChild(document.createTextNode(meta.label + " (" + categoryCounts[cat] + ")"));
+      var more = document.createElement("a");
+      more.href = "../about/about.html#" + cat;
+      more.textContent = meta.label + " (" + categoryCounts[cat] + ")";
+      more.title = "What does " + meta.label + " mean?";
+      more.addEventListener("click", (e) => {
+        e.preventDefault();
+        openAbout(cat);
+      });
+      li.appendChild(more);
       categoryLegend.appendChild(li);
     });
   }
@@ -231,8 +226,10 @@
   var ICON_CALENDAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
   var ICON_GLOBE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
   var ICON_USERS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
-  var ICON_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
   var ICON_EXTERNAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+  var ICON_SCALE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0z"/><path d="M19 7l-3 7a3 3 0 0 0 6 0z"/></svg>';
+  var ICON_NEWS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h13a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2z"/><line x1="8" y1="9" x2="15" y2="9"/><line x1="8" y1="13" x2="15" y2="13"/></svg>';
+  var ICON_LINK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
 
   function infoItem(iconSvg, label, value) {
     var div = document.createElement("div");
@@ -242,6 +239,16 @@
       '<span><span class="info-item__label">' + escapeHtml(label) + '</span>' +
       '<span class="info-item__value">' + escapeHtml(value) + "</span></span>";
     return div;
+  }
+
+  function openInNewTab(url) {
+    if (chrome.tabs && chrome.tabs.create) chrome.tabs.create({ url: url });
+    else window.open(url, "_blank", "noopener");
+  }
+
+  // Ownership is only claimed when we have it (curated list); otherwise say so and send the reader to the MBFC review.
+  function ownershipKnown(outlet) {
+    return !!outlet.ownershipType && outlet.ownershipType !== "Unknown";
   }
 
   function renderSourceTab(outlet, domain) {
@@ -262,41 +269,52 @@
     name.textContent = outlet.name;
     sourceContent.appendChild(name);
 
+    var known = ownershipKnown(outlet);
     var badge = document.createElement("span");
-    badge.className = "ownership-badge";
-    badge.textContent = outlet.ownershipType;
+    badge.className = "ownership-badge" + (known ? "" : " ownership-badge--unknown");
+    badge.textContent = known ? outlet.ownershipType : "Ownership not recorded";
     sourceContent.appendChild(badge);
 
     var grid = document.createElement("div");
     grid.className = "info-grid";
     if (outlet.parentCompany) grid.appendChild(infoItem(ICON_BUILDING, "Parent Company", outlet.parentCompany));
-    if (outlet.founded) grid.appendChild(infoItem(ICON_CALENDAR, "Founded", String(outlet.founded)));
+    grid.appendChild(infoItem(ICON_SCALE, "Political Leaning", outlet.ideology || "Not rated"));
+    if (outlet.mediaType) grid.appendChild(infoItem(ICON_NEWS, "Media Type", outlet.mediaType));
+    if (outlet.country) grid.appendChild(infoItem(ICON_GLOBE, "Country", outlet.country));
     if (outlet.headquarters) grid.appendChild(infoItem(ICON_GLOBE, "Headquarters", outlet.headquarters));
+    if (outlet.founded) grid.appendChild(infoItem(ICON_CALENDAR, "Founded", String(outlet.founded)));
     if (outlet.monthlyReaders) grid.appendChild(infoItem(ICON_USERS, "Monthly Readers", outlet.monthlyReaders));
+    grid.appendChild(infoItem(ICON_LINK, "Website", outlet.domain));
     sourceContent.appendChild(grid);
-
-    var expandBtn = document.createElement("button");
-    expandBtn.type = "button";
-    expandBtn.className = "expand-button";
-    expandBtn.setAttribute("aria-expanded", "false");
-    expandBtn.innerHTML = "<span>Learn about ownership</span>" + ICON_CHEVRON;
 
     var detail = document.createElement("p");
     detail.className = "ownership-detail";
-    detail.textContent = outlet.ownershipDetail || outlet.sourceNote || "";
-    detail.hidden = true;
-
-    expandBtn.addEventListener("click", () => {
-      var expanded = expandBtn.getAttribute("aria-expanded") === "true";
-      expandBtn.setAttribute("aria-expanded", String(!expanded));
-      detail.hidden = expanded;
-    });
-
-    sourceContent.appendChild(expandBtn);
+    detail.textContent =
+      outlet.ownershipDetail ||
+      (known ? "No further ownership details are recorded for this outlet. " : "We don't have ownership details for this outlet yet. ") +
+      "The Media Bias/Fact Check review below usually lists who owns and funds it.";
     sourceContent.appendChild(detail);
-  }
 
-  // --- Compare tab -----------------------------------------------------
+    var note = document.createElement("p");
+    note.className = "source-note";
+    note.textContent = "Leaning rating: Media Bias/Fact Check" + (outlet.ownershipSource ? ". Ownership: curated by the research team." : ".");
+    sourceContent.appendChild(note);
+
+    // Outlets without an MBFC review page in the dataset fall back to an MBFC search for the outlet name.
+    var reviewUrl = outlet.mbfcUrl || "https://mediabiasfactcheck.com/?s=" + encodeURIComponent(outlet.name);
+    var link = document.createElement("a");
+    link.className = "expand-button";
+    link.href = reviewUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.innerHTML = "<span>Learn about ownership</span>" + ICON_EXTERNAL;
+    link.title = (outlet.mbfcUrl ? "Opens the Media Bias/Fact Check review of " : "Searches Media Bias/Fact Check for ") + outlet.name + " in a new tab";
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      openInNewTab(reviewUrl);
+    });
+    sourceContent.appendChild(link);
+  }
 
   function miniLeaningSlider(outlet) {
     var wrap = document.createElement("div");
@@ -367,6 +385,20 @@
     }
   }
 
+  // "Comparative Data Unavailable" (thesis wording) plus the reason, so the reader knows whether to wait or fix something.
+  function unavailableMessage(reason) {
+    var why = {
+      timeout: "NewsAPI did not answer within 1.5 seconds. Switch tabs and back to retry.",
+      rate_limited: "NewsAPI's daily limit (100 requests on the free plan) has been reached. Try again tomorrow.",
+      bad_api_key: "NewsAPI rejected the saved API key. Check it in Settings.",
+      no_api_key: "Add a NewsAPI key in Settings to enable comparison.",
+      no_permission: "Permission to contact newsapi.org was not granted. Save your key again in Settings and allow it.",
+      network_error: "Could not reach newsapi.org. Check your connection and retry.",
+      no_keywords: "Couldn't read this page's topic."
+    }[reason];
+    return "Comparative Data Unavailable" + (why ? ". " + why : ".");
+  }
+
   function currentDomain() {
     if (currentOutlet) return currentOutlet.domain;
     return activeTab && activeTab.url && /^https?:/.test(activeTab.url) ? registrableDomain(new URL(activeTab.url).hostname) : null;
@@ -374,10 +406,10 @@
 
   function requestKeywords() {
     return new Promise((resolve) => {
-      if (!activeTab) return resolve([]);
+      if (!activeTab) return resolve({ keywords: [], publishedAt: null });
       chrome.tabs.sendMessage(activeTab.id, { type: "GET_KEYWORDS" }, (resp) => {
-        if (chrome.runtime.lastError || !resp || !resp.ok) return resolve([]);
-        resolve(CompareUtils.sanitizeKeywords(resp.keywords));
+        if (chrome.runtime.lastError || !resp || !resp.ok) return resolve({ keywords: [], publishedAt: null });
+        resolve({ keywords: CompareUtils.sanitizeKeywords(resp.keywords), publishedAt: resp.publishedAt || null });
       });
     });
   }
@@ -390,13 +422,19 @@
     area.set({ compareData: data }, () => chrome.tabs.create({ url: chrome.runtime.getURL("compare/compare.html") }));
   }
 
-  function renderGroupedCompare(grouped, outlets, keywords) {
+  function renderGroupedCompare(grouped, outlets, keywords, response, win) {
     var total = BUCKETS.reduce((n, b) => n + grouped.groups[b].length, 0);
     compareContent.innerHTML = "";
     if (!total) {
+      var found = (response && response.articles ? response.articles.length : 0);
+      var searches = (response && response.tried ? response.tried.length : 1);
+      var why = win && win.status === "too_new"
+        ? " This story was published less than a day ago, and NewsAPI's free plan holds articles back for about 24 hours. Try again tomorrow."
+        : " Few outlets may have covered this exact topic, or the search words were too specific.";
       showComparePrompt(
-        "No articles from rated outlets were found for this topic" +
-          (grouped.unrated ? " (" + grouped.unrated + " came from outlets we have no rating for)." : "."),
+        "No coverage from rated outlets was found for “" + keywords.join(" + ") + "”. " +
+          "NewsAPI returned " + found + " article" + (found === 1 ? "" : "s") + " across " + searches + " search" + (searches === 1 ? "" : "es") +
+          (grouped.unrated ? ", " + grouped.unrated + " from outlets we have no rating for" : "") + "." + why,
         false
       );
       return;
@@ -440,7 +478,8 @@
 
   function runComparativeLookup() {
     compareState.loading = true;
-    requestKeywords().then((keywords) => {
+    requestKeywords().then((page) => {
+      var keywords = page.keywords;
       if (!keywords.length) {
         compareState.loading = false;
         compareSubtitle.textContent = "Open a news article to compare coverage.";
@@ -455,18 +494,36 @@
           showComparePrompt("Add a NewsAPI key in Settings to enable cross-outlet comparison.", true);
           return;
         }
+        var win = CompareUtils.searchWindow(page.publishedAt);
+        if (win.status === "too_old" && !compareState.forceOld) {
+          compareState.loading = false;
+          showComparePrompt(
+            "This article is about " + win.days + " days old. NewsAPI's free plan only searches roughly the last " + CompareUtils.MAX_AGE_DAYS +
+              " days, so coverage of it can't be found. Open a more recent article to compare outlets.",
+            false
+          );
+          var anyway = document.createElement("button");
+          anyway.className = "button button--secondary";
+          anyway.textContent = "Search anyway";
+          anyway.addEventListener("click", () => {
+            compareState.forceOld = true;
+            runComparativeLookup();
+          });
+          compareContent.appendChild(anyway);
+          return;
+        }
         compareContent.innerHTML = '<p class="hint">Looking up comparative coverage…</p>';
 
-        chrome.runtime.sendMessage({ type: "COMPARATIVE_LOOKUP", keywords }, async (response) => {
+        chrome.runtime.sendMessage({ type: "COMPARATIVE_LOOKUP", keywords, currentDomain: currentDomain() }, async (response) => {
           compareState.loading = false;
           if (!response || !response.ok) {
             compareState.loaded = false; // allow retry on next tab switch
-            showComparePrompt("Comparative Data Unavailable", false);
+            showComparePrompt(unavailableMessage(response && response.reason), response && (response.reason === "no_api_key" || response.reason === "bad_api_key" || response.reason === "no_permission"));
             return;
           }
           compareState.loaded = true;
           var outlets = await loadOutlets();
-          renderGroupedCompare(CompareUtils.groupByIdeology(response.articles, outlets, currentDomain()), outlets, response.keywords || keywords);
+          renderGroupedCompare(CompareUtils.groupByIdeology(response.articles, outlets, currentDomain()), outlets, response.keywords || keywords, response, win);
         });
       });
     });
@@ -565,9 +622,11 @@
 
   // --- Methodology panel -----------------------------------------------
 
-  methodologyToggle.addEventListener("click", () => {
-    methodologyPanel.hidden = !methodologyPanel.hidden;
-  });
+  function openAbout(hash) {
+    openInNewTab(chrome.runtime.getURL("about/about.html") + (hash ? "#" + hash : ""));
+  }
+  methodologyToggle.addEventListener("click", () => openAbout("methodology"));
+  techniquesLink.addEventListener("click", () => openAbout("techniques"));
 
   // --- Init -------------------------------------------------------------
 
