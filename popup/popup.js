@@ -47,7 +47,6 @@
   var keyStatus = document.getElementById("keyStatus");
 
   var methodologyToggle = document.getElementById("methodologyToggle");
-  var techniquesLink = document.getElementById("techniquesLink");
 
   var activeTab = null;
   var lastArticleTitle = null;
@@ -626,7 +625,6 @@
     openInNewTab(chrome.runtime.getURL("about/about.html") + (hash ? "#" + hash : ""));
   }
   methodologyToggle.addEventListener("click", () => openAbout("methodology"));
-  techniquesLink.addEventListener("click", () => openAbout("techniques"));
 
   // --- Init -------------------------------------------------------------
 
