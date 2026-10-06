@@ -1,0 +1,252 @@
+{
+  "_readme": "Regression corpus for false positives. When a highlight is wrong, add the sentence here under mustNotFire (with the rule id that fired), fix the rule's linguisticCondition / contextCondition, and the test in false-positives.test.js keeps it fixed. Each mustNotFire case should have a mustFire companion so a fix cannot silently stop the rule from detecting the real thing. knownLimitations are neutral sentences that are still flagged because the phrase itself is the cue; they are tracked as todo tests.",
+  "mustNotFire": [
+    {
+      "rule": "AF-001",
+      "text": "Mr. Tarriela also rejected claims that Chinese personnel had expelled Philippine vessels or handled the situation.",
+      "note": "Reported by the team on a ground.news article, 2026-10-06: 'claims' is a NOUN here ('rejected claims that ...'), not a reporting verb."
+    },
+    {
+      "rule": "AF-001",
+      "text": "He denied the claims that the ship was damaged.",
+      "note": "noun after a determiner"
+    },
+    {
+      "rule": "AF-001",
+      "text": "The senator's claims that the bill would pass were wrong.",
+      "note": "noun after a possessive"
+    },
+    {
+      "rule": "AF-001",
+      "text": "Officials dismissed false claims that the vote was rigged.",
+      "note": "noun after an adjective"
+    },
+    {
+      "rule": "AF-001",
+      "text": "She repeated her claim that the data was accurate.",
+      "note": "noun after a possessive pronoun"
+    },
+    {
+      "rule": "AF-001",
+      "text": "The report of claims that funds vanished spread quickly.",
+      "note": "noun after a preposition"
+    },
+    {
+      "rule": "NC-001",
+      "text": "Spain's Socialists won 20 seats in the regional parliament.",
+      "note": "party name (capitalized mid-sentence)"
+    },
+    {
+      "rule": "NC-001",
+      "text": "The Democratic Socialists of America endorsed the measure.",
+      "note": "organization name"
+    },
+    {
+      "rule": "NC-001",
+      "text": "The Radicals were a nineteenth-century political faction.",
+      "note": "historical party name"
+    },
+    {
+      "rule": "NC-001",
+      "text": "Thug Life was an album by a rapper.",
+      "note": "proper name at sentence start (next word also capitalized)"
+    },
+    {
+      "rule": "LL-007",
+      "text": "Radical Republicans dominated Congress after the Civil War.",
+      "note": "historical group name at sentence start"
+    },
+    {
+      "rule": "EM-001",
+      "text": "The Notorious B.I.G. released his debut album in 1994.",
+      "note": "a person's stage name"
+    },
+    {
+      "rule": "LL-012",
+      "text": "Officials broke the vicious cycle of arrests with a new program.",
+      "note": "fixed idiom"
+    },
+    {
+      "rule": "LL-012",
+      "text": "The region faces a brutal heat wave this week, forecasters said.",
+      "note": "weather description"
+    },
+    {
+      "rule": "FE-002",
+      "text": "The film is about a village under siege during the war.",
+      "note": "literal military siege"
+    },
+    {
+      "rule": "BF-001",
+      "text": "The law shows there is no alternative route through the valley.",
+      "note": "literal: 'alternative route'"
+    },
+    {
+      "rule": "AA-001",
+      "text": "Studies show that the vaccine reduces hospital stays, according to the journal.",
+      "note": "already attributed to a named source"
+    },
+    {
+      "rule": "DB-002",
+      "text": "He supposedly left at noon, according to a neighbor.",
+      "note": "claim is attributed"
+    },
+    {
+      "rule": "NC-001",
+      "text": "Trump called the opposition “radical socialists who hate America,” in a speech.",
+      "note": "quoted speech (curly quotes): the source said it, not the outlet"
+    },
+    {
+      "rule": "NC-001",
+      "text": "He said \"these radicals are dangerous\" and left.",
+      "note": "quoted speech (straight quotes)"
+    },
+    {
+      "rule": "LL-007",
+      "text": "Mayor calls plan 'a radical betrayal' of voters",
+      "note": "single-quoted headline speech"
+    },
+    {
+      "rule": "LL-007",
+      "text": "“The radical faction pushed for immediate reform,” she said.",
+      "note": "quote of the first sentence in a multi-sentence paragraph"
+    }
+  ],
+  "mustFire": [
+    {
+      "rule": "AF-001",
+      "text": "The senator claimed that the bill would pass easily."
+    },
+    {
+      "rule": "AF-001",
+      "text": "He claims that the report is wrong."
+    },
+    {
+      "rule": "AF-001",
+      "text": "Critics also claimed that the plan failed."
+    },
+    {
+      "rule": "AF-001",
+      "text": "Officials, however, claim that costs fell."
+    },
+    {
+      "rule": "AF-001",
+      "text": "The company has claimed that it acted alone."
+    },
+    {
+      "rule": "NC-001",
+      "text": "A vote for the socialists, for the radicals, for the haters."
+    },
+    {
+      "rule": "NC-001",
+      "text": "Radicals stormed the building and hurt several people."
+    },
+    {
+      "rule": "LL-007",
+      "text": "The radical faction pushed for immediate reform."
+    },
+    {
+      "rule": "EM-001",
+      "text": "The disgraced senator resigned from office."
+    },
+    {
+      "rule": "LL-012",
+      "text": "It was a vicious attack on a defenseless man."
+    },
+    {
+      "rule": "FE-002",
+      "text": "Democracy is under siege, he warned."
+    },
+    {
+      "rule": "BF-001",
+      "text": "He said there is no alternative."
+    },
+    {
+      "rule": "AA-001",
+      "text": "But experts warn such a ban would put pressure on prices."
+    },
+    {
+      "rule": "DB-002",
+      "text": "The deal was allegedly worth millions."
+    },
+    {
+      "rule": "NC-001",
+      "text": "“We will not stop,” she said. The radicals attacked."
+    },
+    {
+      "rule": "LL-011",
+      "text": "The senator blasts the plan as reckless."
+    },
+    {
+      "rule": "SL-001",
+      "text": "The rally chanted “Make America Great Again” at the gate."
+    }
+  ],
+  "knownLimitations": [
+    {
+      "rule": "AA-001",
+      "text": "Sources say the deal could close next week.",
+      "why": "the phrase is the cue; a keyword rule cannot know the sources are credible"
+    },
+    {
+      "rule": "AA-001",
+      "text": "The study found that research shows no link between the two.",
+      "why": "phrase is the cue"
+    },
+    {
+      "rule": "BW-001",
+      "text": "Everyone knows the bakery on Main Street opens at six.",
+      "why": "harmless everyday use of a bandwagon phrase"
+    },
+    {
+      "rule": "BW-001",
+      "text": "Most people agree that the museum is worth a visit.",
+      "why": "harmless everyday use of a bandwagon phrase"
+    },
+    {
+      "rule": "SL-001",
+      "text": "The poster read 'Make America Great Again' in red letters.",
+      "why": "the slogan really is present; quoting it neutrally is still a slogan"
+    },
+    {
+      "rule": "SL-002",
+      "text": "Local workers will do the job at all costs covered by insurance.",
+      "why": "idiomatic 'at all costs' with a different meaning"
+    },
+    {
+      "rule": "CO-001",
+      "text": "He wrote that it was the only reason for the delay, according to the memo.",
+      "why": "causal claim reported from a source"
+    },
+    {
+      "rule": "LL-009",
+      "text": "The word 'propaganda' appears 12 times in the archive catalog.",
+      "why": "the word is mentioned, not used as a label"
+    },
+    {
+      "rule": "LL-012",
+      "text": "The shocking news was confirmed by the ministry.",
+      "why": "evaluative adjective; heuristics cannot tell mild from loaded"
+    },
+    {
+      "rule": "LL-012",
+      "text": "She said the results were absurd and called for a recount.",
+      "why": "evaluative adjective in a quoted opinion"
+    },
+    {
+      "rule": "EX-001",
+      "text": "Fans called the match a massive success for the club.",
+      "why": "intensifier in a positive evaluation"
+    },
+    {
+      "rule": "EX-002",
+      "text": "The company is merely one of three bidders for the contract.",
+      "why": "'merely' used factually"
+    },
+    {
+      "rule": "EX-002",
+      "text": "A mere three people attended the 1990 meeting.",
+      "why": "minimization wording is the cue"
+    }
+  ]
+}

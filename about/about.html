@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How it works - Media Bias-Aware</title>
+  <link rel="stylesheet" href="about.css" />
+</head>
+<body>
+  <nav class="bar" aria-label="On this page">
+    <div class="bar__inner">
+      <a class="bar__brand" href="#top">Media Bias-Aware</a>
+      <div class="bar__links">
+        <a href="#techniques">Techniques</a>
+        <a href="#rules">Rules</a>
+        <a href="#method">Method</a>
+        <a href="#compare">Compare</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#limits">Limits</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <p class="eyebrow">Methodology</p>
+    <h1>Every highlight,<br />fully explained.</h1>
+    <p class="hero__lead">Fourteen propaganda techniques. A rule behind every flagged phrase. Nothing about the article ever leaves your browser.</p>
+  </header>
+
+  <main>
+    <section id="techniques" class="block" aria-labelledby="h-tech">
+      <p class="eyebrow">01 &middot; Techniques</p>
+      <h2 id="h-tech">The 14 techniques.</h2>
+      <p class="block__lead">Taken from <b>SemEval-2020 Task 11</b>, a shared research task on finding propaganda in news. A highlight is a <b>cue about wording</b>: a phrase often used to persuade rather than inform. It never says an article is false or biased, and there is no bias score.</p>
+      <p class="muted" id="coverageLine"></p>
+      <div id="techniqueList" class="tech-grid" aria-live="polite">Loading&hellip;</div>
+    </section>
+
+    <section id="rules" class="block block--tint" aria-labelledby="h-rules">
+      <p class="eyebrow">02 &middot; Rules</p>
+      <h2 id="h-rules">What is a rule?</h2>
+      <p class="block__lead">A rule is one small, readable instruction that says <b>what to look for</b> and <b>when it counts</b>. When the popup says &ldquo;scanned against 29 rules&rdquo;, that is how many such instructions each paragraph was checked against. They are plain JSON in <code>data/pattern-catalog.json</code>, so anyone can read, test or change them.</p>
+
+      <div class="anatomy" id="anatomy" aria-label="Anatomy of a rule"></div>
+
+      <details class="all-rules">
+        <summary>Browse all <span id="ruleCount">29</span> rules</summary>
+        <div id="ruleList" class="rule-list"></div>
+      </details>
+    </section>
+
+    <section id="method" class="block" aria-labelledby="h-method">
+      <p class="eyebrow">03 &middot; Method</p>
+      <h2 id="h-method">Three tests, all must pass.</h2>
+      <p class="formula" role="math" aria-label="D of s and r equals L and S and C">D(s, r) = L <span>and</span> S <span>and</span> C</p>
+      <div class="trio">
+        <div><h3>L &middot; Lexical</h3><p>The text contains the rule's trigger word or phrase, for example <i>claims</i>.</p></div>
+        <div><h3>S &middot; Structure</h3><p>The grammar fits, judged by a part-of-speech tagger. For example, the trigger is used as a verb, not a noun.</p></div>
+        <div><h3>C &middot; Context</h3><p>Nearby words don't rule it out: not a proper name, an idiom, or a statement already attributed to a named source.</p></div>
+      </div>
+
+      <h3 class="sub">Same word, different outcome</h3>
+      <div class="example-pair">
+        <div class="ex ex--yes">
+          <p class="ex__label">Flagged &middot; AF-001</p>
+          <p>The senator <mark>claims</mark> that the bill will pass.</p>
+          <p class="ex__why">&ldquo;claims&rdquo; is a reporting <b>verb</b> that casts doubt.</p>
+        </div>
+        <div class="ex ex--no">
+          <p class="ex__label">Not flagged</p>
+          <p>He rejected the claims that the ship was damaged.</p>
+          <p class="ex__why">&ldquo;claims&rdquo; is a <b>noun</b> here, so it is neutral.</p>
+        </div>
+      </div>
+
+      <h3 class="sub">From page to highlight</h3>
+      <ol class="steps">
+        <li><b>Find the article.</b><span>Readability.js strips menus, ads and comments.</span></li>
+        <li><b>Tag the words.</b><span>Compromise.js labels nouns, verbs and sentences, locally.</span></li>
+        <li><b>Test every rule.</b><span>Candidates must pass L, S and C.</span></li>
+        <li><b>Skip quoted speech.</b><span>If a quoted person said it, the outlet didn't. Slogans are the exception.</span></li>
+        <li><b>Resolve overlaps.</b><span>Longest span wins, then higher confidence tier, then earliest start, then lowest rule ID. Losers go to an audit log.</span></li>
+        <li><b>Highlight.</b><span>Hover a highlight to see the technique, the reason, a neutral wording, and the rule ID.</span></li>
+      </ol>
+
+      <div class="callouts">
+        <div><h3>No bias score</h3><p><b>Phrases Found</b> counts highlighted spans; <b>Techniques</b> counts how many of the 14 they cover. A single number would hide which wording was flagged and why.</p></div>
+        <div><h3>Confidence tiers</h3><p>Each rule has a tier (high, medium, low) set by the authors. It only decides which rule wins when two overlap. It is not a probability.</p></div>
+        <div><h3>Quoted speech</h3><p>Words inside quotation marks (straight, curly or single-quoted headlines) are not flagged: the tool looks at how the outlet writes, not at what the people it quotes say.</p></div>
+      </div>
+    </section>
+
+    <section id="outlets" class="block block--tint" aria-labelledby="h-outlets">
+      <p class="eyebrow">04 &middot; Outlets</p>
+      <h2 id="h-outlets">Where outlet data comes from.</h2>
+      <div class="trio">
+        <div><h3>Leaning</h3><p>From <b>Media Bias/Fact Check</b> ratings for about 8,800 outlets. It describes the outlet overall, not this one article.</p></div>
+        <div><h3>Left / Center / Right</h3><p>The seven-point scale folds into three: Extreme Left, Left and Center-Left are <i>Left</i>; Center-Right, Right and Extreme Right are <i>Right</i>.</p></div>
+        <div><h3>Ownership</h3><p>Filled in by the research team for the most-read outlets. Elsewhere it says &ldquo;Ownership not recorded&rdquo;; <b>Learn about ownership</b> opens the outlet's MBFC review.</p></div>
+      </div>
+    </section>
+
+    <section id="compare" class="block" aria-labelledby="h-compare">
+      <p class="eyebrow">05 &middot; Compare</p>
+      <h2 id="h-compare">Comparing coverage.</h2>
+      <p class="block__lead">Optional, and off until you add your own free NewsAPI key in Settings. It only runs when you open the Compare tab.</p>
+      <ul class="list">
+        <li>The article is reduced to <b>2&ndash;4 topic keywords</b> on your device. Only those are searched.</li>
+        <li>It searches widely read, rated outlets first, then loosens the query (up to three requests). Results are cached for 30 minutes.</li>
+        <li>Matches are sorted into <b>Left, Center and Right</b>. Unrated outlets, and the outlet you are reading, are left out.</li>
+        <li>If NewsAPI doesn't answer within 1.5 seconds you'll see &ldquo;Comparative Data Unavailable&rdquo; and the reason.</li>
+        <li>NewsAPI's free plan only covers articles roughly <b>1 to 30 days old</b>. Newer stories haven't arrived yet; older ones are out of reach.</li>
+      </ul>
+    </section>
+
+    <section id="privacy" class="block block--tint" aria-labelledby="h-privacy">
+      <p class="eyebrow">06 &middot; Privacy</p>
+      <h2 id="h-privacy">What leaves your browser.</h2>
+      <table>
+        <thead><tr><th scope="col">Data</th><th scope="col">Leaves your device?</th></tr></thead>
+        <tbody>
+          <tr><td>Article text, headline, highlights, detections</td><td>Never</td></tr>
+          <tr><td>Pages you visit, reading history, the article's date</td><td>Never</td></tr>
+          <tr><td>2&ndash;4 topic keywords</td><td>Only to newsapi.org, only when you open Compare with a key saved</td></tr>
+          <tr><td>Your NewsAPI key</td><td>Stored on this device; sent only to newsapi.org</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">Keywords are filtered before sending: anything that looks like a title or a sentence is dropped.</p>
+    </section>
+
+    <section id="limits" class="block" aria-labelledby="h-limits">
+      <p class="eyebrow">07 &middot; Limits</p>
+      <h2 id="h-limits">Honest about accuracy.</h2>
+      <ul class="list">
+        <li><b>Rules are heuristics.</b> Some flags will be legitimate wording in context. The tooltip explains the rule so you can judge.</li>
+        <li><b>Some phrases are the cue itself</b> (&ldquo;sources say&rdquo;, &ldquo;everyone knows&rdquo;). A keyword rule can't tell neutral from persuasive use.</li>
+        <li><b>Not every technique is covered.</b> Techniques that need the whole article, such as Repetition, aren't detected automatically yet.</li>
+        <li><b>English only.</b></li>
+        <li><b>How accuracy is measured.</b> Human validators judge each flagged phrase valid or not valid (valid when at least two of three agree). We report precision overall and per technique, the false-positive rate, and agreement between validators (Fleiss' kappa).</li>
+        <li><b>Wrong flags get fixed, not ignored.</b> Each false flag found in testing becomes a regression test and the rule's condition is tightened.</li>
+      </ul>
+    </section>
+
+    <footer class="block block--tint foot" id="sources">
+      <p class="eyebrow">Sources</p>
+      <ul class="list list--small">
+        <li>Da San Martino, G., Barr&oacute;n-Cede&ntilde;o, A., Wachsmuth, H., Petrov, R., &amp; Nakov, P. (2020). SemEval-2020 Task 11: Detection of Propaganda Techniques in News Articles.</li>
+        <li>Spinde et al. (2021), BABE and MBIC: annotated media-bias corpora used to mine candidate phrases.</li>
+        <li>Pryzant et al. (2020), Wiki Neutrality Corpus: neutral-versus-biased rewrites.</li>
+        <li>Media Bias/Fact Check (outlet ratings). NewsAPI.org (comparative search). Readability.js and Compromise.js.</li>
+      </ul>
+      <p class="muted" id="versionLine"></p>
+    </footer>
+  </main>
+
+  <script src="../content/category-meta.js"></script>
+  <script src="about.js"></script>
+</body>
+</html>

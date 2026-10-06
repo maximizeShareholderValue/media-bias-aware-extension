@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(mkdir -p lib content background popup data icons test)",
+      "Bash(cp _vendor_build/node_modules/@mozilla/readability/Readability.js lib/Readability.js)",
+      "Bash(cp _vendor_build/node_modules/compromise/builds/compromise.js lib/compromise.js)",
+      "Bash(rm -rf _vendor_build)",
+      "Bash(node -e ' *)",
+      "Bash(node --test test/pattern-matcher.test.js)",
+      "Bash(node run.js)",
+      "PowerShell(gh auth status 2>&1)",
+      "Bash(gh auth *)",
+      "Bash(git ls-remote *)"
+    ]
+  }
+}
