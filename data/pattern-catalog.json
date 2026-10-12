@@ -1,7 +1,7 @@
 {
   "$schemaVersion": "2.0.0",
-  "catalogVersion": "0.4.2",
-  "lastUpdated": "2026-10-04",
+  "catalogVersion": "0.4.3",
+  "lastUpdated": "2026-10-13",
   "_readme": "Linguistic Pattern Catalog. Each rule follows the ten fields of thesis Table 13 and is evaluated as D(s,r) = L(s,r) AND S(s,r) AND C(s,r) (FR-DET-03): the lexicalTrigger generates a candidate; it is flagged only if the linguisticCondition (structure/POS) and the contextCondition (local context) also hold. A lexical-only run (L alone) is the section 8.3 baseline. Overlaps are resolved by FR-DET-04: longest span, then higher confidenceTier, then earliest offset, then lowest id. Edit this file to change detection without rebuilding the extension. REPETITION has no rules: it needs a repeated-expression comparison rather than a lexical trigger. Rule ID prefixes of the original seed rules (LL/PS/SC/AF/EM) are legacy names; `technique` is authoritative. confidenceTier is currently authored, not yet calibrated on the development corpus (thesis Stage 5).",
   "_schema": {
     "Pattern ID": "id",
@@ -349,9 +349,15 @@
           "horrific",
           "heartless",
           "barbaric",
-          "brutal"
+          "brutal",
+          "draconian",
+          "reckless",
+          "egregious",
+          "deplorable",
+          "despicable",
+          "sinister"
         ],
-        "pattern": "\\b(bizarre|shocking|shameful|disgraceful|ridiculous|absurd|appalling|outrageous|pathetic|vicious|savage|horrific|heartless|barbaric|brutal)\\b"
+        "pattern": "\\b(bizarre|shocking|shameful|disgraceful|ridiculous|absurd|appalling|outrageous|pathetic|vicious|savage|horrific|heartless|barbaric|brutal|draconian|reckless|egregious|deplorable|despicable|sinister)\\b"
       },
       "linguisticCondition": {
         "type": "all",
@@ -393,7 +399,10 @@
           "winter",
           "cold",
           "weather",
-          "storm"
+          "storm",
+          "driving",
+          "endangerment",
+          "homicide"
         ]
       },
       "targetSpan": "trigger",
@@ -872,9 +881,14 @@
           "threat to democracy",
           "crime wave",
           "terrifying",
-          "ticking time bomb"
+          "ticking time bomb",
+          "reign of terror",
+          "nightmare scenario",
+          "doomsday scenario",
+          "menace to society",
+          "spiraling out of control"
         ],
-        "pattern": "\\b(existential threat|threat to democracy|crime wave|wave of crime|climate of fear|grave danger|mortal danger|deadly threat|terrifying|ticking time bomb|never be safe again|will never be safe)\\b"
+        "pattern": "\\b(existential threat|threat to democracy|crime wave|wave of crime|climate of fear|grave danger|mortal danger|deadly threat|terrifying|ticking time bomb|never be safe again|will never be safe|reign of terror|nightmare scenario|doomsday scenario|menace to society|public menace|spiral(?:l?ing|l?ed|s)? out of control)\\b"
       },
       "linguisticCondition": {
         "type": "none",
@@ -900,9 +914,15 @@
       "referenceDefinition": "Attempting to influence an audience by invoking fear, anxiety, panic, or preconceived judgments.",
       "lexicalTrigger": {
         "words": [
-          "under siege"
+          "under siege",
+          "under invasion",
+          "being invaded",
+          "invaded by",
+          "under attack",
+          "overrun by",
+          "hordes of"
         ],
-        "pattern": "\\bunder siege\\b"
+        "pattern": "\\b(under siege|under invasion|being invaded|invaded by|under attack|overrun (?:by|with)|hordes of)\\b"
       },
       "linguisticCondition": {
         "type": "none",
@@ -921,12 +941,32 @@
           "village",
           "capital",
           "besieged",
-          "airport"
+          "airport",
+          "gunmen",
+          "militants",
+          "rebels",
+          "missile",
+          "missiles",
+          "drone",
+          "drones",
+          "rocket",
+          "rockets",
+          "shelling",
+          "airstrike",
+          "airstrikes",
+          "hackers",
+          "cyberattack",
+          "malware",
+          "ransomware",
+          "insects",
+          "ants",
+          "locusts",
+          "weeds"
         ],
-        "description": "Figurative use only: skipped when the sentence is about an actual military siege ('a village under siege during the war')."
+        "description": "Figurative use only: skipped when the sentence is about an actual military siege or attack ('a village under siege during the war', 'came under attack from gunmen'), a cyberattack, or a literal infestation ('a garden overrun by weeds')."
       },
       "targetSpan": "trigger",
-      "explanation": "Describing something as 'under siege' casts it as being attacked, to provoke alarm, rather than stating what actually happened.",
+      "explanation": "Describing something as 'under siege', 'under invasion' or 'overrun' casts it as being attacked, to provoke alarm, rather than stating what actually happened.",
       "sourceExample": {
         "text": "If Hamas is not completely defeated, Israeli families will never be safe again.",
         "source": "Thesis Table 12",
@@ -934,6 +974,53 @@
       },
       "confidenceTier": "medium",
       "neutralAlternative": "State specifically what is happening"
+    },
+    {
+      "id": "FE-003",
+      "technique": "APPEAL_TO_FEAR_PREJUDICE",
+      "label": "Alarmist damage idiom",
+      "referenceDefinition": "Attempting to influence an audience by invoking fear, anxiety, panic, or preconceived judgments.",
+      "lexicalTrigger": {
+        "words": [
+          "wreak havoc",
+          "sow chaos",
+          "sow panic",
+          "spell disaster",
+          "recipe for disaster"
+        ],
+        "pattern": "\\b(wreak(?:s|ed|ing)? havoc|wrought havoc|sow(?:s|ed|ing)? (?:chaos|panic|fear)|spells? disaster|recipe for disaster)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor."
+      },
+      "contextCondition": {
+        "excludeSentenceWords": [
+          "storm",
+          "storms",
+          "hurricane",
+          "tornado",
+          "typhoon",
+          "cyclone",
+          "blizzard",
+          "rain",
+          "snow",
+          "winds",
+          "weather",
+          "flooding",
+          "traffic"
+        ],
+        "description": "Skipped in weather and traffic reports, where the idiom describes physical damage that is the news itself ('the storm wreaked havoc on the coast')."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This idiom predicts dramatic, unspecified damage to provoke alarm instead of stating what harm is expected and how likely it is.",
+      "sourceExample": {
+        "text": "Screwworms have the potential to wreak havoc on the Lone Star State.",
+        "source": "News article reported by the team, 2026-10-13",
+        "triggerEvidence": "Authored from the technique definition after a missed detection on this sentence; weather use excluded by the context condition."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "State the specific expected harm and its likelihood"
     },
     {
       "id": "FW-001",
@@ -1254,9 +1341,11 @@
           "everybody knows",
           "most people agree",
           "like hitler",
-          "new hitler"
+          "new hitler",
+          "everyone agrees",
+          "nobody disputes"
         ],
-        "pattern": "\\b(everyone knows|everybody knows|most people agree|most people believe|the majority agree|millions of (?:people|americans) agree|wrong side of history|like hitler|new hitler|hitler-like|nazi-like)\\b"
+        "pattern": "\\b(everyone knows|everybody knows|everyone agrees|everybody agrees|no one disputes|nobody disputes|most people agree|most people believe|the majority agree|millions of (?:people|americans) agree|wrong side of history|like hitler|new hitler|hitler-like|nazi-like)\\b"
       },
       "linguisticCondition": {
         "type": "none",
