@@ -44,6 +44,8 @@
     "none", "all", "any", "not", "taggedAny", "precedesNoun", "followedByTag",
     "precededByTag", "followedByWord", "reportingVerb", "inQuestion"
   ];
+  // Trigger words compromise's built-in lexicon mis-tags (it reads "draconian" as a noun).
+  var LEXICON = { draconian: "Adjective" };
 
   function norm(s) {
     return (s || "").toLowerCase().replace(/\s+/g, " ").trim();
@@ -77,7 +79,7 @@
    * its sentenceIndex; terms.sentences[i] = { first, last } term indexes.
    */
   function flattenTerms(text) {
-    var sentences = nlpFn(text).out("offsets");
+    var sentences = nlpFn(text, LEXICON).out("offsets");
     var terms = [];
     terms.sentences = [];
     for (var s = 0; s < sentences.length; s++) {

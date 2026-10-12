@@ -1,6 +1,11 @@
 {
   "_readme": "Regression corpus for false positives. When a highlight is wrong, add the sentence here under mustNotFire (with the rule id that fired), fix the rule's linguisticCondition / contextCondition, and the test in false-positives.test.js keeps it fixed. Each mustNotFire case should have a mustFire companion so a fix cannot silently stop the rule from detecting the real thing. knownLimitations are neutral sentences that are still flagged because the phrase itself is the cue; they are tracked as todo tests.",
   "mustNotFire": [
+    { "rule": "FE-002", "text": "The convoy came under attack from gunmen near the border.", "note": "literal armed attack" },
+    { "rule": "FE-002", "text": "The hospital network came under attack by ransomware.", "note": "literal cyberattack" },
+    { "rule": "FE-002", "text": "The garden was overrun by weeds.", "note": "literal infestation" },
+    { "rule": "FE-003", "text": "The storm wreaked havoc on the coast.", "note": "weather report: the damage is the news" },
+    { "rule": "LL-012", "text": "He was charged with reckless driving.", "note": "legal offence name" },
     {
       "rule": "AF-001",
       "text": "Mr. Tarriela also rejected claims that Chinese personnel had expelled Philippine vessels or handled the situation.",
@@ -113,6 +118,15 @@
     }
   ],
   "mustFire": [
+    { "rule": "FE-002", "text": "The U.S. is under invasion." },
+    { "rule": "FE-002", "text": "Our schools are under attack from radical activists." },
+    { "rule": "FE-002", "text": "Small towns are being overrun by hordes of migrants." },
+    { "rule": "FE-003", "text": "Screwworms have the potential to wreak havoc on the Lone Star State." },
+    { "rule": "FE-003", "text": "The plan is a recipe for disaster." },
+    { "rule": "FE-001", "text": "Crime is spiraling out of control in the suburbs." },
+    { "rule": "LL-012", "text": "The governor imposed draconian restrictions on protests." },
+    { "rule": "LL-012", "text": "It was a reckless decision by the board." },
+    { "rule": "BW-001", "text": "Everyone agrees the policy has failed." },
     {
       "rule": "AF-001",
       "text": "The senator claimed that the bill would pass easily."
