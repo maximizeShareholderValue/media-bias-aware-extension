@@ -1,7 +1,7 @@
 {
   "$schemaVersion": "2.0.0",
-  "catalogVersion": "0.5.0",
-  "lastUpdated": "2026-10-13",
+  "catalogVersion": "0.5.1",
+  "lastUpdated": "2026-10-14",
   "_readme": "Linguistic Pattern Catalog. Each rule follows the ten fields of thesis Table 13 and is evaluated as D(s,r) = L(s,r) AND S(s,r) AND C(s,r) (FR-DET-03): the lexicalTrigger generates a candidate; it is flagged only if the linguisticCondition (structure/POS) and the contextCondition (local context) also hold. A lexical-only run (L alone) is the section 8.3 baseline. Overlaps are resolved by FR-DET-04: longest span, then higher confidenceTier, then earliest offset, then lowest id. Edit this file to change detection without rebuilding the extension. REPETITION has no rules: it needs a repeated-expression comparison rather than a lexical trigger. Rule ID prefixes of the original seed rules (LL/PS/SC/AF/EM) are legacy names; `technique` is authoritative. confidenceTier is currently authored, not yet calibrated on the development corpus (thesis Stage 5).",
   "_schema": {
     "Pattern ID": "id",
@@ -147,7 +147,25 @@
         "description": "The trigger functions as a noun label or an attributive adjective (Compromise tags singular 'a terrorist organization' as Adjective, plural 'terrorists attacked' as Noun)."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "excludeNeighborWords": [
+          "attack",
+          "attacks",
+          "organization",
+          "organizations",
+          "group",
+          "groups",
+          "proxies",
+          "plot",
+          "plots",
+          "cell",
+          "cells",
+          "charges",
+          "financing",
+          "list",
+          "designated",
+          "wanted"
+        ],
+        "description": "Not a factual designation or event ('terrorist attack', 'a designated terrorist organization', 'most wanted terrorists'). Calibration round 1: these factual uses were the main source of false positives."
       },
       "targetSpan": "trigger",
       "explanation": "This term labels a person or group in starkly negative, delegitimizing terms rather than describing their actions or stated views neutrally.",
@@ -166,47 +184,6 @@
         "racists": "people accused of racism"
       },
       "techniqueNote": "Moved from LOADED_LANGUAGE: assigning a group a feared/disliked label is Name Calling / Labeling in the SemEval taxonomy."
-    },
-    {
-      "id": "LL-009",
-      "technique": "DOUBT",
-      "label": "Delegitimizing information label",
-      "referenceDefinition": "Questioning or undermining the credibility, legitimacy, truthfulness, or reliability of a person, claim, or institution.",
-      "lexicalTrigger": {
-        "words": [
-          "propaganda"
-        ],
-        "pattern": "\\bpropaganda\\b"
-      },
-      "linguisticCondition": {
-        "type": "taggedAny",
-        "tags": [
-          "Noun",
-          "Adjective"
-        ],
-        "description": "The trigger is used as a label."
-      },
-      "contextCondition": {
-        "excludeNeighborWords": [
-          "poster",
-          "film",
-          "art",
-          "museum",
-          "exhibit",
-          "reel"
-        ],
-        "description": "Not the historical/artistic genre sense ('propaganda poster')."
-      },
-      "targetSpan": "trigger",
-      "explanation": "Labeling information as 'propaganda' dismisses it as illegitimate persuasion rather than describing its content or sourcing neutrally.",
-      "sourceExample": {
-        "text": "Can the same be said for the Obama Administration?",
-        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
-        "triggerEvidence": "Annotator-flagged in BABE/MBIC (propaganda); calling information 'propaganda' undermines its legitimacy."
-      },
-      "confidenceTier": "medium",
-      "neutralAlternative": "material",
-      "techniqueNote": "Mapped to DOUBT: calling information 'propaganda' undermines its legitimacy/credibility."
     },
     {
       "id": "LL-010",
@@ -238,9 +215,17 @@
           "beauty",
           "fitness",
           "workout",
-          "supplement"
+          "supplement",
+          "change",
+          "inspection",
+          "inspections",
+          "sanctions",
+          "regulatory",
+          "tax",
+          "trade",
+          "visa"
         ],
-        "description": "Not the neutral lifestyle/medical sense ('exercise regime')."
+        "description": "Not the neutral lifestyle/medical sense ('exercise regime') and not a neutral policy compound ('regime change', 'inspection regime', 'sanctions regime'). Calibration round 1: these compounds were the main source of false positives."
       },
       "targetSpan": "trigger",
       "explanation": "'Regime' frames a government as illegitimate or authoritarian, in contrast to neutral terms like 'government' or 'administration'.",
@@ -769,9 +754,26 @@
           "detained",
           "custody",
           "accused",
-          "according"
+          "according",
+          "investigation",
+          "criminal",
+          "crime",
+          "victim",
+          "victims",
+          "shot",
+          "shooting",
+          "killed",
+          "murder",
+          "massacre",
+          "stabbed",
+          "attack",
+          "attacks",
+          "gun",
+          "guns",
+          "occurred",
+          "responsible"
         ],
-        "description": "Not legal hedging: no police/court/charge vocabulary in the same sentence. Also skipped when the claim is attributed ('according to a neighbor')."
+        "description": "Not legal or incident hedging: no police/court/charge vocabulary and no account of a specific crime or incident ('the gunman allegedly shot...') in the same sentence. Also skipped when the claim is attributed ('according to a neighbor'). Calibration round 1: crime-report uses were the main source of false positives."
       },
       "targetSpan": "trigger",
       "explanation": "This adverb casts doubt on a claim without saying why. In crime reporting it is a standard legal hedge, so it is skipped when legal terms appear in the same sentence.",
