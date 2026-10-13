@@ -45,6 +45,7 @@
   var saveKeyBtn = document.getElementById("saveKeyBtn");
   var clearKeyBtn = document.getElementById("clearKeyBtn");
   var keyStatus = document.getElementById("keyStatus");
+  var vault = KeyVault.create();
 
   var methodologyToggle = document.getElementById("methodologyToggle");
 
@@ -487,8 +488,8 @@
       }
       compareSubtitle.textContent = "Searching by topic keywords only: " + keywords.slice(0, 3).join(", ") + ". Nothing else about this page is sent.";
 
-      chrome.storage.local.get({ newsApiKey: "" }, (data) => {
-        if (!data.newsApiKey) {
+      vault.hasKey().then((hasKey) => {
+        if (!hasKey) {
           compareState.loading = false;
           showComparePrompt("Add a NewsAPI key in Settings to enable cross-outlet comparison.", true);
           return;
@@ -563,8 +564,8 @@
   backBtn.addEventListener("click", () => showSettings(false));
 
   function refreshKeyStatus() {
-    chrome.storage.local.get({ newsApiKey: "" }, (data) => {
-      keyStatus.textContent = data.newsApiKey ? "A key is currently saved on this device." : "No key saved.";
+    vault.hasKey().then((hasKey) => {
+      keyStatus.textContent = hasKey ? "A key is currently saved (encrypted) on this device." : "No key saved.";
     });
   }
 
@@ -579,7 +580,12 @@
       keyStatus.textContent = "Permission denied - key was not saved.";
       return;
     }
-    await chrome.storage.local.set({ newsApiKey: key });
+    try {
+      await vault.saveKey(key);
+    } catch (e) {
+      keyStatus.textContent = "Could not encrypt and save the key: " + e.message;
+      return;
+    }
     apiKeyInput.value = "";
     keyStatus.textContent = "Key saved.";
     compareState.loaded = false; // let the next Compare tab visit use the new key
@@ -587,7 +593,7 @@
   });
 
   clearKeyBtn.addEventListener("click", async () => {
-    await chrome.storage.local.remove("newsApiKey");
+    await vault.clearKey();
     await chrome.permissions.remove({ origins: ["https://newsapi.org/*"] });
     compareState.loaded = false;
     keyStatus.textContent = "Key removed.";

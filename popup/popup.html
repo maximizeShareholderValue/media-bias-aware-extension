@@ -107,7 +107,7 @@
     <div class="card">
       <label for="apiKeyInput" class="field-label">NewsAPI key (optional)</label>
       <p class="hint">
-        Stored locally on this device only (<code>chrome.storage.local</code>), never hardcoded, and never sent anywhere
+        Stored encrypted on this device only (<code>chrome.storage.local</code>), never hardcoded, and never sent anywhere
         except directly to newsapi.org when you open the Compare tab. Get a free key at
         <span class="muted">newsapi.org/register</span>.
       </p>
@@ -131,6 +131,7 @@
 
   <script src="../content/category-meta.js"></script>
   <script src="../shared/compare-utils.js"></script>
+  <script src="../shared/key-vault.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
