@@ -50,12 +50,12 @@ test("buildAttempts drops duplicate attempts and handles one keyword or none", (
 
 // ---- service worker with a stubbed chrome / fetch ---------------------------
 
-function loadWorker({ responses, key = "k", granted = true }) {
+function loadWorker({ responses, key = "k", granted = true, compareEnabled }) {
   const requests = [];
   const store = {};
   const listeners = [];
   // An older version's plaintext key: the real KeyVault encrypts it on first read.
-  const local = memoryArea({ newsApiKey: key });
+  const local = memoryArea(Object.assign({ newsApiKey: key }, compareEnabled === undefined ? {} : { compareEnabled }));
   const wrapKey = crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
   const sandbox = {
     console: { warn() {}, log() {} },
@@ -188,7 +188,15 @@ test("searchWindow: the free plan covers articles about 1 to 30 days old", () =>
   assert.equal(CompareUtils.searchWindow("not a date", now).status, "unknown");
 });
 
-// ---- the encrypted key (FR-SYS-01 / NFR-PRIV-01) ------------------------------
+// ---- FR-SYS-02 and the encrypted key (FR-SYS-01 / NFR-PRIV-01) ----------------
+
+test("FR-SYS-02: with comparative reporting turned off, no request is sent", async () => {
+  const w = loadWorker({ responses: [{ articles: art("cnn.com", 3) }], compareEnabled: false });
+  const r = await w.ask(["iran", "hormuz"], "nypost.com");
+  assert.equal(r.ok, false);
+  assert.equal(r.reason, "compare_disabled");
+  assert.equal(w.requests.length, 0);
+});
 
 test("a plaintext key from an older version is encrypted on first use and still works", async () => {
   const w = loadWorker({ responses: [{ articles: art("cnn.com", 6) }], key: "secret-key-123" });
