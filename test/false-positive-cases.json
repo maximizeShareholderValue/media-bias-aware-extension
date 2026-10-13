@@ -248,11 +248,6 @@
       "why": "causal claim reported from a source"
     },
     {
-      "rule": "LL-009",
-      "text": "The word 'propaganda' appears 12 times in the archive catalog.",
-      "why": "the word is mentioned, not used as a label"
-    },
-    {
       "rule": "LL-012",
       "text": "The shocking news was confirmed by the ministry.",
       "why": "evaluative adjective; heuristics cannot tell mild from loaded"

@@ -115,15 +115,31 @@ test("SC-012 fires on unattributed collective-claim phrases", () => {
 
 test("LL-008 name-calling labels: plural noun, singular attributive adjective, racists", () => {
   assert.ok(first("Local terrorists attacked the outpost overnight.", "LL-008"));
-  assert.ok(first("The group was labeled a terrorist organization by the state department.", "LL-008"));
+  assert.ok(first("These Hamas sympathizers are nothing but terrorist apologists.", "LL-008"));
   assert.ok(first("The rally attracted known racists from across the region.", "LL-008"));
 });
 
-test("LL-009 and LL-010 fire on the loaded senses only", () => {
-  assert.ok(first("The leaflet was dismissed as propaganda by independent researchers.", "LL-009"));
-  assert.ok(!first("The museum's new exhibit features a rare propaganda poster from the era.", "LL-009"));
+test("LL-008 skips factual designations and events (calibration round 1)", () => {
+  assert.ok(!first("The group was labeled a terrorist organization by the state department.", "LL-008"));
+  assert.ok(!first("Three people died in the terrorist attack on Tuesday.", "LL-008"));
+  assert.ok(!first("He is on the FBI list of most wanted terrorists.", "LL-008"));
+});
+
+test("LL-010 fires on the loaded sense only", () => {
   assert.ok(first("The regime cracked down on dissidents after the protest.", "LL-010"));
   assert.ok(!first("She follows a strict exercise regime every morning.", "LL-010"));
+  assert.ok(!first("Critics said the plan amounted to regime change.", "LL-010"));
+  assert.ok(!first("He suggested expanding the inspection regime at the sites.", "LL-010"));
+});
+
+test("DB-002 skips accounts of a specific crime or incident (calibration round 1)", () => {
+  assert.ok(!first("The guard who was allegedly shot stopping the massacre has vanished.", "DB-002"));
+  assert.ok(!first("Guyger allegedly walked into the apartment during the shooting.", "DB-002"));
+  assert.ok(first("The minister allegedly favors a quiet deal with donors.", "DB-002"));
+});
+
+test("LL-009 ('propaganda') was retired in calibration round 1", () => {
+  assert.ok(!patterns.some((p) => p.id === "LL-009"));
 });
 
 test("EM-001 and AF-001", () => {
