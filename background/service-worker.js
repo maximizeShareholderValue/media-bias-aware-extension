@@ -5,7 +5,8 @@
  *    passing (kept out of web_accessible_resources so a web page cannot
  *    fetch it and fingerprint the extension).
  *  - Performs the ONE optional network call: a comparative-reporting lookup
- *    against NewsAPI, only when the user has saved their own API key.
+ *    against NewsAPI, only when the user has saved their own API key. The key
+ *    is stored encrypted and is decrypted only here (shared/key-vault.js).
  *
  * Privacy (FR-AVD-01 / NFR-PRIV-01): the request carries ONLY short topic
  * keywords (plus a list of public outlet domains to search within or skip).
@@ -19,11 +20,13 @@
  * the free plan's 100-requests-a-day quota.
  */
 
-importScripts("../shared/compare-utils.js");
+importScripts("../shared/compare-utils.js", "../shared/key-vault.js");
 
 const NEWSAPI_TIMEOUT_MS = 1500;
 const NEWSAPI_BASE = "https://newsapi.org/v2/everything";
 const CACHE_TTL_MS = 30 * 60 * 1000;
+
+const vault = KeyVault.create();
 
 let catalogCache = null;
 let outletsCache = null;
@@ -107,7 +110,7 @@ async function handleComparativeLookup(rawKeywords, rawCurrentDomain) {
   const keywords = CompareUtils.sanitizeKeywords(rawKeywords);
   if (!keywords.length) return { ok: false, reason: "no_keywords" };
 
-  const { newsApiKey } = await chrome.storage.local.get({ newsApiKey: "" });
+  const newsApiKey = await vault.loadKey();
   if (!newsApiKey) return { ok: false, reason: "no_api_key" };
 
   const hasPermission = await chrome.permissions.contains({ origins: ["https://newsapi.org/*"] });
