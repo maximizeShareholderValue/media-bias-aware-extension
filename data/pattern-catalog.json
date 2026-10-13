@@ -1,6 +1,6 @@
 {
   "$schemaVersion": "2.0.0",
-  "catalogVersion": "0.4.3",
+  "catalogVersion": "0.5.0",
   "lastUpdated": "2026-10-13",
   "_readme": "Linguistic Pattern Catalog. Each rule follows the ten fields of thesis Table 13 and is evaluated as D(s,r) = L(s,r) AND S(s,r) AND C(s,r) (FR-DET-03): the lexicalTrigger generates a candidate; it is flagged only if the linguisticCondition (structure/POS) and the contextCondition (local context) also hold. A lexical-only run (L alone) is the section 8.3 baseline. Overlaps are resolved by FR-DET-04: longest span, then higher confidenceTier, then earliest offset, then lowest id. Edit this file to change detection without rebuilding the extension. REPETITION has no rules: it needs a repeated-expression comparison rather than a lexical trigger. Rule ID prefixes of the original seed rules (LL/PS/SC/AF/EM) are legacy names; `technique` is authoritative. confidenceTier is currently authored, not yet calibrated on the development corpus (thesis Stage 5).",
   "_schema": {
@@ -1394,6 +1394,221 @@
       },
       "confidenceTier": "medium",
       "neutralAlternative": "Address the original point"
+    },
+    {
+      "id": "EX-004",
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "label": "Absolute or all-time claim",
+      "referenceDefinition": "Presenting something as substantially greater or less important, serious, significant, or consequential than warranted by the context.",
+      "lexicalTrigger": {
+        "words": [
+          "cease to exist",
+          "greatest threat ever faced",
+          "worst in history",
+          "of all time"
+        ],
+        "pattern": "\\b(?:(?:will|would|could) (?:simply )?cease to exist|(?:the )?(?:greatest|biggest|gravest|worst) (?:[a-z’'-]+ ){0,4}?(?:(?:has |have )?ever (?:faced|seen|known)|in (?:our |its |their |human )?history|of all time))\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The absolute or all-time construction is itself the anchor."
+      },
+      "contextCondition": {
+        "requireNoQuantity": true,
+        "excludeSentenceWords": [
+          "record",
+          "records",
+          "recorded",
+          "data",
+          "statistics",
+          "company",
+          "firm",
+          "merger",
+          "brand",
+          "species",
+          "program",
+          "programme",
+          "account",
+          "subscription",
+          "season",
+          "team",
+          "game",
+          "album",
+          "film",
+          "movie"
+        ],
+        "description": "Not a measured record backed by figures ('the deadliest storm in history, killing 8,000'), and not a business, product or sports context where the phrase is literal or routine."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This presents the issue in absolute, all-time terms (the worst ever, the end of everything) instead of describing its actual size or likely effect.",
+      "sourceExample": {
+        "text": "If Israel loses this war, the entire country will cease to exist.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Exaggeration example) and Table 9 ('the greatest threat our civilization has ever faced'); measured records and business/sports uses excluded by the context condition."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "Describe the actual scale or likely effect"
+    },
+    {
+      "id": "CO-002",
+      "technique": "CAUSAL_OVERSIMPLIFICATION",
+      "label": "Single-condition solution",
+      "referenceDefinition": "Presenting a complex situation as having a single or substantially simplified cause, including forms of scapegoating.",
+      "lexicalTrigger": {
+        "words": [
+          "simply surrendered",
+          "just resigned",
+          "would be peace tomorrow"
+        ],
+        "pattern": "\\b(?:(?:simply|just|only) (?:surrendered|surrender|resigned|resign|stepped down|step down|gave up|give up|went away|go away|stopped|stop|left|leave)|would be (?:peace|no (?:crime|war|inflation|problem|problems|crisis)) (?:tomorrow|overnight|immediately))\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The phrase is itself the anchor."
+      },
+      "contextCondition": {
+        "requireSentenceWords": [
+          "if"
+        ],
+        "description": "Part of a conditional ('if X simply surrendered'), so a complex outcome is presented as hinging on one actor's single act."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This presents a complex situation as if one actor's single act would resolve it, leaving out the other causes involved.",
+      "sourceExample": {
+        "text": "There would be peace tomorrow if Hamas simply surrendered.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Causal Oversimplification example)."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "Name the other factors involved"
+    },
+    {
+      "id": "AA-003",
+      "technique": "APPEAL_TO_AUTHORITY",
+      "label": "Authority as a reason not to question",
+      "referenceDefinition": "Presenting a claim as true or valid primarily because an authority, expert, institution, or other perceived source supports it.",
+      "lexicalTrigger": {
+        "words": [
+          "no reason to question",
+          "who are we to question",
+          "we should trust the experts"
+        ],
+        "pattern": "\\b(?:there is no (?:reason|need) to (?:question|doubt|challenge) (?:it|them|this|that)|who are we to (?:question|doubt|challenge)|(?:we|you) (?:should|must) (?:simply |just )?trust (?:the|our) (?:experts|military|generals|scientists|doctors|leaders|government|officials))\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The phrase is itself the anchor."
+      },
+      "contextCondition": {
+        "requireSentenceWords": [
+          "said",
+          "says",
+          "say",
+          "leaders",
+          "experts",
+          "officials",
+          "generals",
+          "scientists",
+          "doctors",
+          "military",
+          "authorities",
+          "commanders",
+          "government"
+        ],
+        "description": "The sentence cites an authority, so the phrase uses that authority as the reason to stop questioning the claim."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This treats an authority's statement as a reason to stop questioning the claim, instead of giving the evidence for it.",
+      "sourceExample": {
+        "text": "Our military leaders have said the operation is necessary, so there is no reason to question it.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Appeal to Authority example)."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "State the evidence behind the authority's claim"
+    },
+    {
+      "id": "LL-013",
+      "technique": "LOADED_LANGUAGE",
+      "label": "Flood metaphor for people",
+      "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
+      "lexicalTrigger": {
+        "words": [
+          "flooding our borders",
+          "pouring into our country",
+          "swarming our cities"
+        ],
+        "pattern": "\\b(?:flood(?:ing|ed|s)?|pour(?:ing|ed|s)?|swarm(?:ing|ed|s)?) (?:into |across |over |through )?(?:our (?:borders?|country|nation|cities|streets|towns|communities|neighborhoods|schools)|the borders?)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The metaphor is itself the anchor."
+      },
+      "contextCondition": {
+        "excludeSentenceWords": [
+          "rain",
+          "rainfall",
+          "water",
+          "waters",
+          "river",
+          "rivers",
+          "storm",
+          "hurricane",
+          "floodwater",
+          "floodwaters",
+          "snowmelt",
+          "sewage",
+          "mud",
+          "lava",
+          "fentanyl",
+          "drugs",
+          "goods",
+          "imports",
+          "products",
+          "cash",
+          "money"
+        ],
+        "description": "About people, not literal water ('rain flooding the streets') or goods, where 'pouring across the border' describes trafficking volumes."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This describes people with a flood or swarm metaphor, which frames them as a natural disaster or threat rather than describing who they are and how many.",
+      "sourceExample": {
+        "text": "Illegals are flooding our borders",
+        "source": "Thesis Table 9",
+        "triggerEvidence": "Thesis Table 9 (Loaded Language example); literal water and goods/trafficking uses excluded by the context condition."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "State who is arriving and in what numbers"
+    },
+    {
+      "id": "RP-001",
+      "technique": "REPETITION",
+      "label": "Immediate rhetorical repetition",
+      "referenceDefinition": "Repeated use of a word, phrase, message, or idea to increase its persuasive effect.",
+      "lexicalTrigger": {
+        "words": [
+          "jobs, jobs, jobs",
+          "take it back! take it back"
+        ],
+        "pattern": "\\b(?!(?:very|much|many|more|well|again|really|so|that|there|here|now)\\b)(?:([a-z][a-z’'-]{3,}),\\s*\\1\\b|([a-z][a-z’'-]{3,})\\b[^.!?]{0,30}!\\s*\\2\\b)"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The repeated word and the words between its occurrences form the span."
+      },
+      "contextCondition": {
+        "excludeMidSentenceCapital": true,
+        "description": "A word repeated straight after a comma ('Jobs, jobs, jobs') or a phrase restarted straight after an exclamation mark ('Take our country back! Take it back!'): a rhetorical device rather than ordinary reference. Repetition spread across the whole article is not covered."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This repeats the same word or phrase back-to-back to drive the message home through repetition rather than argument.",
+      "sourceExample": {
+        "text": "We must take our country back! Take it back!",
+        "source": "Thesis Table 9",
+        "triggerEvidence": "Thesis Table 9 (Repetition example). Only immediate repetition is covered; repetition spread across an article needs article-level comparison (thesis 4.2)."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "State the point once"
     }
   ]
 }
