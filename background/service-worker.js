@@ -5,8 +5,9 @@
  *    passing (kept out of web_accessible_resources so a web page cannot
  *    fetch it and fingerprint the extension).
  *  - Performs the ONE optional network call: a comparative-reporting lookup
- *    against NewsAPI, only when the user has saved their own API key. The key
- *    is stored encrypted and is decrypted only here (shared/key-vault.js).
+ *    against NewsAPI, only when the user has saved their own API key and has
+ *    not turned comparative reporting off (FR-SYS-02). The key is stored
+ *    encrypted and is decrypted only here (shared/key-vault.js).
  *
  * Privacy (FR-AVD-01 / NFR-PRIV-01): the request carries ONLY short topic
  * keywords (plus a list of public outlet domains to search within or skip).
@@ -109,6 +110,10 @@ async function writeCache(key, response) {
 async function handleComparativeLookup(rawKeywords, rawCurrentDomain) {
   const keywords = CompareUtils.sanitizeKeywords(rawKeywords);
   if (!keywords.length) return { ok: false, reason: "no_keywords" };
+
+  // FR-SYS-02: with comparative reporting turned off, the extension makes no external requests.
+  const { compareEnabled } = await chrome.storage.local.get({ compareEnabled: true });
+  if (!compareEnabled) return { ok: false, reason: "compare_disabled" };
 
   const newsApiKey = await vault.loadKey();
   if (!newsApiKey) return { ok: false, reason: "no_api_key" };

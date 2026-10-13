@@ -120,6 +120,16 @@
     </div>
 
     <div class="card">
+      <section class="toggle-row">
+        <label class="toggle-row__label" for="compareToggle">Comparative reporting</label>
+        <button type="button" class="switch" id="compareToggle" role="switch" aria-checked="true">
+          <span class="switch__knob"></span>
+        </button>
+      </section>
+      <p class="hint">When off, the Compare tab sends no request to newsapi.org and the extension makes no external requests at all.</p>
+    </div>
+
+    <div class="card">
       <h3 class="field-label">Evaluation (optional)</h3>
       <p class="hint">Download this page's detections as JSON (rule IDs, character spans, techniques, suppressed overlaps) so validators can judge them. Stays on your device.</p>
       <button id="exportBtn" class="button button--secondary">Export detections (JSON)</button>
