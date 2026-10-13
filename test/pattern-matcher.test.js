@@ -60,9 +60,9 @@ test("catalog integrity: unique ids, compilable regexes, only known condition ty
   for (const p of patterns) assert.doesNotThrow(() => new RegExp(p.lexicalTrigger.pattern.replace(/ /g, "\\s+"), "gi"), p.id);
 });
 
-test("every technique except REPETITION has at least one rule", () => {
+test("every one of the 14 techniques has at least one rule", () => {
   const used = new Set(patterns.map((p) => p.technique));
-  assert.deepEqual(Object.keys(techniques).filter((t) => !used.has(t)), ["REPETITION"]);
+  assert.deepEqual(Object.keys(techniques).filter((t) => !used.has(t)), []);
 });
 
 test("match objects record span, ids, technique, tier and explanation (FR-DET-03)", () => {
@@ -237,7 +237,10 @@ const TABLE_12 = [
   ["BLACK_AND_WHITE_FALLACY", "You either support Israel or you support terrorism."],
   ["THOUGHT_TERMINATING_CLICHES", "Israel has the right to defend itself. End of discussion."],
   ["STRAW_MAN_WHATABOUTISM_RED_HERRING", "Instead of criticizing Israel, why aren't you talking about what Hamas did?"],
-  ["BANDWAGON_REDUCTIO_AD_HITLERUM", "The whole world now stands with Israel, and anyone who still questions the operation is on the wrong side of history."]
+  ["BANDWAGON_REDUCTIO_AD_HITLERUM", "The whole world now stands with Israel, and anyone who still questions the operation is on the wrong side of history."],
+  ["EXAGGERATION_MINIMIZATION", "If Israel loses this war, the entire country will cease to exist."],
+  ["CAUSAL_OVERSIMPLIFICATION", "There would be peace tomorrow if Hamas simply surrendered."],
+  ["APPEAL_TO_AUTHORITY", "Our military leaders have said the operation is necessary, so there is no reason to question it."]
 ];
 for (const [technique, sentence] of TABLE_12) {
   test(`Table 12 example is flagged as ${technique}`, () => {
@@ -245,11 +248,22 @@ for (const [technique, sentence] of TABLE_12) {
   });
 }
 
+const TABLE_9 = [
+  ["EXAGGERATION_MINIMIZATION", "This is the greatest threat our civilization has ever faced."],
+  ["BLACK_AND_WHITE_FALLACY", "Either you are with us or you are with the terrorists."],
+  ["APPEAL_TO_AUTHORITY", "Experts agree that the plan will fail."],
+  ["LOADED_LANGUAGE", "Illegals are flooding our borders"],
+  ["REPETITION", "We must take our country back! Take it back!"]
+];
+for (const [technique, sentence] of TABLE_9) {
+  test(`Table 9 example is flagged as ${technique}`, () => {
+    assert.ok(full(sentence).some((m) => m.technique === technique), `not flagged as ${technique}: ${sentence}`);
+  });
+}
+
+// Table 12's Repetition row is repetition spread across an article, which needs article-level comparison.
 const TABLE_12_GAPS = [
-  ["REPETITION", "Repeatedly describing protesters as 'terrorists' without distinguishing the specific individuals (needs a repeated-expression detector)."],
-  ["EXAGGERATION_MINIMIZATION", "If Israel loses this war, the entire country will cease to exist."],
-  ["CAUSAL_OVERSIMPLIFICATION", "There would be peace tomorrow if Hamas simply surrendered."],
-  ["APPEAL_TO_AUTHORITY", "Our military leaders have said the operation is necessary, so there is no reason to question it."]
+  ["REPETITION", "Repeatedly describing protesters as 'terrorists' without distinguishing the specific individuals (needs a repeated-expression detector)."]
 ];
 for (const [technique, sentence] of TABLE_12_GAPS) {
   test(`Table 12 example is flagged as ${technique}`, { todo: "not yet covered by a rule" }, () => {
