@@ -67,7 +67,7 @@ test("every one of the 14 techniques has at least one rule", () => {
 
 test("match objects record span, ids, technique, tier and explanation (FR-DET-03)", () => {
   const text = "The senator claimed that the bill would pass.";
-  const m = first(text, "AF-001");
+  const m = first(text, "DB-004");
   assert.ok(m);
   assert.equal(text.slice(m.start, m.end), "claimed");
   assert.equal(typeof m.tokenStart, "number");
@@ -85,10 +85,10 @@ test("match objects record span, ids, technique, tier and explanation (FR-DET-03
 test("seed rules keep their behavior and map to SemEval techniques", () => {
   const byId = Object.fromEntries(patterns.map((p) => [p.id, p.technique]));
   assert.equal(byId["LL-007"], "LOADED_LANGUAGE");
-  assert.equal(byId["LL-008"], "NAME_CALLING_LABELING");
-  assert.equal(byId["PS-003"], "LOADED_LANGUAGE");
-  assert.equal(byId["AF-001"], "DOUBT");
-  assert.equal(byId["SC-012"], "APPEAL_TO_AUTHORITY");
+  assert.equal(byId["NC-004"], "NAME_CALLING_LABELING");
+  assert.equal(byId["LL-016"], "LOADED_LANGUAGE");
+  assert.equal(byId["DB-004"], "DOUBT");
+  assert.equal(byId["AA-002"], "APPEAL_TO_AUTHORITY");
 });
 
 test("LL-007 fires on 'radical faction' but not on 'radical surgery'", () => {
@@ -99,37 +99,37 @@ test("LL-007 fires on 'radical faction' but not on 'radical surgery'", () => {
   assert.ok(!first("She underwent radical surgery last week.", "LL-007"));
 });
 
-test("PS-003 fires on a reporting verb, not on 'admitted to the hospital'", () => {
-  assert.ok(first("The senator admitted that he lied to investigators.", "PS-003"));
-  assert.ok(first('The spokesperson acknowledged "we made mistakes" during the briefing.', "PS-003"));
-  assert.ok(!first("The hospital admitted the patient overnight.", "PS-003"));
-  assert.equal(first("The senator admitted that he lied.", "PS-003").neutralAlternative, "said");
+test("LL-016 fires on a reporting verb, not on 'admitted to the hospital'", () => {
+  assert.ok(first("The senator admitted that he lied to investigators.", "LL-016"));
+  assert.ok(first('The spokesperson acknowledged "we made mistakes" during the briefing.', "LL-016"));
+  assert.ok(!first("The hospital admitted the patient overnight.", "LL-016"));
+  assert.equal(first("The senator admitted that he lied.", "LL-016").neutralAlternative, "said");
 });
 
-test("SC-012 fires on unattributed collective-claim phrases", () => {
+test("AA-002 fires on unattributed collective-claim phrases", () => {
   const text = "Some say the policy will fail. Critics argue that the bill goes too far.";
-  const hits = full(text).filter((m) => m.id === "SC-012");
+  const hits = full(text).filter((m) => m.id === "AA-002");
   assert.deepEqual(hits.map((m) => text.slice(m.start, m.end).toLowerCase()), ["some say", "critics argue"]);
   assert.equal(hits[0].neutralAlternative, "Name the specific source");
 });
 
-test("LL-008 name-calling labels: plural noun, singular attributive adjective, racists", () => {
-  assert.ok(first("Local terrorists attacked the outpost overnight.", "LL-008"));
-  assert.ok(first("These Hamas sympathizers are nothing but terrorist apologists.", "LL-008"));
-  assert.ok(first("The rally attracted known racists from across the region.", "LL-008"));
+test("NC-004 name-calling labels: plural noun, singular attributive adjective, racists", () => {
+  assert.ok(first("Local terrorists attacked the outpost overnight.", "NC-004"));
+  assert.ok(first("These Hamas sympathizers are nothing but terrorist apologists.", "NC-004"));
+  assert.ok(first("The rally attracted known racists from across the region.", "NC-004"));
 });
 
-test("LL-008 skips factual designations and events (calibration round 1)", () => {
-  assert.ok(!first("The group was labeled a terrorist organization by the state department.", "LL-008"));
-  assert.ok(!first("Three people died in the terrorist attack on Tuesday.", "LL-008"));
-  assert.ok(!first("He is on the FBI list of most wanted terrorists.", "LL-008"));
+test("NC-004 skips factual designations and events (calibration round 1)", () => {
+  assert.ok(!first("The group was labeled a terrorist organization by the state department.", "NC-004"));
+  assert.ok(!first("Three people died in the terrorist attack on Tuesday.", "NC-004"));
+  assert.ok(!first("He is on the FBI list of most wanted terrorists.", "NC-004"));
 });
 
-test("LL-010 fires on the loaded sense only", () => {
-  assert.ok(first("The regime cracked down on dissidents after the protest.", "LL-010"));
-  assert.ok(!first("She follows a strict exercise regime every morning.", "LL-010"));
-  assert.ok(!first("Critics said the plan amounted to regime change.", "LL-010"));
-  assert.ok(!first("He suggested expanding the inspection regime at the sites.", "LL-010"));
+test("NC-005 fires on the loaded sense only", () => {
+  assert.ok(first("The regime cracked down on dissidents after the protest.", "NC-005"));
+  assert.ok(!first("She follows a strict exercise regime every morning.", "NC-005"));
+  assert.ok(!first("Critics said the plan amounted to regime change.", "NC-005"));
+  assert.ok(!first("He suggested expanding the inspection regime at the sites.", "NC-005"));
 });
 
 test("DB-002 skips accounts of a specific crime or incident (calibration round 1)", () => {
@@ -147,11 +147,11 @@ test("calibration round 2: genuine misfires are skipped, the real uses still fir
   assert.ok(first("They want to hand benefits to illegal aliens.", "NC-002"));
   assert.ok(first("Illegals are flooding our borders", "NC-001"));
   assert.ok(!first("It would mark a radical change in doctrine.", "LL-007"));
-  assert.ok(!first("Ebola is one of the most notorious diseases in the world.", "EM-001"));
-  assert.ok(first("The notorious criminal was finally apprehended.", "EM-001"));
+  assert.ok(!first("Ebola is one of the most notorious diseases in the world.", "LL-015"));
+  assert.ok(first("The notorious criminal was finally apprehended.", "LL-015"));
   assert.ok(!first("Cost is a factor, but it is not the only reason families leave.", "CO-001"));
   assert.ok(first("The only reason prices rose is the new tax.", "CO-001"));
-  assert.ok(!first("A terrorist-launched rocket hit the town.", "LL-008"));
+  assert.ok(!first("A terrorist-launched rocket hit the town.", "NC-004"));
 });
 
 test("calibration round 3: corpus-derived terms and the Loaded Language remap", () => {
@@ -165,17 +165,28 @@ test("calibration round 3: corpus-derived terms and the Loaded Language remap", 
   assert.ok(first("She said the senator is a liar.", "NC-003"));
 });
 
+test("calibration round 4: Flag-Waving public appeal and totalitarian comparison", () => {
+  const tech = (t, id) => (first(t, id) || {}).technique;
+  assert.equal(tech("The agency kept the records secret from the American people.", "FW-002"), "FLAG_WAVING");
+  assert.ok(first("This assault on our country must stop.", "FW-002"));
+  assert.ok(!first("A new poll shows 60 percent of the American people support it.", "FW-002"), "poll result skipped");
+  assert.ok(!first("Thousands tried to enter our country illegally.", "FW-002"), "literal entry skipped");
+  assert.equal(tech("He made Stalinist statements about taking guns first.", "BW-002"), "BANDWAGON_REDUCTIO_AD_HITLERUM");
+  assert.ok(first("This is an assault by the fascist Left on our liberties.", "BW-002"));
+  assert.ok(!first("Sanctions target North Korea's Stalinist regime.", "BW-002"), "literal regime description skipped");
+});
+
 test("LL-009 ('propaganda') was retired in calibration round 1", () => {
   assert.ok(!patterns.some((p) => p.id === "LL-009"));
 });
 
-test("EM-001 and AF-001", () => {
+test("LL-015 and DB-004", () => {
   for (const t of ["The notorious criminal was finally apprehended.", "The disgraced senator resigned.", "The infamous scandal rocked the administration."]) {
-    assert.ok(first(t, "EM-001"), t);
+    assert.ok(first(t, "LL-015"), t);
   }
-  assert.equal(first("The senator claimed that the bill would pass easily.", "AF-001").neutralAlternative, "said");
-  assert.ok(!first("He filed an insurance claim after the accident.", "AF-001"));
-  assert.ok(!first("The claimed savings turned out to be exaggerated.", "AF-001"));
+  assert.equal(first("The senator claimed that the bill would pass easily.", "DB-004").neutralAlternative, "said");
+  assert.ok(!first("He filed an insurance claim after the accident.", "DB-004"));
+  assert.ok(!first("The claimed savings turned out to be exaggerated.", "DB-004"));
 });
 
 // ---------------------------------------------------------------------------
@@ -231,8 +242,8 @@ const CONDITION_CASES = [
   ["EX-001", "Prices skyrocketed 40% to 199.79p in October.", "context: the sentence states a figure"],
   ["DB-002", "The tanker, allegedly linked to Venezuela, was seized by police.", "context: legal hedging"],
   ["DB-003", "What is really happening in the market?", "context: plain question, no insinuated alternative"],
-  ["PS-003", "The hospital admitted the patient overnight.", "structure: not a reporting verb"],
-  ["AF-001", "He filed an insurance claim after the accident.", "structure: noun sense"],
+  ["LL-016", "The hospital admitted the patient overnight.", "structure: not a reporting verb"],
+  ["DB-004", "He filed an insurance claim after the accident.", "structure: noun sense"],
   ["NC-001", "The Democratic Socialists of America endorsed the measure.", "context: proper organization name"],
   ["LL-007", "She underwent radical surgery last week.", "context: neutral technical collocation"]
 ];
@@ -319,8 +330,8 @@ test("REGRESSION: multi-word phrases match across line breaks and NBSP in raw te
   const m = first(wrapped, "FE-001");
   assert.ok(m, "phrase split by a line break was missed");
   assert.equal(wrapped.slice(m.start, m.end), "existential\n      threat");
-  assert.ok(first("Some\n   say the plan will fail.", "SC-012"));
-  assert.ok(first("Critics argue that it fails.", "SC-012"));
+  assert.ok(first("Some\n   say the plan will fail.", "AA-002"));
+  assert.ok(first("Critics argue that it fails.", "AA-002"));
   assert.equal(first("Trump lashed\n   out at the defectors.", "LL-011").neutralAlternative, "criticized");
 });
 

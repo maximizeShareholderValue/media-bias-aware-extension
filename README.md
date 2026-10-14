@@ -129,8 +129,8 @@ repeated-expression detector rather than a lexical trigger, so `REPETITION` has 
   emits `category` as an alias used by the highlighter CSS.
 - **Rule IDs**: prefixes of the original seed rules (LL / PS / SC / AF / EM) are legacy names from
   an earlier 5-category scheme and were kept so references stay valid; `technique` is authoritative.
-  Re-mapped seed rules carry a `techniqueNote` explaining why (e.g. `PS-003` -> Loaded Language
-  because SemEval has no presupposition class; `SC-012` -> Appeal to Authority although
+  Re-mapped seed rules carry a `techniqueNote` explaining why (e.g. `LL-016` (formerly PS-003) -> Loaded Language
+  because SemEval has no presupposition class; `AA-002` (formerly SC-012) -> Appeal to Authority although
   "many believe" is arguably Bandwagon).
 - **Highlight span** is the trigger word/phrase itself, not the noun it is checked against.
 - **Whitespace**: a literal space in a rule matches line breaks and NBSP, because `textContent`
