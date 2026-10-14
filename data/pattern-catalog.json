@@ -1,6 +1,6 @@
 {
   "$schemaVersion": "2.0.0",
-  "catalogVersion": "0.5.1",
+  "catalogVersion": "0.5.2",
   "lastUpdated": "2026-10-14",
   "_readme": "Linguistic Pattern Catalog. Each rule follows the ten fields of thesis Table 13 and is evaluated as D(s,r) = L(s,r) AND S(s,r) AND C(s,r) (FR-DET-03): the lexicalTrigger generates a candidate; it is flagged only if the linguisticCondition (structure/POS) and the contextCondition (local context) also hold. A lexical-only run (L alone) is the section 8.3 baseline. Overlaps are resolved by FR-DET-04: longest span, then higher confidenceTier, then earliest offset, then lowest id. Edit this file to change detection without rebuilding the extension. REPETITION has no rules: it needs a repeated-expression comparison rather than a lexical trigger. Rule ID prefixes of the original seed rules (LL/PS/SC/AF/EM) are legacy names; `technique` is authoritative. confidenceTier is currently authored, not yet calibrated on the development corpus (thesis Stage 5).",
   "_schema": {
@@ -103,9 +103,15 @@
           "departure",
           "redesign",
           "overhaul",
-          "rethink"
+          "rethink",
+          "change",
+          "changes",
+          "shift",
+          "reform",
+          "reforms",
+          "transformation"
         ],
-        "description": "Not a neutral technical collocation such as 'radical surgery' or 'radical honesty'. Not part of a capitalized proper name ('Radical Republicans').",
+        "description": "Not a neutral technical collocation such as 'radical surgery' or 'radical honesty'. Not part of a capitalized proper name ('Radical Republicans'). Not a description of the size of a change ('a radical change in doctrine'). Calibration round 2.",
         "excludeMidSentenceCapital": true
       },
       "targetSpan": "trigger",
@@ -165,7 +171,8 @@
           "designated",
           "wanted"
         ],
-        "description": "Not a factual designation or event ('terrorist attack', 'a designated terrorist organization', 'most wanted terrorists'). Calibration round 1: these factual uses were the main source of false positives."
+        "description": "Not a factual designation or event ('terrorist attack', 'a designated terrorist organization', 'most wanted terrorists'). Calibration round 1: these factual uses were the main source of false positives. Not a hyphenated factual compound ('terrorist-launched rocket'). Calibration round 2.",
+        "excludeFollowingPattern": "-\\w"
       },
       "targetSpan": "trigger",
       "explanation": "This term labels a person or group in starkly negative, delegitimizing terms rather than describing their actions or stated views neutrally.",
@@ -422,8 +429,18 @@
         "description": "The reputational modifier directly precedes the noun it judges (Compromise tags 'disgraced' as a past-tense verb, so the rule keys on the following noun, not the trigger's own tag)."
       },
       "contextCondition": {
-        "description": "Not part of a capitalized name ('The Notorious B.I.G.').",
-        "excludeMidSentenceCapital": true
+        "description": "Not part of a capitalized name ('The Notorious B.I.G.'). Not describing a disease or pathogen ('one of the most notorious diseases'). Calibration round 2.",
+        "excludeMidSentenceCapital": true,
+        "excludeNeighborWords": [
+          "disease",
+          "diseases",
+          "virus",
+          "viruses",
+          "outbreak",
+          "pathogen",
+          "pathogens",
+          "bacteria"
+        ]
       },
       "targetSpan": "trigger",
       "explanation": "This word injects the writer's own negative judgment about someone's reputation, rather than letting the reader draw that conclusion from neutrally reported facts.",
@@ -491,7 +508,6 @@
       "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
       "lexicalTrigger": {
         "words": [
-          "illegal aliens",
           "illegals",
           "leftists",
           "socialists",
@@ -502,7 +518,7 @@
           "haters",
           "radicals"
         ],
-        "pattern": "\\b(illegal aliens?|illegals|leftists?|socialists|snowflakes?|globalists?|thugs?|traitors?|haters|radicals|radical left|radical right)\\b"
+        "pattern": "\\b(illegals|leftists?|socialists|snowflakes?|globalists?|thugs?|traitors?|haters|radicals|radical left|radical right)\\b"
       },
       "linguisticCondition": {
         "type": "taggedAny",
@@ -546,6 +562,60 @@
         "thugs": "suspects",
         "thug": "suspect"
       }
+    },
+    {
+      "id": "NC-002",
+      "technique": "NAME_CALLING_LABELING",
+      "label": "Immigration-status label",
+      "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
+      "lexicalTrigger": {
+        "words": [
+          "illegal alien",
+          "illegal aliens"
+        ],
+        "pattern": "\\billegal aliens?\\b"
+      },
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Noun",
+          "Adjective"
+        ],
+        "description": "The phrase functions as a label for people."
+      },
+      "contextCondition": {
+        "excludeSentenceWords": [
+          "deported",
+          "deportation",
+          "deportations",
+          "removal",
+          "custody",
+          "arrested",
+          "arrest",
+          "ice",
+          "felony",
+          "charged",
+          "court",
+          "judge",
+          "immigration",
+          "enforcement",
+          "prosecuted",
+          "convicted",
+          "ordered",
+          "statute",
+          "law"
+        ],
+        "description": "Not when used as the statutory term in legal or enforcement reporting ('an illegal alien with a final order of removal was arrested'). Calibration round 2."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This labels people by immigration status in a way widely regarded as dehumanizing, rather than describing them neutrally.",
+      "sourceExample": {
+        "text": "Illegals are flooding our borders",
+        "source": "Thesis Table 9",
+        "triggerEvidence": "Split from NC-001 in calibration round 2: 'illegal alien' is also the U.S. statutory term, so legal and enforcement contexts are skipped."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "undocumented immigrant"
     },
     {
       "id": "EX-001",
@@ -614,10 +684,9 @@
         "words": [
           "a mere",
           "nothing more than",
-          "merely",
           "barely worth"
         ],
-        "pattern": "\\b(a mere|nothing more than|merely|barely worth)\\b"
+        "pattern": "\\b(a mere|nothing more than|barely worth)\\b"
       },
       "linguisticCondition": {
         "type": "followedByTag",
@@ -633,7 +702,7 @@
         "description": "The downplaying word is followed by the thing being minimized."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "description": "No additional local context condition. 'merely' was removed in calibration round 2: it is mostly a neutral adverb ('he merely sold the rounds')."
       },
       "targetSpan": "trigger",
       "explanation": "This phrasing shrinks the importance of something instead of letting the facts show how significant it is.",
@@ -701,7 +770,8 @@
         "description": "The qualifier modifies a following noun ('so-called experts')."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "excludeFollowingPattern": "\\s*[\"“'‘]",
+        "description": "Not when it introduces a quoted term or name ('the so-called \"sunset\" clause'), where it only names the term. Calibration round 2."
       },
       "targetSpan": "trigger",
       "explanation": "This qualifier signals the writer doubts a person, claim, or title without presenting evidence for that doubt.",
@@ -1076,7 +1146,17 @@
         "description": "The multi-word expression is itself the anchor (phrase-level condition)."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "excludeWindowWords": {
+          "words": [
+            "not",
+            "isn't",
+            "wasn't",
+            "never"
+          ],
+          "before": 2,
+          "after": 0
+        },
+        "description": "Not negated ('it is not the only reason'), which rejects a single cause. Calibration round 2."
       },
       "targetSpan": "trigger",
       "explanation": "This presents a complicated situation as having one cause. Most real events have several contributing factors.",

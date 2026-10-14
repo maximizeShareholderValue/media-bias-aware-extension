@@ -138,6 +138,22 @@ test("DB-002 skips accounts of a specific crime or incident (calibration round 1
   assert.ok(first("The minister allegedly favors a quiet deal with donors.", "DB-002"));
 });
 
+test("calibration round 2: genuine misfires are skipped, the real uses still fire", () => {
+  assert.ok(!first("He said he merely sold the rounds to the buyer.", "EX-002"));
+  assert.ok(first("It affects a mere three percent of households.", "EX-002"));
+  assert.ok(!first("They want to cancel the so-called “sunset” clause.", "DB-001"));
+  assert.ok(first("The so-called experts disagreed with the findings.", "DB-001"));
+  assert.ok(!first("An illegal alien with a final order of removal was arrested by ICE.", "NC-002"));
+  assert.ok(first("They want to hand benefits to illegal aliens.", "NC-002"));
+  assert.ok(first("Illegals are flooding our borders", "NC-001"));
+  assert.ok(!first("It would mark a radical change in doctrine.", "LL-007"));
+  assert.ok(!first("Ebola is one of the most notorious diseases in the world.", "EM-001"));
+  assert.ok(first("The notorious criminal was finally apprehended.", "EM-001"));
+  assert.ok(!first("Cost is a factor, but it is not the only reason families leave.", "CO-001"));
+  assert.ok(first("The only reason prices rose is the new tax.", "CO-001"));
+  assert.ok(!first("A terrorist-launched rocket hit the town.", "LL-008"));
+});
+
 test("LL-009 ('propaganda') was retired in calibration round 1", () => {
   assert.ok(!patterns.some((p) => p.id === "LL-009"));
 });
