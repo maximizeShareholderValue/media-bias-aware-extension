@@ -154,6 +154,17 @@ test("calibration round 2: genuine misfires are skipped, the real uses still fir
   assert.ok(!first("A terrorist-launched rocket hit the town.", "LL-008"));
 });
 
+test("calibration round 3: corpus-derived terms and the Loaded Language remap", () => {
+  const tech = (t, id) => (first(t, id) || {}).technique;
+  assert.equal(tech("It was a smear campaign built on bogus claims.", "LL-014"), "LOADED_LANGUAGE");
+  assert.equal(tech("The ruling was a devastating blow to the plan.", "LL-014"), "LOADED_LANGUAGE");
+  assert.ok(!first("The ruling was a devastating blow to the plan.", "EX-001"), "devastating moved out of Exaggeration");
+  assert.ok(first("Prices have skyrocketed since February.", "EX-001"), "true exaggeration stays in EX-001");
+  assert.ok(!first("Residents boiled dirty water for weeks.", "LL-014"), "literal sense skipped");
+  assert.equal(tech("He called the inquiry a witch hunt.", "NC-003"), "NAME_CALLING_LABELING");
+  assert.ok(first("She said the senator is a liar.", "NC-003"));
+});
+
 test("LL-009 ('propaganda') was retired in calibration round 1", () => {
   assert.ok(!patterns.some((p) => p.id === "LL-009"));
 });

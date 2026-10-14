@@ -1,6 +1,6 @@
 {
   "$schemaVersion": "2.0.0",
-  "catalogVersion": "0.5.2",
+  "catalogVersion": "0.6.0",
   "lastUpdated": "2026-10-14",
   "_readme": "Linguistic Pattern Catalog. Each rule follows the ten fields of thesis Table 13 and is evaluated as D(s,r) = L(s,r) AND S(s,r) AND C(s,r) (FR-DET-03): the lexicalTrigger generates a candidate; it is flagged only if the linguisticCondition (structure/POS) and the contextCondition (local context) also hold. A lexical-only run (L alone) is the section 8.3 baseline. Overlaps are resolved by FR-DET-04: longest span, then higher confidenceTier, then earliest offset, then lowest id. Edit this file to change detection without rebuilding the extension. REPETITION has no rules: it needs a repeated-expression comparison rather than a lexical trigger. Rule ID prefixes of the original seed rules (LL/PS/SC/AF/EM) are legacy names; `technique` is authoritative. confidenceTier is currently authored, not yet calibrated on the development corpus (thesis Stage 5).",
   "_schema": {
@@ -618,6 +618,53 @@
       "neutralAlternative": "undocumented immigrant"
     },
     {
+      "id": "NC-003",
+      "technique": "NAME_CALLING_LABELING",
+      "label": "Corpus-derived label",
+      "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
+      "lexicalTrigger": {
+        "words": [
+          "witch hunt",
+          "witch-hunt",
+          "liar",
+          "liars",
+          "psychopath",
+          "psychopaths",
+          "arch-conservative",
+          "neocon",
+          "neocons",
+          "bully",
+          "bullies",
+          "thieves",
+          "totalitarian",
+          "rigged"
+        ],
+        "pattern": "\\b(witch hunt|witch\\-hunt|liar|liars|psychopath|psychopaths|arch\\-conservative|neocon|neocons|bully|bullies|thieves|totalitarian|rigged)\\b"
+      },
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Noun",
+          "Adjective",
+          "Verb"
+        ],
+        "description": "The term labels a person, group, institution or process."
+      },
+      "contextCondition": {
+        "excludeMidSentenceCapital": true,
+        "description": "Not part of a capitalized name or title. Calibration round 3: words kept only if they fell inside a SemEval Name Calling span in at least half of their occurrences on a 221-article mining split."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This labels the target with a term meant to make the audience dislike or distrust them, rather than describing what they did.",
+      "sourceExample": {
+        "text": "Critics called the inquiry a witch hunt run by liars.",
+        "source": "PTC / SemEval-2020 Task 11 training set (mining split)",
+        "triggerEvidence": "Each term fell inside a gold Name Calling span in >=50% of its occurrences on 221 mining articles, and was kept only if it is a label in ordinary news use."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "Name the person or group and describe the specific conduct"
+    },
+    {
       "id": "EX-001",
       "technique": "EXAGGERATION_MINIMIZATION",
       "label": "Exaggerating intensifier",
@@ -626,16 +673,13 @@
         "words": [
           "skyrocketed",
           "plummeted",
-          "catastrophic",
           "staggering",
           "enormous",
           "unprecedented",
-          "devastating",
           "crushing",
-          "massive",
-          "disastrous"
+          "massive"
         ],
-        "pattern": "\\b(skyrocket(?:ed|ing|s)?|plummet(?:ed|ing|s)?|catastrophic|staggering|enormous|unprecedented|devastating|crushing|massive|disastrous|colossal|monumental|astronomical)\\b"
+        "pattern": "\\b(skyrocket(?:ed|ing|s)?|plummet(?:ed|ing|s)?|staggering|enormous|unprecedented|crushing|massive|colossal|monumental)\\b"
       },
       "linguisticCondition": {
         "type": "taggedAny",
@@ -648,7 +692,7 @@
       },
       "contextCondition": {
         "requireNoQuantity": true,
-        "description": "The sentence gives no figure (number, percent, money). A stated quantity substantiates the claim; the SemEval definition concerns magnitude 'greater than warranted by the context'."
+        "description": "The sentence gives no figure (number, percent, money). A stated quantity substantiates the claim; the SemEval definition concerns magnitude 'greater than warranted by the context'. Calibration round 3: catastrophic/devastating/disastrous/astronomical moved to LL-014, because SemEval annotators label them Loaded Language."
       },
       "targetSpan": "trigger",
       "explanation": "This word makes something sound larger or more severe than the plain facts may justify. A specific figure is more informative.",
@@ -952,7 +996,6 @@
           "existential threat",
           "threat to democracy",
           "crime wave",
-          "terrifying",
           "ticking time bomb",
           "reign of terror",
           "nightmare scenario",
@@ -960,14 +1003,14 @@
           "menace to society",
           "spiraling out of control"
         ],
-        "pattern": "\\b(existential threat|threat to democracy|crime wave|wave of crime|climate of fear|grave danger|mortal danger|deadly threat|terrifying|ticking time bomb|never be safe again|will never be safe|reign of terror|nightmare scenario|doomsday scenario|menace to society|public menace|spiral(?:l?ing|l?ed|s)? out of control)\\b"
+        "pattern": "\\b(existential threat|threat to democracy|crime wave|wave of crime|climate of fear|grave danger|mortal danger|deadly threat|ticking time bomb|never be safe again|will never be safe|reign of terror|nightmare scenario|doomsday scenario|menace to society|public menace|spiral(?:l?ing|l?ed|s)? out of control)\\b"
       },
       "linguisticCondition": {
         "type": "none",
         "description": "The multi-word expression is itself the anchor (phrase-level condition)."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "description": "No additional local context condition. Calibration round 3: 'terrifying' moved to LL-014 (labelled Loaded Language in SemEval)."
       },
       "targetSpan": "trigger",
       "explanation": "This wording is meant to provoke fear or alarm rather than inform; the underlying risk is stated in dramatic terms.",
@@ -1661,6 +1704,100 @@
       },
       "confidenceTier": "medium",
       "neutralAlternative": "State who is arriving and in what numbers"
+    },
+    {
+      "id": "LL-014",
+      "technique": "LOADED_LANGUAGE",
+      "label": "Corpus-derived evaluative term",
+      "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
+      "lexicalTrigger": {
+        "words": [
+          "smear",
+          "smears",
+          "nefarious",
+          "ugly",
+          "filth",
+          "filthy",
+          "insane",
+          "demonizing",
+          "demonize",
+          "annihilated",
+          "annihilation",
+          "bogus",
+          "disgusting",
+          "phony",
+          "blatant",
+          "blatantly",
+          "brutality",
+          "nonsense",
+          "disturbing",
+          "onslaught",
+          "destructive",
+          "tyrannical",
+          "charade",
+          "sordid",
+          "bombshell",
+          "ruthless",
+          "venomous",
+          "travesty",
+          "cowardice",
+          "cowardly",
+          "humiliation",
+          "hellbent",
+          "scandalous",
+          "baffling",
+          "rampant",
+          "grossly",
+          "horrible",
+          "laughable",
+          "childish",
+          "vilification",
+          "botched",
+          "foolish",
+          "worthless",
+          "hypocritical",
+          "hypocritically",
+          "dirty",
+          "catastrophic",
+          "devastating",
+          "disastrous",
+          "astronomical",
+          "terrifying"
+        ],
+        "pattern": "\\b(smear|smears|nefarious|ugly|filth|filthy|insane|demonizing|demonize|annihilated|annihilation|bogus|disgusting|phony|blatant|blatantly|brutality|nonsense|disturbing|onslaught|destructive|tyrannical|charade|sordid|bombshell|ruthless|venomous|travesty|cowardice|cowardly|humiliation|hellbent|scandalous|baffling|rampant|grossly|horrible|laughable|childish|vilification|botched|foolish|worthless|hypocritical|hypocritically|dirty|catastrophic|devastating|disastrous|astronomical|terrifying)\\b"
+      },
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Adjective",
+          "Adverb",
+          "Noun",
+          "Verb"
+        ],
+        "description": "The term is used as a content word (evaluative adjective, adverb, noun or verb), not as part of a name."
+      },
+      "contextCondition": {
+        "excludeNeighborWords": [
+          "water",
+          "clothes",
+          "laundry",
+          "dishes",
+          "bomb",
+          "energy",
+          "work"
+        ],
+        "excludeMidSentenceCapital": true,
+        "description": "Not a literal sense ('dirty water', 'dirty bomb') or a capitalized title. Calibration round 3: words kept only if they fell inside a SemEval Loaded Language span in at least half of their occurrences on a 221-article mining split."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This word expresses the writer's own strong judgment or emotion about the subject instead of describing it neutrally.",
+      "sourceExample": {
+        "text": "It was a smear campaign built on bogus claims.",
+        "source": "PTC / SemEval-2020 Task 11 training set (mining split)",
+        "triggerEvidence": "Each word fell inside a gold Loaded Language span in >=50% of its occurrences (>=3 occurrences) on 221 mining articles, and was kept only if it is evaluative in ordinary news use."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "Describe what happened without the evaluative word"
     },
     {
       "id": "RP-001",
