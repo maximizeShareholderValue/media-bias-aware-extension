@@ -64,18 +64,25 @@ Not shipped to users; run with Node.
 
 ```
 node eval/generate-sheet.js <articlesDir> [outDir]     # one <id>.txt per article, paragraphs separated by a blank line
-# give outDir/validation-sheet.csv to the 3 validators (columns validator1..3: Valid / Not Valid)
-node eval/score.js <filled-sheet.csv> <outDir>/key.json --stage calibration|formal --out results.json
+# Phase 1: validators annotate the clean copies in their "Validator N - Phase 1" tabs (download each as CSV)
+# Phase 2: validators mark each highlight Valid / Not Valid (columns validator1..3)
+node eval/score.js --articles <articlesDir> --detections <outDir>/detections.json \
+  --phase1 v1.csv v2.csv v3.csv [--phase2 <filled-sheet.csv> --key <outDir>/key.json] [--out results.json]
 ```
 
-`generate-sheet.js` writes the blinded sheet (all baseline candidates, shuffled, nothing
-revealing which the full pipeline kept), `key.json`, `detections.json` (incl. suppressed
-overlaps), SemEval-format span files (`articleId  technique  start  end`) for both modes, and
-`summary.json` (incl. the proportion of overlaps resolved, section 8.4). `score.js` computes
-Fleiss' kappa and agreement, precision / per-technique precision / FPR for the full pipeline
-**and** the baseline, and checks Gate 1 (kappa >= 0.60), Gate 2 (calibration FPR < 15%) and the
-formal precision threshold (>= 0.50). If Gate 1 fails it says the judgments must not be used
-(section 9.3). The metric code is tested against the published Fleiss (1971) worked example.
+`generate-sheet.js` writes the blinded sheet (shuffled, nothing revealing which the full
+pipeline kept), `key.json`, `detections.json` (incl. suppressed overlaps), SemEval-format span
+files (`articleId  technique  start  end`) for both modes, and `summary.json` (incl. the
+proportion of overlaps resolved, section 8.4).
+
+`score.js` follows section 7.2. It finds each Phase 1 span in its article (Sentence Context picks
+between repeats; spans it cannot find are listed for fixing), keeps spans marked by at least 2 of
+3 validators as the reference set, and scores the full pipeline **and** the keyword baseline
+(section 8.3) against it: precision, recall, F1 and FPR, strict (same technique) and lenient (any
+technique), overall and per technique. Phase 2 judgments give Fleiss' kappa for Gate 1
+(>= 0.60); if it fails the report says the judgments must not be used (section 9.3). It also
+checks EC1 (precision >= 0.50) and the proposed revised Gate 2 (pipeline FPR below baseline).
+The kappa code is tested against the published Fleiss (1971) worked example.
 The popup's Settings has **Export detections (JSON)** to capture what the extension actually
 flagged on a live page.
 
