@@ -3,7 +3,7 @@
  * Runs the real detection modules over a folder of plain-text articles and
  * writes everything the thesis evaluation (sections 7-9) needs.
  *
- *   node eval/generate-sheet.js <articlesDir> [outDir]
+ *   node eval/generate-sheet.js <articlesDir> [outDir] [--pipeline-only]
  *
  * <articlesDir>: one `<articleId>.txt` per article (paragraphs separated by a blank line).
  *
@@ -13,6 +13,8 @@
  *                          It contains the BASELINE candidates (lexical trigger only), which are a
  *                          superset of the full pipeline's detections (thesis 8.3), and nothing that
  *                          reveals which ones the full pipeline kept.
+ *                          With --pipeline-only it lists only the full pipeline's highlights (thesis 7.2
+ *                          Phase 2): the baseline is scored against the Phase 1 reference set, not judged.
  *   key.json               itemId -> {inFullPipeline, patternId, technique, tier, status} (hidden from validators)
  *   detections.json        full detail incl. suppressed overlaps (the FR-DET-04 audit log)
  *   semeval-full.labels / semeval-baseline.labels
@@ -66,9 +68,11 @@ function shuffled(arr, seed) {
 }
 
 function main() {
-  const [articlesDir, outArg] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const pipelineOnly = args.includes("--pipeline-only");
+  const [articlesDir, outArg] = args.filter((a) => !a.startsWith("--"));
   if (!articlesDir) {
-    console.error("usage: node eval/generate-sheet.js <articlesDir> [outDir]");
+    console.error("usage: node eval/generate-sheet.js <articlesDir> [outDir] [--pipeline-only]");
     process.exit(1);
   }
   const outDir = outArg || path.join(__dirname, "out");
@@ -135,7 +139,7 @@ function main() {
   });
 
   const sheetRows = [["itemId", "articleId", "technique_to_judge", "phrase", "context", "start", "end", "validator1", "validator2", "validator3"]];
-  shuffled(items, 20260101).forEach((it) => {
+  shuffled(pipelineOnly ? items.filter((it) => it.inFullPipeline) : items, 20260101).forEach((it) => {
     sheetRows.push([it.itemId, it.articleId, it.techniqueLabel, it.phrase, it.context, it.start, it.end, "", "", ""]);
   });
   fs.writeFileSync(path.join(outDir, "validation-sheet.csv"), csv.stringify(sheetRows));
@@ -162,7 +166,7 @@ function main() {
   };
   fs.writeFileSync(path.join(outDir, "summary.json"), JSON.stringify(summary, null, 2));
   console.log(JSON.stringify(summary, null, 2));
-  console.log("\nWrote validation-sheet.csv (give to validators), key.json (keep hidden), detections.json, semeval-*.labels, summary.json to " + outDir);
+  console.log("\nWrote validation-sheet.csv (" + (sheetRows.length - 1) + (pipelineOnly ? " pipeline highlights" : " baseline candidates") + "; give to validators), key.json (keep hidden), detections.json, semeval-*.labels, summary.json to " + outDir);
 }
 
 main();
