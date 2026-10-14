@@ -1,7 +1,7 @@
 {
   "$schemaVersion": "2.0.0",
-  "catalogVersion": "0.4.3",
-  "lastUpdated": "2026-10-13",
+  "catalogVersion": "0.6.0",
+  "lastUpdated": "2026-10-14",
   "_readme": "Linguistic Pattern Catalog. Each rule follows the ten fields of thesis Table 13 and is evaluated as D(s,r) = L(s,r) AND S(s,r) AND C(s,r) (FR-DET-03): the lexicalTrigger generates a candidate; it is flagged only if the linguisticCondition (structure/POS) and the contextCondition (local context) also hold. A lexical-only run (L alone) is the section 8.3 baseline. Overlaps are resolved by FR-DET-04: longest span, then higher confidenceTier, then earliest offset, then lowest id. Edit this file to change detection without rebuilding the extension. REPETITION has no rules: it needs a repeated-expression comparison rather than a lexical trigger. Rule ID prefixes of the original seed rules (LL/PS/SC/AF/EM) are legacy names; `technique` is authoritative. confidenceTier is currently authored, not yet calibrated on the development corpus (thesis Stage 5).",
   "_schema": {
     "Pattern ID": "id",
@@ -103,9 +103,15 @@
           "departure",
           "redesign",
           "overhaul",
-          "rethink"
+          "rethink",
+          "change",
+          "changes",
+          "shift",
+          "reform",
+          "reforms",
+          "transformation"
         ],
-        "description": "Not a neutral technical collocation such as 'radical surgery' or 'radical honesty'. Not part of a capitalized proper name ('Radical Republicans').",
+        "description": "Not a neutral technical collocation such as 'radical surgery' or 'radical honesty'. Not part of a capitalized proper name ('Radical Republicans'). Not a description of the size of a change ('a radical change in doctrine'). Calibration round 2.",
         "excludeMidSentenceCapital": true
       },
       "targetSpan": "trigger",
@@ -147,7 +153,26 @@
         "description": "The trigger functions as a noun label or an attributive adjective (Compromise tags singular 'a terrorist organization' as Adjective, plural 'terrorists attacked' as Noun)."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "excludeNeighborWords": [
+          "attack",
+          "attacks",
+          "organization",
+          "organizations",
+          "group",
+          "groups",
+          "proxies",
+          "plot",
+          "plots",
+          "cell",
+          "cells",
+          "charges",
+          "financing",
+          "list",
+          "designated",
+          "wanted"
+        ],
+        "description": "Not a factual designation or event ('terrorist attack', 'a designated terrorist organization', 'most wanted terrorists'). Calibration round 1: these factual uses were the main source of false positives. Not a hyphenated factual compound ('terrorist-launched rocket'). Calibration round 2.",
+        "excludeFollowingPattern": "-\\w"
       },
       "targetSpan": "trigger",
       "explanation": "This term labels a person or group in starkly negative, delegitimizing terms rather than describing their actions or stated views neutrally.",
@@ -166,47 +191,6 @@
         "racists": "people accused of racism"
       },
       "techniqueNote": "Moved from LOADED_LANGUAGE: assigning a group a feared/disliked label is Name Calling / Labeling in the SemEval taxonomy."
-    },
-    {
-      "id": "LL-009",
-      "technique": "DOUBT",
-      "label": "Delegitimizing information label",
-      "referenceDefinition": "Questioning or undermining the credibility, legitimacy, truthfulness, or reliability of a person, claim, or institution.",
-      "lexicalTrigger": {
-        "words": [
-          "propaganda"
-        ],
-        "pattern": "\\bpropaganda\\b"
-      },
-      "linguisticCondition": {
-        "type": "taggedAny",
-        "tags": [
-          "Noun",
-          "Adjective"
-        ],
-        "description": "The trigger is used as a label."
-      },
-      "contextCondition": {
-        "excludeNeighborWords": [
-          "poster",
-          "film",
-          "art",
-          "museum",
-          "exhibit",
-          "reel"
-        ],
-        "description": "Not the historical/artistic genre sense ('propaganda poster')."
-      },
-      "targetSpan": "trigger",
-      "explanation": "Labeling information as 'propaganda' dismisses it as illegitimate persuasion rather than describing its content or sourcing neutrally.",
-      "sourceExample": {
-        "text": "Can the same be said for the Obama Administration?",
-        "source": "SemEval-2020 Task 11, Table 1 (technique-level example)",
-        "triggerEvidence": "Annotator-flagged in BABE/MBIC (propaganda); calling information 'propaganda' undermines its legitimacy."
-      },
-      "confidenceTier": "medium",
-      "neutralAlternative": "material",
-      "techniqueNote": "Mapped to DOUBT: calling information 'propaganda' undermines its legitimacy/credibility."
     },
     {
       "id": "LL-010",
@@ -238,9 +222,17 @@
           "beauty",
           "fitness",
           "workout",
-          "supplement"
+          "supplement",
+          "change",
+          "inspection",
+          "inspections",
+          "sanctions",
+          "regulatory",
+          "tax",
+          "trade",
+          "visa"
         ],
-        "description": "Not the neutral lifestyle/medical sense ('exercise regime')."
+        "description": "Not the neutral lifestyle/medical sense ('exercise regime') and not a neutral policy compound ('regime change', 'inspection regime', 'sanctions regime'). Calibration round 1: these compounds were the main source of false positives."
       },
       "targetSpan": "trigger",
       "explanation": "'Regime' frames a government as illegitimate or authoritarian, in contrast to neutral terms like 'government' or 'administration'.",
@@ -437,8 +429,18 @@
         "description": "The reputational modifier directly precedes the noun it judges (Compromise tags 'disgraced' as a past-tense verb, so the rule keys on the following noun, not the trigger's own tag)."
       },
       "contextCondition": {
-        "description": "Not part of a capitalized name ('The Notorious B.I.G.').",
-        "excludeMidSentenceCapital": true
+        "description": "Not part of a capitalized name ('The Notorious B.I.G.'). Not describing a disease or pathogen ('one of the most notorious diseases'). Calibration round 2.",
+        "excludeMidSentenceCapital": true,
+        "excludeNeighborWords": [
+          "disease",
+          "diseases",
+          "virus",
+          "viruses",
+          "outbreak",
+          "pathogen",
+          "pathogens",
+          "bacteria"
+        ]
       },
       "targetSpan": "trigger",
       "explanation": "This word injects the writer's own negative judgment about someone's reputation, rather than letting the reader draw that conclusion from neutrally reported facts.",
@@ -506,7 +508,6 @@
       "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
       "lexicalTrigger": {
         "words": [
-          "illegal aliens",
           "illegals",
           "leftists",
           "socialists",
@@ -517,7 +518,7 @@
           "haters",
           "radicals"
         ],
-        "pattern": "\\b(illegal aliens?|illegals|leftists?|socialists|snowflakes?|globalists?|thugs?|traitors?|haters|radicals|radical left|radical right)\\b"
+        "pattern": "\\b(illegals|leftists?|socialists|snowflakes?|globalists?|thugs?|traitors?|haters|radicals|radical left|radical right)\\b"
       },
       "linguisticCondition": {
         "type": "taggedAny",
@@ -563,6 +564,107 @@
       }
     },
     {
+      "id": "NC-002",
+      "technique": "NAME_CALLING_LABELING",
+      "label": "Immigration-status label",
+      "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
+      "lexicalTrigger": {
+        "words": [
+          "illegal alien",
+          "illegal aliens"
+        ],
+        "pattern": "\\billegal aliens?\\b"
+      },
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Noun",
+          "Adjective"
+        ],
+        "description": "The phrase functions as a label for people."
+      },
+      "contextCondition": {
+        "excludeSentenceWords": [
+          "deported",
+          "deportation",
+          "deportations",
+          "removal",
+          "custody",
+          "arrested",
+          "arrest",
+          "ice",
+          "felony",
+          "charged",
+          "court",
+          "judge",
+          "immigration",
+          "enforcement",
+          "prosecuted",
+          "convicted",
+          "ordered",
+          "statute",
+          "law"
+        ],
+        "description": "Not when used as the statutory term in legal or enforcement reporting ('an illegal alien with a final order of removal was arrested'). Calibration round 2."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This labels people by immigration status in a way widely regarded as dehumanizing, rather than describing them neutrally.",
+      "sourceExample": {
+        "text": "Illegals are flooding our borders",
+        "source": "Thesis Table 9",
+        "triggerEvidence": "Split from NC-001 in calibration round 2: 'illegal alien' is also the U.S. statutory term, so legal and enforcement contexts are skipped."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "undocumented immigrant"
+    },
+    {
+      "id": "NC-003",
+      "technique": "NAME_CALLING_LABELING",
+      "label": "Corpus-derived label",
+      "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
+      "lexicalTrigger": {
+        "words": [
+          "witch hunt",
+          "witch-hunt",
+          "liar",
+          "liars",
+          "psychopath",
+          "psychopaths",
+          "arch-conservative",
+          "neocon",
+          "neocons",
+          "bully",
+          "bullies",
+          "thieves",
+          "totalitarian",
+          "rigged"
+        ],
+        "pattern": "\\b(witch hunt|witch\\-hunt|liar|liars|psychopath|psychopaths|arch\\-conservative|neocon|neocons|bully|bullies|thieves|totalitarian|rigged)\\b"
+      },
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Noun",
+          "Adjective",
+          "Verb"
+        ],
+        "description": "The term labels a person, group, institution or process."
+      },
+      "contextCondition": {
+        "excludeMidSentenceCapital": true,
+        "description": "Not part of a capitalized name or title. Calibration round 3: words kept only if they fell inside a SemEval Name Calling span in at least half of their occurrences on a 221-article mining split."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This labels the target with a term meant to make the audience dislike or distrust them, rather than describing what they did.",
+      "sourceExample": {
+        "text": "Critics called the inquiry a witch hunt run by liars.",
+        "source": "PTC / SemEval-2020 Task 11 training set (mining split)",
+        "triggerEvidence": "Each term fell inside a gold Name Calling span in >=50% of its occurrences on 221 mining articles, and was kept only if it is a label in ordinary news use."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "Name the person or group and describe the specific conduct"
+    },
+    {
       "id": "EX-001",
       "technique": "EXAGGERATION_MINIMIZATION",
       "label": "Exaggerating intensifier",
@@ -571,16 +673,13 @@
         "words": [
           "skyrocketed",
           "plummeted",
-          "catastrophic",
           "staggering",
           "enormous",
           "unprecedented",
-          "devastating",
           "crushing",
-          "massive",
-          "disastrous"
+          "massive"
         ],
-        "pattern": "\\b(skyrocket(?:ed|ing|s)?|plummet(?:ed|ing|s)?|catastrophic|staggering|enormous|unprecedented|devastating|crushing|massive|disastrous|colossal|monumental|astronomical)\\b"
+        "pattern": "\\b(skyrocket(?:ed|ing|s)?|plummet(?:ed|ing|s)?|staggering|enormous|unprecedented|crushing|massive|colossal|monumental)\\b"
       },
       "linguisticCondition": {
         "type": "taggedAny",
@@ -593,7 +692,7 @@
       },
       "contextCondition": {
         "requireNoQuantity": true,
-        "description": "The sentence gives no figure (number, percent, money). A stated quantity substantiates the claim; the SemEval definition concerns magnitude 'greater than warranted by the context'."
+        "description": "The sentence gives no figure (number, percent, money). A stated quantity substantiates the claim; the SemEval definition concerns magnitude 'greater than warranted by the context'. Calibration round 3: catastrophic/devastating/disastrous/astronomical moved to LL-014, because SemEval annotators label them Loaded Language."
       },
       "targetSpan": "trigger",
       "explanation": "This word makes something sound larger or more severe than the plain facts may justify. A specific figure is more informative.",
@@ -629,10 +728,9 @@
         "words": [
           "a mere",
           "nothing more than",
-          "merely",
           "barely worth"
         ],
-        "pattern": "\\b(a mere|nothing more than|merely|barely worth)\\b"
+        "pattern": "\\b(a mere|nothing more than|barely worth)\\b"
       },
       "linguisticCondition": {
         "type": "followedByTag",
@@ -648,7 +746,7 @@
         "description": "The downplaying word is followed by the thing being minimized."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "description": "No additional local context condition. 'merely' was removed in calibration round 2: it is mostly a neutral adverb ('he merely sold the rounds')."
       },
       "targetSpan": "trigger",
       "explanation": "This phrasing shrinks the importance of something instead of letting the facts show how significant it is.",
@@ -716,7 +814,8 @@
         "description": "The qualifier modifies a following noun ('so-called experts')."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "excludeFollowingPattern": "\\s*[\"“'‘]",
+        "description": "Not when it introduces a quoted term or name ('the so-called \"sunset\" clause'), where it only names the term. Calibration round 2."
       },
       "targetSpan": "trigger",
       "explanation": "This qualifier signals the writer doubts a person, claim, or title without presenting evidence for that doubt.",
@@ -769,9 +868,26 @@
           "detained",
           "custody",
           "accused",
-          "according"
+          "according",
+          "investigation",
+          "criminal",
+          "crime",
+          "victim",
+          "victims",
+          "shot",
+          "shooting",
+          "killed",
+          "murder",
+          "massacre",
+          "stabbed",
+          "attack",
+          "attacks",
+          "gun",
+          "guns",
+          "occurred",
+          "responsible"
         ],
-        "description": "Not legal hedging: no police/court/charge vocabulary in the same sentence. Also skipped when the claim is attributed ('according to a neighbor')."
+        "description": "Not legal or incident hedging: no police/court/charge vocabulary and no account of a specific crime or incident ('the gunman allegedly shot...') in the same sentence. Also skipped when the claim is attributed ('according to a neighbor'). Calibration round 1: crime-report uses were the main source of false positives."
       },
       "targetSpan": "trigger",
       "explanation": "This adverb casts doubt on a claim without saying why. In crime reporting it is a standard legal hedge, so it is skipped when legal terms appear in the same sentence.",
@@ -880,7 +996,6 @@
           "existential threat",
           "threat to democracy",
           "crime wave",
-          "terrifying",
           "ticking time bomb",
           "reign of terror",
           "nightmare scenario",
@@ -888,14 +1003,14 @@
           "menace to society",
           "spiraling out of control"
         ],
-        "pattern": "\\b(existential threat|threat to democracy|crime wave|wave of crime|climate of fear|grave danger|mortal danger|deadly threat|terrifying|ticking time bomb|never be safe again|will never be safe|reign of terror|nightmare scenario|doomsday scenario|menace to society|public menace|spiral(?:l?ing|l?ed|s)? out of control)\\b"
+        "pattern": "\\b(existential threat|threat to democracy|crime wave|wave of crime|climate of fear|grave danger|mortal danger|deadly threat|ticking time bomb|never be safe again|will never be safe|reign of terror|nightmare scenario|doomsday scenario|menace to society|public menace|spiral(?:l?ing|l?ed|s)? out of control)\\b"
       },
       "linguisticCondition": {
         "type": "none",
         "description": "The multi-word expression is itself the anchor (phrase-level condition)."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "description": "No additional local context condition. Calibration round 3: 'terrifying' moved to LL-014 (labelled Loaded Language in SemEval)."
       },
       "targetSpan": "trigger",
       "explanation": "This wording is meant to provoke fear or alarm rather than inform; the underlying risk is stated in dramatic terms.",
@@ -1074,7 +1189,17 @@
         "description": "The multi-word expression is itself the anchor (phrase-level condition)."
       },
       "contextCondition": {
-        "description": "No additional local context condition."
+        "excludeWindowWords": {
+          "words": [
+            "not",
+            "isn't",
+            "wasn't",
+            "never"
+          ],
+          "before": 2,
+          "after": 0
+        },
+        "description": "Not negated ('it is not the only reason'), which rejects a single cause. Calibration round 2."
       },
       "targetSpan": "trigger",
       "explanation": "This presents a complicated situation as having one cause. Most real events have several contributing factors.",
@@ -1394,6 +1519,315 @@
       },
       "confidenceTier": "medium",
       "neutralAlternative": "Address the original point"
+    },
+    {
+      "id": "EX-004",
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "label": "Absolute or all-time claim",
+      "referenceDefinition": "Presenting something as substantially greater or less important, serious, significant, or consequential than warranted by the context.",
+      "lexicalTrigger": {
+        "words": [
+          "cease to exist",
+          "greatest threat ever faced",
+          "worst in history",
+          "of all time"
+        ],
+        "pattern": "\\b(?:(?:will|would|could) (?:simply )?cease to exist|(?:the )?(?:greatest|biggest|gravest|worst) (?:[a-z’'-]+ ){0,4}?(?:(?:has |have )?ever (?:faced|seen|known)|in (?:our |its |their |human )?history|of all time))\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The absolute or all-time construction is itself the anchor."
+      },
+      "contextCondition": {
+        "requireNoQuantity": true,
+        "excludeSentenceWords": [
+          "record",
+          "records",
+          "recorded",
+          "data",
+          "statistics",
+          "company",
+          "firm",
+          "merger",
+          "brand",
+          "species",
+          "program",
+          "programme",
+          "account",
+          "subscription",
+          "season",
+          "team",
+          "game",
+          "album",
+          "film",
+          "movie"
+        ],
+        "description": "Not a measured record backed by figures ('the deadliest storm in history, killing 8,000'), and not a business, product or sports context where the phrase is literal or routine."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This presents the issue in absolute, all-time terms (the worst ever, the end of everything) instead of describing its actual size or likely effect.",
+      "sourceExample": {
+        "text": "If Israel loses this war, the entire country will cease to exist.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Exaggeration example) and Table 9 ('the greatest threat our civilization has ever faced'); measured records and business/sports uses excluded by the context condition."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "Describe the actual scale or likely effect"
+    },
+    {
+      "id": "CO-002",
+      "technique": "CAUSAL_OVERSIMPLIFICATION",
+      "label": "Single-condition solution",
+      "referenceDefinition": "Presenting a complex situation as having a single or substantially simplified cause, including forms of scapegoating.",
+      "lexicalTrigger": {
+        "words": [
+          "simply surrendered",
+          "just resigned",
+          "would be peace tomorrow"
+        ],
+        "pattern": "\\b(?:(?:simply|just|only) (?:surrendered|surrender|resigned|resign|stepped down|step down|gave up|give up|went away|go away|stopped|stop|left|leave)|would be (?:peace|no (?:crime|war|inflation|problem|problems|crisis)) (?:tomorrow|overnight|immediately))\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The phrase is itself the anchor."
+      },
+      "contextCondition": {
+        "requireSentenceWords": [
+          "if"
+        ],
+        "description": "Part of a conditional ('if X simply surrendered'), so a complex outcome is presented as hinging on one actor's single act."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This presents a complex situation as if one actor's single act would resolve it, leaving out the other causes involved.",
+      "sourceExample": {
+        "text": "There would be peace tomorrow if Hamas simply surrendered.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Causal Oversimplification example)."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "Name the other factors involved"
+    },
+    {
+      "id": "AA-003",
+      "technique": "APPEAL_TO_AUTHORITY",
+      "label": "Authority as a reason not to question",
+      "referenceDefinition": "Presenting a claim as true or valid primarily because an authority, expert, institution, or other perceived source supports it.",
+      "lexicalTrigger": {
+        "words": [
+          "no reason to question",
+          "who are we to question",
+          "we should trust the experts"
+        ],
+        "pattern": "\\b(?:there is no (?:reason|need) to (?:question|doubt|challenge) (?:it|them|this|that)|who are we to (?:question|doubt|challenge)|(?:we|you) (?:should|must) (?:simply |just )?trust (?:the|our) (?:experts|military|generals|scientists|doctors|leaders|government|officials))\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The phrase is itself the anchor."
+      },
+      "contextCondition": {
+        "requireSentenceWords": [
+          "said",
+          "says",
+          "say",
+          "leaders",
+          "experts",
+          "officials",
+          "generals",
+          "scientists",
+          "doctors",
+          "military",
+          "authorities",
+          "commanders",
+          "government"
+        ],
+        "description": "The sentence cites an authority, so the phrase uses that authority as the reason to stop questioning the claim."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This treats an authority's statement as a reason to stop questioning the claim, instead of giving the evidence for it.",
+      "sourceExample": {
+        "text": "Our military leaders have said the operation is necessary, so there is no reason to question it.",
+        "source": "Thesis Table 12",
+        "triggerEvidence": "Thesis Table 12 (Appeal to Authority example)."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "State the evidence behind the authority's claim"
+    },
+    {
+      "id": "LL-013",
+      "technique": "LOADED_LANGUAGE",
+      "label": "Flood metaphor for people",
+      "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
+      "lexicalTrigger": {
+        "words": [
+          "flooding our borders",
+          "pouring into our country",
+          "swarming our cities"
+        ],
+        "pattern": "\\b(?:flood(?:ing|ed|s)?|pour(?:ing|ed|s)?|swarm(?:ing|ed|s)?) (?:into |across |over |through )?(?:our (?:borders?|country|nation|cities|streets|towns|communities|neighborhoods|schools)|the borders?)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The metaphor is itself the anchor."
+      },
+      "contextCondition": {
+        "excludeSentenceWords": [
+          "rain",
+          "rainfall",
+          "water",
+          "waters",
+          "river",
+          "rivers",
+          "storm",
+          "hurricane",
+          "floodwater",
+          "floodwaters",
+          "snowmelt",
+          "sewage",
+          "mud",
+          "lava",
+          "fentanyl",
+          "drugs",
+          "goods",
+          "imports",
+          "products",
+          "cash",
+          "money"
+        ],
+        "description": "About people, not literal water ('rain flooding the streets') or goods, where 'pouring across the border' describes trafficking volumes."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This describes people with a flood or swarm metaphor, which frames them as a natural disaster or threat rather than describing who they are and how many.",
+      "sourceExample": {
+        "text": "Illegals are flooding our borders",
+        "source": "Thesis Table 9",
+        "triggerEvidence": "Thesis Table 9 (Loaded Language example); literal water and goods/trafficking uses excluded by the context condition."
+      },
+      "confidenceTier": "medium",
+      "neutralAlternative": "State who is arriving and in what numbers"
+    },
+    {
+      "id": "LL-014",
+      "technique": "LOADED_LANGUAGE",
+      "label": "Corpus-derived evaluative term",
+      "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
+      "lexicalTrigger": {
+        "words": [
+          "smear",
+          "smears",
+          "nefarious",
+          "ugly",
+          "filth",
+          "filthy",
+          "insane",
+          "demonizing",
+          "demonize",
+          "annihilated",
+          "annihilation",
+          "bogus",
+          "disgusting",
+          "phony",
+          "blatant",
+          "blatantly",
+          "brutality",
+          "nonsense",
+          "disturbing",
+          "onslaught",
+          "destructive",
+          "tyrannical",
+          "charade",
+          "sordid",
+          "bombshell",
+          "ruthless",
+          "venomous",
+          "travesty",
+          "cowardice",
+          "cowardly",
+          "humiliation",
+          "hellbent",
+          "scandalous",
+          "baffling",
+          "rampant",
+          "grossly",
+          "horrible",
+          "laughable",
+          "childish",
+          "vilification",
+          "botched",
+          "foolish",
+          "worthless",
+          "hypocritical",
+          "hypocritically",
+          "dirty",
+          "catastrophic",
+          "devastating",
+          "disastrous",
+          "astronomical",
+          "terrifying"
+        ],
+        "pattern": "\\b(smear|smears|nefarious|ugly|filth|filthy|insane|demonizing|demonize|annihilated|annihilation|bogus|disgusting|phony|blatant|blatantly|brutality|nonsense|disturbing|onslaught|destructive|tyrannical|charade|sordid|bombshell|ruthless|venomous|travesty|cowardice|cowardly|humiliation|hellbent|scandalous|baffling|rampant|grossly|horrible|laughable|childish|vilification|botched|foolish|worthless|hypocritical|hypocritically|dirty|catastrophic|devastating|disastrous|astronomical|terrifying)\\b"
+      },
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Adjective",
+          "Adverb",
+          "Noun",
+          "Verb"
+        ],
+        "description": "The term is used as a content word (evaluative adjective, adverb, noun or verb), not as part of a name."
+      },
+      "contextCondition": {
+        "excludeNeighborWords": [
+          "water",
+          "clothes",
+          "laundry",
+          "dishes",
+          "bomb",
+          "energy",
+          "work"
+        ],
+        "excludeMidSentenceCapital": true,
+        "description": "Not a literal sense ('dirty water', 'dirty bomb') or a capitalized title. Calibration round 3: words kept only if they fell inside a SemEval Loaded Language span in at least half of their occurrences on a 221-article mining split."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This word expresses the writer's own strong judgment or emotion about the subject instead of describing it neutrally.",
+      "sourceExample": {
+        "text": "It was a smear campaign built on bogus claims.",
+        "source": "PTC / SemEval-2020 Task 11 training set (mining split)",
+        "triggerEvidence": "Each word fell inside a gold Loaded Language span in >=50% of its occurrences (>=3 occurrences) on 221 mining articles, and was kept only if it is evaluative in ordinary news use."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "Describe what happened without the evaluative word"
+    },
+    {
+      "id": "RP-001",
+      "technique": "REPETITION",
+      "label": "Immediate rhetorical repetition",
+      "referenceDefinition": "Repeated use of a word, phrase, message, or idea to increase its persuasive effect.",
+      "lexicalTrigger": {
+        "words": [
+          "jobs, jobs, jobs",
+          "take it back! take it back"
+        ],
+        "pattern": "\\b(?!(?:very|much|many|more|well|again|really|so|that|there|here|now)\\b)(?:([a-z][a-z’'-]{3,}),\\s*\\1\\b|([a-z][a-z’'-]{3,})\\b[^.!?]{0,30}!\\s*\\2\\b)"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The repeated word and the words between its occurrences form the span."
+      },
+      "contextCondition": {
+        "excludeMidSentenceCapital": true,
+        "description": "A word repeated straight after a comma ('Jobs, jobs, jobs') or a phrase restarted straight after an exclamation mark ('Take our country back! Take it back!'): a rhetorical device rather than ordinary reference. Repetition spread across the whole article is not covered."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This repeats the same word or phrase back-to-back to drive the message home through repetition rather than argument.",
+      "sourceExample": {
+        "text": "We must take our country back! Take it back!",
+        "source": "Thesis Table 9",
+        "triggerEvidence": "Thesis Table 9 (Repetition example). Only immediate repetition is covered; repetition spread across an article needs article-level comparison (thesis 4.2)."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "State the point once"
     }
   ]
 }

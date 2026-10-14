@@ -10,6 +10,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const CompareUtils = require("../shared/compare-utils.js");
+const KeyVault = require("../shared/key-vault.js");
 const outletsFile = JSON.parse(fs.readFileSync(path.join(__dirname, "../data/outlet-metadata.json"), "utf8"));
 const outlets = outletsFile.outlets;
 
@@ -49,14 +50,20 @@ test("buildAttempts drops duplicate attempts and handles one keyword or none", (
 
 // ---- service worker with a stubbed chrome / fetch ---------------------------
 
-function loadWorker({ responses, key = "k", granted = true }) {
+function loadWorker({ responses, key = "k", granted = true, compareEnabled }) {
   const requests = [];
   const store = {};
   const listeners = [];
+  // An older version's plaintext key: the real KeyVault encrypts it on first read.
+  const local = memoryArea(Object.assign({ newsApiKey: key }, compareEnabled === undefined ? {} : { compareEnabled }));
+  const wrapKey = crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
   const sandbox = {
     console: { warn() {}, log() {} },
     URL, AbortController, setTimeout, clearTimeout, Date, Promise, encodeURIComponent,
-    importScripts: () => { sandbox.CompareUtils = CompareUtils; },
+    importScripts: () => {
+      sandbox.CompareUtils = CompareUtils;
+      sandbox.KeyVault = { create: () => KeyVault.create({ storage: local, getWrapKey: () => wrapKey }) };
+    },
     fetch: async (url) => {
       if (String(url).startsWith("chrome-extension://")) {
         const name = String(url).split("/").pop();
@@ -72,7 +79,7 @@ function loadWorker({ responses, key = "k", granted = true }) {
     chrome: {
       runtime: { getURL: (p) => "chrome-extension://id/" + p, onMessage: { addListener: (fn) => listeners.push(fn) }, onInstalled: { addListener() {} } },
       storage: {
-        local: { get: async () => ({ newsApiKey: key }), set: async () => {} },
+        local,
         session: {
           get: async (k) => (k in store ? { [k]: store[k] } : {}),
           set: async (o) => Object.assign(store, o)
@@ -85,7 +92,22 @@ function loadWorker({ responses, key = "k", granted = true }) {
   vm.runInContext(fs.readFileSync(path.join(__dirname, "../background/service-worker.js"), "utf8"), sandbox);
   const ask = (keywords, currentDomain) =>
     new Promise((resolve) => listeners[0]({ type: "COMPARATIVE_LOOKUP", keywords, currentDomain }, {}, resolve));
-  return { ask, requests, store };
+  return { ask, requests, store, local };
+}
+
+/** A chrome.storage.local stand-in (promise API) backed by a plain object. */
+function memoryArea(initial) {
+  const data = Object.assign({}, initial);
+  return {
+    data,
+    get: async (defaults) => {
+      const out = Object.assign({}, defaults);
+      for (const k of Object.keys(out)) if (k in data) out[k] = data[k];
+      return out;
+    },
+    set: async (o) => { Object.assign(data, o); },
+    remove: async (keys) => { [].concat(keys).forEach((k) => delete data[k]); }
+  };
 }
 
 const art = (host, n) => Array.from({ length: n }, (_, i) => ({ title: host + i, source: host, url: "https://" + host + "/a" + i, publishedAt: "2026-01-01" }));
@@ -164,4 +186,48 @@ test("searchWindow: the free plan covers articles about 1 to 30 days old", () =>
   assert.equal(CompareUtils.searchWindow("2026-08-24T00:00:00Z", now).days, 44);
   assert.equal(CompareUtils.searchWindow(null, now).status, "unknown");
   assert.equal(CompareUtils.searchWindow("not a date", now).status, "unknown");
+});
+
+// ---- FR-SYS-02 and the encrypted key (FR-SYS-01 / NFR-PRIV-01) ----------------
+
+test("FR-SYS-02: with comparative reporting turned off, no request is sent", async () => {
+  const w = loadWorker({ responses: [{ articles: art("cnn.com", 3) }], compareEnabled: false });
+  const r = await w.ask(["iran", "hormuz"], "nypost.com");
+  assert.equal(r.ok, false);
+  assert.equal(r.reason, "compare_disabled");
+  assert.equal(w.requests.length, 0);
+});
+
+test("a plaintext key from an older version is encrypted on first use and still works", async () => {
+  const w = loadWorker({ responses: [{ articles: art("cnn.com", 6) }], key: "secret-key-123" });
+  const r = await w.ask(["iran", "hormuz"], "nypost.com");
+  assert.equal(r.ok, true);
+  assert.equal(w.local.data.newsApiKey, undefined, "plaintext key removed");
+  assert.ok(w.local.data.newsApiKeyEnc, "encrypted key stored");
+  assert.doesNotMatch(JSON.stringify(w.local.data), /secret-key-123/, "the key never sits in storage as plaintext");
+});
+
+test("KeyVault: save, load, hasKey and clear round-trip", async () => {
+  const local = memoryArea({});
+  const wrap = crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  const v = KeyVault.create({ storage: local, getWrapKey: () => wrap });
+  assert.equal(await v.hasKey(), false);
+  assert.equal(await v.loadKey(), "");
+  await v.saveKey("abc123");
+  assert.equal(await v.hasKey(), true);
+  assert.doesNotMatch(JSON.stringify(local.data), /abc123/);
+  assert.equal(await v.loadKey(), "abc123");
+  await v.clearKey();
+  assert.equal(await v.hasKey(), false);
+});
+
+test("KeyVault: a key that can no longer be decrypted is dropped, not crashed on", async () => {
+  const local = memoryArea({});
+  const mk = () => crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  const first = mk();
+  await KeyVault.create({ storage: local, getWrapKey: () => first }).saveKey("abc123");
+  const other = mk(); // e.g. the browser's extension data was cleared
+  const v = KeyVault.create({ storage: local, getWrapKey: () => other });
+  assert.equal(await v.loadKey(), "");
+  assert.equal(await v.hasKey(), false, "the user is asked for the key again");
 });
