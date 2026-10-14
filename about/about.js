@@ -6,7 +6,7 @@
   "use strict";
 
   var MAX_PHRASES = 8;
-  var ANATOMY_RULE = "AF-001";
+  var ANATOMY_RULE = "DB-004";
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
