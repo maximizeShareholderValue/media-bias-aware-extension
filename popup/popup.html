@@ -107,7 +107,7 @@
     <div class="card">
       <label for="apiKeyInput" class="field-label">NewsAPI key (optional)</label>
       <p class="hint">
-        Stored locally on this device only (<code>chrome.storage.local</code>), never hardcoded, and never sent anywhere
+        Stored encrypted on this device only (<code>chrome.storage.local</code>), never hardcoded, and never sent anywhere
         except directly to newsapi.org when you open the Compare tab. Get a free key at
         <span class="muted">newsapi.org/register</span>.
       </p>
@@ -117,6 +117,16 @@
         <button id="clearKeyBtn" class="button button--secondary">Remove key</button>
       </div>
       <p class="status" id="keyStatus" role="status"></p>
+    </div>
+
+    <div class="card">
+      <section class="toggle-row">
+        <label class="toggle-row__label" for="compareToggle">Comparative reporting</label>
+        <button type="button" class="switch" id="compareToggle" role="switch" aria-checked="true">
+          <span class="switch__knob"></span>
+        </button>
+      </section>
+      <p class="hint">When off, the Compare tab sends no request to newsapi.org and the extension makes no external requests at all.</p>
     </div>
 
     <div class="card">
@@ -131,6 +141,7 @@
 
   <script src="../content/category-meta.js"></script>
   <script src="../shared/compare-utils.js"></script>
+  <script src="../shared/key-vault.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

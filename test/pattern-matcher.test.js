@@ -60,9 +60,9 @@ test("catalog integrity: unique ids, compilable regexes, only known condition ty
   for (const p of patterns) assert.doesNotThrow(() => new RegExp(p.lexicalTrigger.pattern.replace(/ /g, "\\s+"), "gi"), p.id);
 });
 
-test("every technique except REPETITION has at least one rule", () => {
+test("every one of the 14 techniques has at least one rule", () => {
   const used = new Set(patterns.map((p) => p.technique));
-  assert.deepEqual(Object.keys(techniques).filter((t) => !used.has(t)), ["REPETITION"]);
+  assert.deepEqual(Object.keys(techniques).filter((t) => !used.has(t)), []);
 });
 
 test("match objects record span, ids, technique, tier and explanation (FR-DET-03)", () => {
@@ -115,15 +115,58 @@ test("SC-012 fires on unattributed collective-claim phrases", () => {
 
 test("LL-008 name-calling labels: plural noun, singular attributive adjective, racists", () => {
   assert.ok(first("Local terrorists attacked the outpost overnight.", "LL-008"));
-  assert.ok(first("The group was labeled a terrorist organization by the state department.", "LL-008"));
+  assert.ok(first("These Hamas sympathizers are nothing but terrorist apologists.", "LL-008"));
   assert.ok(first("The rally attracted known racists from across the region.", "LL-008"));
 });
 
-test("LL-009 and LL-010 fire on the loaded senses only", () => {
-  assert.ok(first("The leaflet was dismissed as propaganda by independent researchers.", "LL-009"));
-  assert.ok(!first("The museum's new exhibit features a rare propaganda poster from the era.", "LL-009"));
+test("LL-008 skips factual designations and events (calibration round 1)", () => {
+  assert.ok(!first("The group was labeled a terrorist organization by the state department.", "LL-008"));
+  assert.ok(!first("Three people died in the terrorist attack on Tuesday.", "LL-008"));
+  assert.ok(!first("He is on the FBI list of most wanted terrorists.", "LL-008"));
+});
+
+test("LL-010 fires on the loaded sense only", () => {
   assert.ok(first("The regime cracked down on dissidents after the protest.", "LL-010"));
   assert.ok(!first("She follows a strict exercise regime every morning.", "LL-010"));
+  assert.ok(!first("Critics said the plan amounted to regime change.", "LL-010"));
+  assert.ok(!first("He suggested expanding the inspection regime at the sites.", "LL-010"));
+});
+
+test("DB-002 skips accounts of a specific crime or incident (calibration round 1)", () => {
+  assert.ok(!first("The guard who was allegedly shot stopping the massacre has vanished.", "DB-002"));
+  assert.ok(!first("Guyger allegedly walked into the apartment during the shooting.", "DB-002"));
+  assert.ok(first("The minister allegedly favors a quiet deal with donors.", "DB-002"));
+});
+
+test("calibration round 2: genuine misfires are skipped, the real uses still fire", () => {
+  assert.ok(!first("He said he merely sold the rounds to the buyer.", "EX-002"));
+  assert.ok(first("It affects a mere three percent of households.", "EX-002"));
+  assert.ok(!first("They want to cancel the so-called “sunset” clause.", "DB-001"));
+  assert.ok(first("The so-called experts disagreed with the findings.", "DB-001"));
+  assert.ok(!first("An illegal alien with a final order of removal was arrested by ICE.", "NC-002"));
+  assert.ok(first("They want to hand benefits to illegal aliens.", "NC-002"));
+  assert.ok(first("Illegals are flooding our borders", "NC-001"));
+  assert.ok(!first("It would mark a radical change in doctrine.", "LL-007"));
+  assert.ok(!first("Ebola is one of the most notorious diseases in the world.", "EM-001"));
+  assert.ok(first("The notorious criminal was finally apprehended.", "EM-001"));
+  assert.ok(!first("Cost is a factor, but it is not the only reason families leave.", "CO-001"));
+  assert.ok(first("The only reason prices rose is the new tax.", "CO-001"));
+  assert.ok(!first("A terrorist-launched rocket hit the town.", "LL-008"));
+});
+
+test("calibration round 3: corpus-derived terms and the Loaded Language remap", () => {
+  const tech = (t, id) => (first(t, id) || {}).technique;
+  assert.equal(tech("It was a smear campaign built on bogus claims.", "LL-014"), "LOADED_LANGUAGE");
+  assert.equal(tech("The ruling was a devastating blow to the plan.", "LL-014"), "LOADED_LANGUAGE");
+  assert.ok(!first("The ruling was a devastating blow to the plan.", "EX-001"), "devastating moved out of Exaggeration");
+  assert.ok(first("Prices have skyrocketed since February.", "EX-001"), "true exaggeration stays in EX-001");
+  assert.ok(!first("Residents boiled dirty water for weeks.", "LL-014"), "literal sense skipped");
+  assert.equal(tech("He called the inquiry a witch hunt.", "NC-003"), "NAME_CALLING_LABELING");
+  assert.ok(first("She said the senator is a liar.", "NC-003"));
+});
+
+test("LL-009 ('propaganda') was retired in calibration round 1", () => {
+  assert.ok(!patterns.some((p) => p.id === "LL-009"));
 });
 
 test("EM-001 and AF-001", () => {
@@ -237,7 +280,10 @@ const TABLE_12 = [
   ["BLACK_AND_WHITE_FALLACY", "You either support Israel or you support terrorism."],
   ["THOUGHT_TERMINATING_CLICHES", "Israel has the right to defend itself. End of discussion."],
   ["STRAW_MAN_WHATABOUTISM_RED_HERRING", "Instead of criticizing Israel, why aren't you talking about what Hamas did?"],
-  ["BANDWAGON_REDUCTIO_AD_HITLERUM", "The whole world now stands with Israel, and anyone who still questions the operation is on the wrong side of history."]
+  ["BANDWAGON_REDUCTIO_AD_HITLERUM", "The whole world now stands with Israel, and anyone who still questions the operation is on the wrong side of history."],
+  ["EXAGGERATION_MINIMIZATION", "If Israel loses this war, the entire country will cease to exist."],
+  ["CAUSAL_OVERSIMPLIFICATION", "There would be peace tomorrow if Hamas simply surrendered."],
+  ["APPEAL_TO_AUTHORITY", "Our military leaders have said the operation is necessary, so there is no reason to question it."]
 ];
 for (const [technique, sentence] of TABLE_12) {
   test(`Table 12 example is flagged as ${technique}`, () => {
@@ -245,11 +291,22 @@ for (const [technique, sentence] of TABLE_12) {
   });
 }
 
+const TABLE_9 = [
+  ["EXAGGERATION_MINIMIZATION", "This is the greatest threat our civilization has ever faced."],
+  ["BLACK_AND_WHITE_FALLACY", "Either you are with us or you are with the terrorists."],
+  ["APPEAL_TO_AUTHORITY", "Experts agree that the plan will fail."],
+  ["LOADED_LANGUAGE", "Illegals are flooding our borders"],
+  ["REPETITION", "We must take our country back! Take it back!"]
+];
+for (const [technique, sentence] of TABLE_9) {
+  test(`Table 9 example is flagged as ${technique}`, () => {
+    assert.ok(full(sentence).some((m) => m.technique === technique), `not flagged as ${technique}: ${sentence}`);
+  });
+}
+
+// Table 12's Repetition row is repetition spread across an article, which needs article-level comparison.
 const TABLE_12_GAPS = [
-  ["REPETITION", "Repeatedly describing protesters as 'terrorists' without distinguishing the specific individuals (needs a repeated-expression detector)."],
-  ["EXAGGERATION_MINIMIZATION", "If Israel loses this war, the entire country will cease to exist."],
-  ["CAUSAL_OVERSIMPLIFICATION", "There would be peace tomorrow if Hamas simply surrendered."],
-  ["APPEAL_TO_AUTHORITY", "Our military leaders have said the operation is necessary, so there is no reason to question it."]
+  ["REPETITION", "Repeatedly describing protesters as 'terrorists' without distinguishing the specific individuals (needs a repeated-expression detector)."]
 ];
 for (const [technique, sentence] of TABLE_12_GAPS) {
   test(`Table 12 example is flagged as ${technique}`, { todo: "not yet covered by a rule" }, () => {

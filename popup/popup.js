@@ -45,6 +45,8 @@
   var saveKeyBtn = document.getElementById("saveKeyBtn");
   var clearKeyBtn = document.getElementById("clearKeyBtn");
   var keyStatus = document.getElementById("keyStatus");
+  var compareToggle = document.getElementById("compareToggle");
+  var vault = KeyVault.create();
 
   var methodologyToggle = document.getElementById("methodologyToggle");
 
@@ -393,7 +395,8 @@
       no_api_key: "Add a NewsAPI key in Settings to enable comparison.",
       no_permission: "Permission to contact newsapi.org was not granted. Save your key again in Settings and allow it.",
       network_error: "Could not reach newsapi.org. Check your connection and retry.",
-      no_keywords: "Couldn't read this page's topic."
+      no_keywords: "Couldn't read this page's topic.",
+      compare_disabled: "Comparative reporting is turned off in Settings, so no request was sent."
     }[reason];
     return "Comparative Data Unavailable" + (why ? ". " + why : ".");
   }
@@ -487,8 +490,13 @@
       }
       compareSubtitle.textContent = "Searching by topic keywords only: " + keywords.slice(0, 3).join(", ") + ". Nothing else about this page is sent.";
 
-      chrome.storage.local.get({ newsApiKey: "" }, (data) => {
-        if (!data.newsApiKey) {
+      Promise.all([chrome.storage.local.get({ compareEnabled: true }), vault.hasKey()]).then(([settings, hasKey]) => {
+        if (!settings.compareEnabled) {
+          compareState.loading = false;
+          showComparePrompt(unavailableMessage("compare_disabled"), true);
+          return;
+        }
+        if (!hasKey) {
           compareState.loading = false;
           showComparePrompt("Add a NewsAPI key in Settings to enable cross-outlet comparison.", true);
           return;
@@ -517,7 +525,7 @@
           compareState.loading = false;
           if (!response || !response.ok) {
             compareState.loaded = false; // allow retry on next tab switch
-            showComparePrompt(unavailableMessage(response && response.reason), response && (response.reason === "no_api_key" || response.reason === "bad_api_key" || response.reason === "no_permission"));
+            showComparePrompt(unavailableMessage(response && response.reason), response && (response.reason === "no_api_key" || response.reason === "bad_api_key" || response.reason === "no_permission" || response.reason === "compare_disabled"));
             return;
           }
           compareState.loaded = true;
@@ -563,10 +571,24 @@
   backBtn.addEventListener("click", () => showSettings(false));
 
   function refreshKeyStatus() {
-    chrome.storage.local.get({ newsApiKey: "" }, (data) => {
-      keyStatus.textContent = data.newsApiKey ? "A key is currently saved on this device." : "No key saved.";
+    vault.hasKey().then((hasKey) => {
+      keyStatus.textContent = hasKey ? "A key is currently saved (encrypted) on this device." : "No key saved.";
     });
   }
+
+  // FR-SYS-02: comparative reporting can be turned off; then no external request is made.
+  function setCompareToggleUi(enabled) {
+    compareToggle.setAttribute("aria-checked", String(enabled));
+  }
+
+  chrome.storage.local.get({ compareEnabled: true }, (settings) => setCompareToggleUi(settings.compareEnabled));
+
+  compareToggle.addEventListener("click", () => {
+    var enabled = compareToggle.getAttribute("aria-checked") !== "true";
+    setCompareToggleUi(enabled);
+    chrome.storage.local.set({ compareEnabled: enabled });
+    compareState.loaded = false; // the next Compare tab visit reflects the new setting
+  });
 
   saveKeyBtn.addEventListener("click", async () => {
     var key = apiKeyInput.value.trim();
@@ -579,7 +601,12 @@
       keyStatus.textContent = "Permission denied - key was not saved.";
       return;
     }
-    await chrome.storage.local.set({ newsApiKey: key });
+    try {
+      await vault.saveKey(key);
+    } catch (e) {
+      keyStatus.textContent = "Could not encrypt and save the key: " + e.message;
+      return;
+    }
     apiKeyInput.value = "";
     keyStatus.textContent = "Key saved.";
     compareState.loaded = false; // let the next Compare tab visit use the new key
@@ -587,7 +614,7 @@
   });
 
   clearKeyBtn.addEventListener("click", async () => {
-    await chrome.storage.local.remove("newsApiKey");
+    await vault.clearKey();
     await chrome.permissions.remove({ origins: ["https://newsapi.org/*"] });
     compareState.loaded = false;
     keyStatus.textContent = "Key removed.";

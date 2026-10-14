@@ -1,6 +1,16 @@
 {
   "_readme": "Regression corpus for false positives. When a highlight is wrong, add the sentence here under mustNotFire (with the rule id that fired), fix the rule's linguisticCondition / contextCondition, and the test in false-positives.test.js keeps it fixed. Each mustNotFire case should have a mustFire companion so a fix cannot silently stop the rule from detecting the real thing. knownLimitations are neutral sentences that are still flagged because the phrase itself is the cue; they are tracked as todo tests.",
   "mustNotFire": [
+    { "rule": "EX-004", "text": "The company will cease to exist after the merger.", "note": "literal business outcome" },
+    { "rule": "EX-004", "text": "It was the deadliest storm in history, killing 8,000 people.", "note": "measured record with figures" },
+    { "rule": "EX-004", "text": "The team won its biggest game in its history on Sunday.", "note": "routine sports phrasing" },
+    { "rule": "CO-002", "text": "He just resigned from the board on Monday.", "note": "plain report, no conditional" },
+    { "rule": "AA-003", "text": "There is no reason to question the timeline, the report concluded.", "note": "no authority invoked" },
+    { "rule": "LL-013", "text": "Heavy rain is flooding our streets tonight.", "note": "literal water" },
+    { "rule": "LL-013", "text": "Fentanyl is pouring across the border, officials said.", "note": "goods/trafficking, not people" },
+    { "rule": "RP-001", "text": "Prices rose, prices fell, and traders shrugged.", "note": "parallel phrasing, not rhetorical repetition" },
+    { "rule": "RP-001", "text": "The report covered housing, jobs and transport, and jobs growth was strong.", "note": "ordinary second mention" },
+    { "rule": "RP-001", "text": "In Paris, Paris police said nothing.", "note": "place name followed by its own adjective use" },
     { "rule": "FE-002", "text": "The convoy came under attack from gunmen near the border.", "note": "literal armed attack" },
     { "rule": "FE-002", "text": "The hospital network came under attack by ransomware.", "note": "literal cyberattack" },
     { "rule": "FE-002", "text": "The garden was overrun by weeds.", "note": "literal infestation" },
@@ -118,6 +128,11 @@
     }
   ],
   "mustFire": [
+    { "rule": "EX-004", "text": "The bill is the worst piece of legislation in history." },
+    { "rule": "CO-002", "text": "If the governor just resigned, the crisis would end." },
+    { "rule": "AA-003", "text": "Experts say it is safe, and who are we to question them?" },
+    { "rule": "LL-013", "text": "Migrants are pouring into our country every day." },
+    { "rule": "RP-001", "text": "Jobs, jobs, jobs. That is what this election is about." },
     { "rule": "FE-002", "text": "The U.S. is under invasion." },
     { "rule": "FE-002", "text": "Our schools are under attack from radical activists." },
     { "rule": "FE-002", "text": "Small towns are being overrun by hordes of migrants." },
@@ -231,11 +246,6 @@
       "rule": "CO-001",
       "text": "He wrote that it was the only reason for the delay, according to the memo.",
       "why": "causal claim reported from a source"
-    },
-    {
-      "rule": "LL-009",
-      "text": "The word 'propaganda' appears 12 times in the archive catalog.",
-      "why": "the word is mentioned, not used as a label"
     },
     {
       "rule": "LL-012",
