@@ -17,32 +17,32 @@
     { "rule": "FE-003", "text": "The storm wreaked havoc on the coast.", "note": "weather report: the damage is the news" },
     { "rule": "LL-012", "text": "He was charged with reckless driving.", "note": "legal offence name" },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "Mr. Tarriela also rejected claims that Chinese personnel had expelled Philippine vessels or handled the situation.",
       "note": "Reported by the team on a ground.news article, 2026-10-06: 'claims' is a NOUN here ('rejected claims that ...'), not a reporting verb."
     },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "He denied the claims that the ship was damaged.",
       "note": "noun after a determiner"
     },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "The senator's claims that the bill would pass were wrong.",
       "note": "noun after a possessive"
     },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "Officials dismissed false claims that the vote was rigged.",
       "note": "noun after an adjective"
     },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "She repeated her claim that the data was accurate.",
       "note": "noun after a possessive pronoun"
     },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "The report of claims that funds vanished spread quickly.",
       "note": "noun after a preposition"
     },
@@ -72,7 +72,7 @@
       "note": "historical group name at sentence start"
     },
     {
-      "rule": "EM-001",
+      "rule": "LL-015",
       "text": "The Notorious B.I.G. released his debut album in 1994.",
       "note": "a person's stage name"
     },
@@ -143,23 +143,23 @@
     { "rule": "LL-012", "text": "It was a reckless decision by the board." },
     { "rule": "BW-001", "text": "Everyone agrees the policy has failed." },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "The senator claimed that the bill would pass easily."
     },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "He claims that the report is wrong."
     },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "Critics also claimed that the plan failed."
     },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "Officials, however, claim that costs fell."
     },
     {
-      "rule": "AF-001",
+      "rule": "DB-004",
       "text": "The company has claimed that it acted alone."
     },
     {
@@ -175,7 +175,7 @@
       "text": "The radical faction pushed for immediate reform."
     },
     {
-      "rule": "EM-001",
+      "rule": "LL-015",
       "text": "The disgraced senator resigned from office."
     },
     {

@@ -1,6 +1,6 @@
 {
   "$schemaVersion": "2.0.0",
-  "catalogVersion": "0.6.0",
+  "catalogVersion": "1.0.0",
   "lastUpdated": "2026-10-14",
   "_readme": "Linguistic Pattern Catalog. Each rule follows the ten fields of thesis Table 13 and is evaluated as D(s,r) = L(s,r) AND S(s,r) AND C(s,r) (FR-DET-03): the lexicalTrigger generates a candidate; it is flagged only if the linguisticCondition (structure/POS) and the contextCondition (local context) also hold. A lexical-only run (L alone) is the section 8.3 baseline. Overlaps are resolved by FR-DET-04: longest span, then higher confidenceTier, then earliest offset, then lowest id. Edit this file to change detection without rebuilding the extension. REPETITION has no rules: it needs a repeated-expression comparison rather than a lexical trigger. Rule ID prefixes of the original seed rules (LL/PS/SC/AF/EM) are legacy names; `technique` is authoritative. confidenceTier is currently authored, not yet calibrated on the development corpus (thesis Stage 5).",
   "_schema": {
@@ -129,7 +129,8 @@
       }
     },
     {
-      "id": "LL-008",
+      "id": "NC-004",
+      "formerId": "LL-008",
       "technique": "NAME_CALLING_LABELING",
       "label": "Dehumanizing group/actor label",
       "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
@@ -193,7 +194,8 @@
       "techniqueNote": "Moved from LOADED_LANGUAGE: assigning a group a feared/disliked label is Name Calling / Labeling in the SemEval taxonomy."
     },
     {
-      "id": "LL-010",
+      "id": "NC-005",
+      "formerId": "LL-010",
       "technique": "NAME_CALLING_LABELING",
       "label": "Delegitimizing government label",
       "referenceDefinition": "Assigning a person, group, institution, or entity a label associated with something the audience may fear, dislike, admire, or favor.",
@@ -412,7 +414,8 @@
       }
     },
     {
-      "id": "EM-001",
+      "id": "LL-015",
+      "formerId": "EM-001",
       "technique": "LOADED_LANGUAGE",
       "label": "Reputational judgment modifier",
       "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
@@ -457,7 +460,8 @@
       }
     },
     {
-      "id": "PS-003",
+      "id": "LL-016",
+      "formerId": "PS-003",
       "technique": "LOADED_LANGUAGE",
       "label": "Guilt-presupposing reporting verb",
       "referenceDefinition": "Words or phrases carrying strong emotional or evaluative implications intended to influence the audience.",
@@ -932,7 +936,8 @@
       "neutralAlternative": "Report the evidence for or against the motive"
     },
     {
-      "id": "AF-001",
+      "id": "DB-004",
+      "formerId": "AF-001",
       "technique": "DOUBT",
       "label": "Doubt-casting reporting verb",
       "referenceDefinition": "Questioning or undermining the credibility, legitimacy, truthfulness, or reliability of a person, claim, or institution.",
@@ -1318,7 +1323,8 @@
       "neutralAlternative": "Name the specific expert or study"
     },
     {
-      "id": "SC-012",
+      "id": "AA-002",
+      "formerId": "SC-012",
       "technique": "APPEAL_TO_AUTHORITY",
       "label": "Unattributed collective claim",
       "referenceDefinition": "Presenting a claim as true or valid primarily because an authority, expert, institution, or other perceived source supports it.",
