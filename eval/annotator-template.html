@@ -47,6 +47,8 @@
   #picker button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; padding: 6px 8px; }
   #picker button:hover { background: var(--bg); }
   #picker .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  #savedAt { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+  #storageWarn { background: var(--warn); color: #fff; padding: 8px 16px; font-size: 14px; }
   #toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 6px; font-size: 13px; display: none; z-index: 30; }
   .hint, .article p.hint { color: var(--muted); font: 13px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0 0 12px; }
   #start { max-width: 520px; margin: 60px auto; }
@@ -65,10 +67,12 @@
   <h1>Annotator · <span id="whoLabel"></span></h1>
   <select id="articleSel" aria-label="Article"></select>
   <div class="progress"><div class="bar"><div id="barFill"></div></div><span id="progText"></span></div>
+  <span id="savedAt">Not saved yet</span>
   <button id="importBtn">Import CSV</button>
   <button class="primary" id="exportBtn">Export CSV</button>
   <input type="file" id="importFile" accept=".csv" hidden>
 </header>
+<div id="storageWarn" hidden><b>Autosave is not working in this browser</b> (private window or blocked site data). Your marks will be lost when you close this page: click <b>Export CSV</b> often, and use <b>Import CSV</b> to continue later.</div>
 <main>
   <section class="card article">
     <h2 id="artTitle"></h2>
@@ -104,7 +108,19 @@ var DATA = /*__DATA__*/null;
     try { var raw = localStorage.getItem(storeKey()); if (raw) return JSON.parse(raw); } catch (e) {}
     return { anns: [], done: {}, seq: 0 };
   }
-  function save() { try { localStorage.setItem(storeKey(), JSON.stringify(state)); } catch (e) { toast("Could not autosave: export CSV regularly."); } }
+  function storageWorks() {
+    try { var k = "annotator:probe"; localStorage.setItem(k, "1"); var ok = localStorage.getItem(k) === "1"; localStorage.removeItem(k); return ok; } catch (e) { return false; }
+  }
+  function save() {
+    try {
+      localStorage.setItem(storeKey(), JSON.stringify(state));
+      var now = new Date();
+      $("savedAt").textContent = "Saved " + String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+    } catch (e) {
+      $("storageWarn").hidden = false;
+      $("savedAt").textContent = "NOT saved - export CSV";
+    }
+  }
   function toast(msg) { var t = $("toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toast.h); toast.h = setTimeout(function () { t.style.display = "none"; }, 2600); }
 
   function paragraphs(text) {
@@ -188,7 +204,7 @@ var DATA = /*__DATA__*/null;
     return null;
   }
 
-  function onSelect(ev) {
+  function onSelect() {
     var sel = window.getSelection();
     if (!sel || sel.isCollapsed || !sel.rangeCount) return;
     var r = sel.getRangeAt(0);
@@ -205,7 +221,8 @@ var DATA = /*__DATA__*/null;
     pending = { start: s, end: e };
     var pk = $("picker");
     pk.style.display = "block";
-    var x = Math.min(ev.pageX, window.scrollX + window.innerWidth - 290), y = ev.pageY + 12;
+    var rect = r.getBoundingClientRect();
+    var x = Math.max(window.scrollX + 8, Math.min(window.scrollX + rect.left, window.scrollX + window.innerWidth - 290)), y = window.scrollY + rect.bottom + 8;
     pk.style.left = x + "px"; pk.style.top = y + "px";
   }
 
@@ -280,6 +297,7 @@ var DATA = /*__DATA__*/null;
     $("start").hidden = true; $("app").hidden = false;
     $("whoLabel").textContent = who;
     state = load();
+    if (!storageWorks()) { $("storageWarn").hidden = false; $("savedAt").textContent = "NOT saved - export CSV"; }
     $("articleSel").innerHTML = DATA.articles.map(function (a, i) { return '<option value="' + i + '"></option>'; }).join("");
     $("techList").innerHTML = techs.map(function (t) {
       return '<div class="tech" style="border-color:' + t.color + '"><b>' + esc(t.label) + "</b><span>" + esc(t.description) + "</span></div>";
@@ -298,13 +316,22 @@ var DATA = /*__DATA__*/null;
   $("exportBtn").onclick = exportCsv;
   $("importBtn").onclick = function () { $("importFile").click(); };
   $("importFile").onchange = function () { if (this.files[0]) importCsv(this.files[0]); this.value = ""; };
-  $("artBody").addEventListener("mouseup", function (ev) { setTimeout(function () { onSelect(ev); }, 0); });
+  // Mouse: act when the button is released. Touch: the selection is adjusted with handles after
+  // the finger lifts, so wait until it has been still for a moment.
+  var lastPointer = "mouse", selTimer = null;
+  document.addEventListener("pointerdown", function (ev) { lastPointer = ev.pointerType || "mouse"; }, true);
+  $("artBody").addEventListener("mouseup", function () { if (lastPointer === "mouse") setTimeout(onSelect, 0); });
+  document.addEventListener("selectionchange", function () {
+    if (lastPointer === "mouse") return;
+    clearTimeout(selTimer);
+    selTimer = setTimeout(onSelect, 700);
+  });
   $("artBody").addEventListener("click", function (ev) {
     var m = ev.target.closest("mark");
     if (m && window.getSelection().isCollapsed) removeAnn(m.dataset.id);
   });
   $("picker").addEventListener("click", function (ev) { var b = ev.target.closest("button"); if (b && pending) addAnn(b.dataset.k); });
-  document.addEventListener("mousedown", function (ev) { if (!$("picker").contains(ev.target)) { $("picker").style.display = "none"; } });
+  document.addEventListener("pointerdown", function (ev) { if (!$("picker").contains(ev.target)) { $("picker").style.display = "none"; } });
   window.addEventListener("beforeunload", save);
 })();
 </script>
