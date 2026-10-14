@@ -1,6 +1,6 @@
 {
   "$schemaVersion": "2.0.0",
-  "catalogVersion": "1.0.0",
+  "catalogVersion": "1.1.0",
   "lastUpdated": "2026-10-14",
   "_readme": "Linguistic Pattern Catalog. Each rule follows the ten fields of thesis Table 13 and is evaluated as D(s,r) = L(s,r) AND S(s,r) AND C(s,r) (FR-DET-03): the lexicalTrigger generates a candidate; it is flagged only if the linguisticCondition (structure/POS) and the contextCondition (local context) also hold. A lexical-only run (L alone) is the section 8.3 baseline. Overlaps are resolved by FR-DET-04: longest span, then higher confidenceTier, then earliest offset, then lowest id. Edit this file to change detection without rebuilding the extension. REPETITION has no rules: it needs a repeated-expression comparison rather than a lexical trigger. Rule ID prefixes of the original seed rules (LL/PS/SC/AF/EM) are legacy names; `technique` is authoritative. confidenceTier is currently authored, not yet calibrated on the development corpus (thesis Stage 5).",
   "_schema": {
@@ -1175,6 +1175,51 @@
       "neutralAlternative": "Describe the policy or position itself"
     },
     {
+      "id": "FW-002",
+      "technique": "FLAG_WAVING",
+      "label": "Appeal to the national public",
+      "referenceDefinition": "Invoking national, cultural, religious, ideological, or group identity to encourage support for an action, position, or cause.",
+      "lexicalTrigger": {
+        "words": [
+          "the american people",
+          "the american public",
+          "all americans",
+          "every american",
+          "our country",
+          "our communities",
+          "america first"
+        ],
+        "pattern": "\\b(the american (?:people|public)|all americans|every american|our country|our communities|america first)\\b"
+      },
+      "linguisticCondition": {
+        "type": "none",
+        "description": "The multi-word expression is itself the anchor (phrase-level condition)."
+      },
+      "contextCondition": {
+        "excludeSentenceWords": [
+          "poll",
+          "polls",
+          "survey",
+          "surveys",
+          "percent",
+          "illegally",
+          "enter",
+          "entering",
+          "entered"
+        ],
+        "description": "Not a poll or survey result, and not a literal reference to entering the country. Calibration round 4: phrases kept only if they fell inside a SemEval Flag-Waving span in at least half of their occurrences (>=3) on the 221-article mining split."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This invokes the nation or 'the American people' as a whole to win support, implying the whole country stands on one side.",
+      "sourceExample": {
+        "text": "The CIA kept the records secret from the American people for decades.",
+        "source": "PTC / SemEval-2020 Task 11 training set (mining split)",
+        "triggerEvidence": "'the American people' fell inside a gold Flag-Waving span in 24 of 31 occurrences, 'our country' in 8 of 15, on 221 mining articles."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "Name the specific people or groups affected"
+    },
+    {
       "id": "CO-001",
       "technique": "CAUSAL_OVERSIMPLIFICATION",
       "label": "Single-cause claim",
@@ -1494,6 +1539,52 @@
       },
       "confidenceTier": "medium",
       "neutralAlternative": "Cite the evidence or the actual survey"
+    },
+    {
+      "id": "BW-002",
+      "technique": "BANDWAGON_REDUCTIO_AD_HITLERUM",
+      "label": "Totalitarian comparison",
+      "referenceDefinition": "Using popularity, social acceptance, or association with a strongly rejected figure or group as a persuasive device.",
+      "lexicalTrigger": {
+        "words": [
+          "stalinist",
+          "fascist",
+          "fascists",
+          "fascistic",
+          "gestapo",
+          "gestapo-like"
+        ],
+        "pattern": "\\b(stalinist|fascists?|fascistic|gestapo(?:-like)?)\\b"
+      },
+      "linguisticCondition": {
+        "type": "taggedAny",
+        "tags": [
+          "Adjective",
+          "Noun"
+        ],
+        "description": "The term is used as a descriptive label (adjective or noun)."
+      },
+      "contextCondition": {
+        "excludeFollowingPattern": "\\s+(regimes?|era|period|dictatorship|party)\\b",
+        "excludeSentenceWords": [
+          "1930s",
+          "1940s",
+          "wwii",
+          "historian",
+          "historians",
+          "mussolini"
+        ],
+        "description": "Not a literal historical or political-system description ('Stalinist regime', 'the fascist era', Mussolini's party). Calibration round 4: terms kept only if they fell inside a SemEval Bandwagon/Reductio span in at least half of their occurrences on the 221-article mining split."
+      },
+      "targetSpan": "trigger",
+      "explanation": "This links the target to a universally rejected regime (Stalin, fascism, the Gestapo) to discredit it, instead of addressing what it actually did.",
+      "sourceExample": {
+        "text": "President Trump's Stalinist statements about taking guns first.",
+        "source": "PTC / SemEval-2020 Task 11 training set (mining split)",
+        "triggerEvidence": "'Stalinist' fell inside a gold Reductio span in 5 of 6 occurrences; 'fascist(s)/fascistic' 3 of 3; 'Gestapo' 1 of 1, on 221 mining articles."
+      },
+      "confidenceTier": "low",
+      "neutralAlternative": "Describe the specific action and its effect"
     },
     {
       "id": "SM-001",
