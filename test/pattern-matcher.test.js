@@ -165,6 +165,17 @@ test("calibration round 3: corpus-derived terms and the Loaded Language remap", 
   assert.ok(first("She said the senator is a liar.", "NC-003"));
 });
 
+test("calibration round 4: Flag-Waving public appeal and totalitarian comparison", () => {
+  const tech = (t, id) => (first(t, id) || {}).technique;
+  assert.equal(tech("The agency kept the records secret from the American people.", "FW-002"), "FLAG_WAVING");
+  assert.ok(first("This assault on our country must stop.", "FW-002"));
+  assert.ok(!first("A new poll shows 60 percent of the American people support it.", "FW-002"), "poll result skipped");
+  assert.ok(!first("Thousands tried to enter our country illegally.", "FW-002"), "literal entry skipped");
+  assert.equal(tech("He made Stalinist statements about taking guns first.", "BW-002"), "BANDWAGON_REDUCTIO_AD_HITLERUM");
+  assert.ok(first("This is an assault by the fascist Left on our liberties.", "BW-002"));
+  assert.ok(!first("Sanctions target North Korea's Stalinist regime.", "BW-002"), "literal regime description skipped");
+});
+
 test("LL-009 ('propaganda') was retired in calibration round 1", () => {
   assert.ok(!patterns.some((p) => p.id === "LL-009"));
 });
