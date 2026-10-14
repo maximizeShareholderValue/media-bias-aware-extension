@@ -43,7 +43,8 @@ function pct(x) {
 function readPhase1(rows, validator) {
   const header = rows[0].map((h) => h.trim().toLowerCase());
   const col = (name) => header.indexOf(name);
-  const c = { id: col("annotation id"), article: col("article id"), span: col("span"), tech: col("technique"), ctx: col("sentence context") };
+  const c = { id: col("annotation id"), article: col("article id"), span: col("span"), tech: col("technique"), ctx: col("sentence context"), start: col("start"), end: col("end") };
+  const num = (r, i) => (i >= 0 && String(r[i] || "").trim() !== "" && !isNaN(Number(r[i])) ? Number(r[i]) : null);
   if (c.article < 0 || c.span < 0 || c.tech < 0) throw new Error("Phase 1 sheet for " + validator + " needs Article ID, Span and Technique columns");
   return rows
     .slice(1)
@@ -54,8 +55,17 @@ function readPhase1(rows, validator) {
       articleId: String(r[c.article] || "").trim(),
       span: r[c.span],
       technique: r[c.tech],
-      context: c.ctx >= 0 ? r[c.ctx] : ""
+      context: c.ctx >= 0 ? r[c.ctx] : "",
+      start: num(r, c.start),
+      end: num(r, c.end)
     }));
+}
+
+/** Start/End from the annotation page, used when they still point at the same words in the article. */
+function exactOffsets(text, a) {
+  if (a.start === null || a.end === null || a.start < 0 || a.end > text.length || a.end <= a.start) return null;
+  const squash = (s) => String(s).replace(/\s+/g, " ").trim().toLowerCase();
+  return squash(text.slice(a.start, a.end)) === squash(a.span) ? { start: a.start, end: a.end, ambiguous: false } : null;
 }
 
 /** Phase 2 rows + key -> kappa report (null when no rows are fully rated). */
@@ -103,7 +113,7 @@ function score(input) {
     readPhase1(rows, "V" + (i + 1)).forEach((a) => {
       const technique = resolveTech(a.technique);
       const text = input.articles[a.articleId];
-      const where = text === undefined ? null : R.locateSpan(text, a.span, a.context);
+      const where = text === undefined ? null : exactOffsets(text, a) || R.locateSpan(text, a.span, a.context);
       const problem = text === undefined ? "unknown article" : !technique ? "unknown technique" : !where ? "span not found in article" : null;
       if (problem) {
         unlocated.push({ validator: a.validator, annotationId: a.annotationId, articleId: a.articleId, span: a.span, technique: a.technique, problem: problem });
