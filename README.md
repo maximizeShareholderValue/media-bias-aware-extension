@@ -63,6 +63,7 @@ Condition types and the tests that enforce the schema are in `content/pattern-ma
 Not shipped to users; run with Node.
 
 ```
+node eval/export-to-txt.js <exportsDir> <articlesDir>    # popup "Export detections (JSON)" files (<id>.json) -> <id>.txt
 node eval/generate-sheet.js <articlesDir> [outDir] --pipeline-only     # one <id>.txt per article, paragraphs separated by a blank line
 # --pipeline-only: the Phase 2 sheet lists only the extension's highlights (baseline is scored against Phase 1, not judged)
 # Phase 1: validators annotate the clean copies in their "Validator N - Phase 1" tabs (download each as CSV)
