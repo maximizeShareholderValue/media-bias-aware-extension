@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Article Annotator</title>
+<style>
+  :root {
+    --bg: #f6f5f1; --panel: #ffffff; --ink: #1d1d1f; --muted: #6b6b70; --line: #e2e0d8;
+    --accent: #2f5d50; --accent-ink: #ffffff; --quote: #9a9aa0; --warn: #a3412b; --done: #2f7a4a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17181a; --panel: #212226; --ink: #ececee; --muted: #a0a0a8; --line: #34353a;
+      --accent: #7fc4ad; --accent-ink: #10221c; --quote: #75757d; --warn: #f08a72; --done: #7fd39b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 5; }
+  header h1 { font-size: 16px; margin: 0 8px 0 0; }
+  select, button, input[type=text] { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .progress { flex: 1; min-width: 160px; display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+  .bar { flex: 1; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  .bar > div { height: 100%; background: var(--done); width: 0; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; padding: 16px; max-width: 1200px; margin: 0 auto; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; }
+  .article h2 { margin: 0 0 4px; font-size: 18px; }
+  .article .meta { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .article p { margin: 0 0 14px; font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.7; }
+  .q { color: var(--quote); }
+  mark { border-radius: 3px; padding: 1px 0; color: inherit; cursor: pointer; }
+  .side h3 { margin: 0 0 8px; font-size: 14px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .tech { border-left: 4px solid; padding: 4px 8px; margin-bottom: 6px; }
+  .tech b { display: block; font-size: 14px; }
+  .tech span { font-size: 12.5px; color: var(--muted); }
+  .list { margin-top: 14px; }
+  .ann { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+  .ann .t { font-size: 12px; color: var(--muted); }
+  .ann input { width: 100%; font-size: 12.5px; padding: 3px 6px; grid-column: 1 / -1; }
+  .done-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .nav { display: flex; gap: 8px; margin-top: 12px; }
+  #picker { position: absolute; z-index: 20; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18); padding: 6px; display: none; max-height: 70vh; overflow: auto; width: 270px; }
+  #picker button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; padding: 6px 8px; }
+  #picker button:hover { background: var(--bg); }
+  #picker .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  #toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 6px; font-size: 13px; display: none; z-index: 30; }
+  .hint, .article p.hint { color: var(--muted); font: 13px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0 0 12px; }
+  #start { max-width: 520px; margin: 60px auto; }
+</style>
+</head>
+<body>
+<div id="start" class="card">
+  <h2 style="margin-top:0">Article annotation (Phase 1)</h2>
+  <p class="hint">Choose your validator number. Your work is saved in this browser automatically. Use <b>Export CSV</b> to send it to the researchers (and as a backup).</p>
+  <p><select id="who"><option value="">Validator…</option><option>V1</option><option>V2</option><option>V3</option></select>
+  <button class="primary" id="go">Start</button></p>
+</div>
+
+<div id="app" hidden>
+<header>
+  <h1>Annotator · <span id="whoLabel"></span></h1>
+  <select id="articleSel" aria-label="Article"></select>
+  <div class="progress"><div class="bar"><div id="barFill"></div></div><span id="progText"></span></div>
+  <button id="importBtn">Import CSV</button>
+  <button class="primary" id="exportBtn">Export CSV</button>
+  <input type="file" id="importFile" accept=".csv" hidden>
+</header>
+<main>
+  <section class="card article">
+    <h2 id="artTitle"></h2>
+    <div class="meta" id="artMeta"></div>
+    <p class="hint">Select words in the text, then pick a technique. Click a highlight to remove it. <span class="q">Grey text is quoted speech: do not annotate it.</span></p>
+    <div id="artBody"></div>
+    <div class="done-row"><input type="checkbox" id="doneBox"><label for="doneBox"><b>I have finished this article</b> (tick it even if you found no techniques)</label></div>
+    <div class="nav"><button id="prevBtn">← Previous</button><button id="nextBtn">Next →</button></div>
+  </section>
+  <aside class="card side">
+    <h3>The 14 techniques</h3>
+    <div id="techList"></div>
+    <div class="list"><h3>Your marks in this article (<span id="annCount">0</span>)</h3><div id="annList"></div></div>
+  </aside>
+</main>
+</div>
+<div id="picker" role="menu"></div>
+<div id="toast"></div>
+
+<script>
+var DATA = /*__DATA__*/null;
+(function () {
+  "use strict";
+  var COLORS = ["#f4a259", "#e76f51", "#8ab17d", "#2a9d8f", "#e9c46a", "#b56576", "#6d597a", "#457b9d", "#f28482", "#84a59d", "#c9ada7", "#90be6d", "#bc6c25", "#7f5539"];
+  var techs = DATA.techniques.map(function (t, i) { return { key: t.key, label: t.label, description: t.description, color: COLORS[i % COLORS.length] }; });
+  var byKey = {};
+  techs.forEach(function (t) { byKey[t.key] = t; });
+  var who = null, state = null, current = 0, pending = null;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function storeKey() { return "annotator:" + DATA.buildId + ":" + who; }
+  function load() {
+    try { var raw = localStorage.getItem(storeKey()); if (raw) return JSON.parse(raw); } catch (e) {}
+    return { anns: [], done: {}, seq: 0 };
+  }
+  function save() { try { localStorage.setItem(storeKey(), JSON.stringify(state)); } catch (e) { toast("Could not autosave: export CSV regularly."); } }
+  function toast(msg) { var t = $("toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toast.h); toast.h = setTimeout(function () { t.style.display = "none"; }, 2600); }
+
+  function paragraphs(text) {
+    var out = [], re = /[^\n]+(?:\n(?!\s*\n)[^\n]+)*/g, m;
+    while ((m = re.exec(text)) !== null) out.push({ text: m[0], offset: m.index });
+    return out;
+  }
+  function quoteRanges(text) {
+    var out = [], re = /[“"][^”"]*[”"]/g, m;
+    while ((m = re.exec(text)) !== null) out.push([m.index, m.index + m[0].length]);
+    return out;
+  }
+  function sentenceAround(text, s, e) {
+    var a = s, b = e;
+    while (a > 0 && !/[.!?\n]/.test(text[a - 1])) a--;
+    while (b < text.length && !/[.!?\n]/.test(text[b])) b++;
+    if (b < text.length) b++;
+    return text.slice(a, b).replace(/\s+/g, " ").trim();
+  }
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  function renderPara(p, anns, quotes) {
+    var cuts = [0, p.text.length];
+    var local = anns.map(function (a) { return { a: a, s: a.start - p.offset, e: a.end - p.offset }; }).filter(function (x) { return x.e > 0 && x.s < p.text.length; });
+    local.forEach(function (x) { cuts.push(Math.max(0, x.s), Math.min(p.text.length, x.e)); });
+    quotes.forEach(function (q) { cuts.push(q[0], q[1]); });
+    cuts = cuts.filter(function (v, i, arr) { return arr.indexOf(v) === i; }).sort(function (a, b) { return a - b; });
+    var html = "";
+    for (var i = 0; i < cuts.length - 1; i++) {
+      var s = cuts[i], e = cuts[i + 1], seg = esc(p.text.slice(s, e));
+      var inQ = quotes.some(function (q) { return s >= q[0] && e <= q[1]; });
+      var hits = local.filter(function (x) { return x.s <= s && x.e >= e; });
+      if (inQ) seg = '<span class="q">' + seg + "</span>";
+      if (hits.length) {
+        var top = hits[hits.length - 1].a;
+        var title = hits.map(function (h) { return byKey[h.a.technique].label; }).join(" + ");
+        seg = '<mark data-id="' + top.id + '" title="' + esc(title) + ' (click to remove)" style="background:' + byKey[top.technique].color + '55;box-shadow:inset 0 -2px ' + byKey[top.technique].color + '">' + seg + "</mark>";
+      }
+      html += '<span data-o="' + (p.offset + s) + '">' + seg + "</span>";
+    }
+    return html;
+  }
+
+  function render() {
+    var art = DATA.articles[current];
+    $("articleSel").value = String(current);
+    $("artTitle").textContent = art.title || art.id;
+    $("artMeta").textContent = art.id + (art.url ? " · " + art.url : "");
+    var anns = state.anns.filter(function (a) { return a.articleId === art.id; }).sort(function (a, b) { return a.start - b.start; });
+    $("artBody").innerHTML = paragraphs(art.text).map(function (p) {
+      return '<p data-off="' + p.offset + '" data-len="' + p.text.length + '">' + renderPara(p, anns, quoteRanges(p.text)) + "</p>";
+    }).join("");
+    $("annCount").textContent = anns.length;
+    $("annList").innerHTML = anns.length ? "" : '<p class="hint">No marks yet.</p>';
+    anns.forEach(function (a) {
+      var row = document.createElement("div");
+      row.className = "ann";
+      row.innerHTML = '<div>“' + esc(a.span) + '”<div class="t" style="color:' + byKey[a.technique].color + '">' + esc(byKey[a.technique].label) + "</div></div>" +
+        '<button title="Remove">✕</button><input type="text" placeholder="Comment (optional)" value="' + esc(a.comment || "") + '">';
+      row.querySelector("button").onclick = function () { removeAnn(a.id); };
+      row.querySelector("input").onchange = function (ev) { a.comment = ev.target.value; save(); };
+      $("annList").appendChild(row);
+    });
+    $("doneBox").checked = !!state.done[art.id];
+    var nDone = DATA.articles.filter(function (x) { return state.done[x.id]; }).length;
+    $("barFill").style.width = (100 * nDone / DATA.articles.length) + "%";
+    $("progText").textContent = nDone + " / " + DATA.articles.length + " done";
+    Array.prototype.forEach.call($("articleSel").options, function (o, i) {
+      var x = DATA.articles[i];
+      o.textContent = (state.done[x.id] ? "✓ " : "   ") + x.id + " – " + (x.title || "").slice(0, 50);
+    });
+  }
+
+  function absOffset(node, off) {
+    var span = node.nodeType === 3 ? node.parentNode : node;
+    while (span && !(span.dataset && span.dataset.o !== undefined)) span = span.parentNode;
+    if (!span) return null;
+    if (node.nodeType !== 3) return Number(span.dataset.o) + (off > 0 ? span.textContent.length : 0);
+    var walker = document.createTreeWalker(span, NodeFilter.SHOW_TEXT), n, count = 0;
+    while ((n = walker.nextNode())) { if (n === node) return Number(span.dataset.o) + count + off; count += n.textContent.length; }
+    return null;
+  }
+
+  function onSelect(ev) {
+    var sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+    var r = sel.getRangeAt(0);
+    if (!$("artBody").contains(r.commonAncestorContainer)) return;
+    var s = absOffset(r.startContainer, r.startOffset), e = absOffset(r.endContainer, r.endOffset);
+    if (s === null || e === null || e <= s) return;
+    var text = DATA.articles[current].text;
+    while (s < e && /\s/.test(text[s])) s++;
+    while (e > s && /\s/.test(text[e - 1])) e--;
+    if (e <= s) return;
+    if (/\n\s*\n/.test(text.slice(s, e))) { toast("Select within one paragraph."); return; }
+    var p = paragraphs(text).filter(function (x) { return s >= x.offset && s < x.offset + x.text.length; })[0];
+    if (p && quoteRanges(p.text).some(function (q) { return s - p.offset >= q[0] && e - p.offset <= q[1]; })) { toast("That is quoted speech: not annotated."); sel.removeAllRanges(); return; }
+    pending = { start: s, end: e };
+    var pk = $("picker");
+    pk.style.display = "block";
+    var x = Math.min(ev.pageX, window.scrollX + window.innerWidth - 290), y = ev.pageY + 12;
+    pk.style.left = x + "px"; pk.style.top = y + "px";
+  }
+
+  function addAnn(techKey) {
+    var art = DATA.articles[current];
+    state.seq += 1;
+    var text = art.text.slice(pending.start, pending.end);
+    state.anns.push({
+      id: who + "-" + String(state.seq).padStart(3, "0"), articleId: art.id, start: pending.start, end: pending.end,
+      span: text.replace(/\s+/g, " "), technique: techKey, context: sentenceAround(art.text, pending.start, pending.end), comment: ""
+    });
+    pending = null;
+    $("picker").style.display = "none";
+    window.getSelection().removeAllRanges();
+    save(); render();
+  }
+  function removeAnn(id) {
+    var a = state.anns.filter(function (x) { return x.id === id; })[0];
+    if (!a || !confirm("Remove “" + a.span + "” (" + byKey[a.technique].label + ")?")) return;
+    state.anns = state.anns.filter(function (x) { return x.id !== id; });
+    save(); render();
+  }
+
+  function csvCell(v) { v = String(v == null ? "" : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function exportCsv() {
+    var rows = [["Annotation ID", "Article ID", "Span", "Technique", "Sentence Context", "Comment", "Start", "End"]];
+    state.anns.slice().sort(function (a, b) { return a.articleId < b.articleId ? -1 : a.articleId > b.articleId ? 1 : a.start - b.start; }).forEach(function (a) {
+      rows.push([a.id, a.articleId, a.span, byKey[a.technique].label, a.context, a.comment, a.start, a.end]);
+    });
+    var done = DATA.articles.filter(function (x) { return state.done[x.id]; }).map(function (x) { return x.id; });
+    rows.push(["#done", done.join(" "), "", "", "", "", "", ""]);
+    var blob = new Blob([rows.map(function (r) { return r.map(csvCell).join(","); }).join("\r\n") + "\r\n"], { type: "text/csv" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = who + "-phase1-" + new Date().toISOString().slice(0, 10) + ".csv";
+    a.click();
+    toast("Exported " + state.anns.length + " marks. Send this file to the researchers.");
+  }
+  function parseCsv(text) {
+    var rows = [], row = [], cell = "", q = false;
+    for (var i = 0; i < text.length; i++) {
+      var c = text[i];
+      if (q) { if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; } else if (c === '"') q = false; else cell += c; }
+      else if (c === '"') q = true;
+      else if (c === ",") { row.push(cell); cell = ""; }
+      else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(cell); rows.push(row); row = []; cell = ""; }
+      else cell += c;
+    }
+    if (cell || row.length) { row.push(cell); rows.push(row); }
+    return rows;
+  }
+  function importCsv(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var rows = parseCsv(reader.result), labelToKey = {};
+      techs.forEach(function (t) { labelToKey[t.label] = t.key; });
+      var anns = [], done = {}, seq = 0;
+      rows.slice(1).forEach(function (r) {
+        if (r[0] === "#done") { (r[1] || "").split(" ").filter(Boolean).forEach(function (id) { done[id] = true; }); return; }
+        if (!r[1] || !labelToKey[r[3]] || isNaN(Number(r[6]))) return;
+        anns.push({ id: r[0], articleId: r[1], span: r[2], technique: labelToKey[r[3]], context: r[4], comment: r[5], start: Number(r[6]), end: Number(r[7]) });
+        seq = Math.max(seq, Number((r[0].match(/(\d+)$/) || [0, 0])[1]));
+      });
+      if (!confirm("Replace your current work with " + anns.length + " marks from this file?")) return;
+      state = { anns: anns, done: done, seq: seq };
+      save(); render(); toast("Imported " + anns.length + " marks.");
+    };
+    reader.readAsText(file);
+  }
+
+  function start() {
+    $("start").hidden = true; $("app").hidden = false;
+    $("whoLabel").textContent = who;
+    state = load();
+    $("articleSel").innerHTML = DATA.articles.map(function (a, i) { return '<option value="' + i + '"></option>'; }).join("");
+    $("techList").innerHTML = techs.map(function (t) {
+      return '<div class="tech" style="border-color:' + t.color + '"><b>' + esc(t.label) + "</b><span>" + esc(t.description) + "</span></div>";
+    }).join("");
+    $("picker").innerHTML = techs.map(function (t) {
+      return '<button data-k="' + t.key + '"><span class="dot" style="background:' + t.color + '"></span>' + esc(t.label) + "</button>";
+    }).join("");
+    render();
+  }
+
+  $("go").onclick = function () { who = $("who").value; if (!who) return toast("Choose your validator number."); start(); };
+  $("articleSel").onchange = function () { current = Number(this.value); render(); window.scrollTo(0, 0); };
+  $("prevBtn").onclick = function () { if (current > 0) { current--; render(); window.scrollTo(0, 0); } };
+  $("nextBtn").onclick = function () { if (current < DATA.articles.length - 1) { current++; render(); window.scrollTo(0, 0); } };
+  $("doneBox").onchange = function () { state.done[DATA.articles[current].id] = this.checked; save(); render(); };
+  $("exportBtn").onclick = exportCsv;
+  $("importBtn").onclick = function () { $("importFile").click(); };
+  $("importFile").onchange = function () { if (this.files[0]) importCsv(this.files[0]); this.value = ""; };
+  $("artBody").addEventListener("mouseup", function (ev) { setTimeout(function () { onSelect(ev); }, 0); });
+  $("artBody").addEventListener("click", function (ev) {
+    var m = ev.target.closest("mark");
+    if (m && window.getSelection().isCollapsed) removeAnn(m.dataset.id);
+  });
+  $("picker").addEventListener("click", function (ev) { var b = ev.target.closest("button"); if (b && pending) addAnn(b.dataset.k); });
+  document.addEventListener("mousedown", function (ev) { if (!$("picker").contains(ev.target)) { $("picker").style.display = "none"; } });
+  window.addEventListener("beforeunload", save);
+})();
+</script>
+</body>
+</html>

@@ -64,6 +64,7 @@ Not shipped to users; run with Node.
 
 ```
 node eval/export-to-txt.js <exportsDir> <articlesDir>    # popup "Export detections (JSON)" files (<id>.json) -> <id>.txt
+node eval/build-annotator.js <articlesDir> annotator.html --exports <exportsDir>   # Phase 1 page: send the same file to all 3 validators; each returns its Export CSV
 node eval/generate-sheet.js <articlesDir> [outDir] --pipeline-only     # one <id>.txt per article, paragraphs separated by a blank line
 # --pipeline-only: the Phase 2 sheet lists only the extension's highlights (baseline is scored against Phase 1, not judged)
 # Phase 1: validators annotate the clean copies in their "Validator N - Phase 1" tabs (download each as CSV)
