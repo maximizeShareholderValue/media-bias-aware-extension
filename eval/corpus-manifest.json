@@ -1,0 +1,306 @@
+{
+  "createdAt": "2026-10-21",
+  "note": "Article texts are not published (copyright); they are kept locally in eval/corpus/ (gitignored). sha256 is over the cleaned .txt used by annotator.html, generate-sheet.js and score.js.",
+  "articles": [
+    {
+      "id": "C01",
+      "url": "https://san.com/cc/scotus-rules-against-trumps-global-tariffs-saying-he-did-not-have-authority/",
+      "title": "Trump vows to reimpose tariffs despite 'unpatriotic' Supreme Court decision",
+      "exportedAt": "2026-10-20T20:57:58.538Z",
+      "catalogVersion": "1.1.0",
+      "words": 1366,
+      "sha256": "56bdfc4187336b7fd679abfe0701e7b9fe9d44d677ba35fd7a72ecd68d89367e",
+      "boilerplateParagraphsRemoved": 2
+    },
+    {
+      "id": "C02",
+      "url": "https://www.upi.com/Top_News/US/2026/05/13/warsh-confirmed-as-fed-chair/5451778714462/",
+      "title": "Warsh confirmed as Federal Reserve chief to follow Jerome Powell - UPI.com",
+      "exportedAt": "2026-10-20T22:44:03.839Z",
+      "catalogVersion": "1.1.0",
+      "words": 384,
+      "sha256": "7102250cb56556fedcaf23226c6703aafd8b945907521fd2cf02f469b61ad944",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "C03",
+      "url": "https://www.reuters.com/world/middle-east/diverted-flydubai-flight-israel-was-not-hijacking-incident-israeli-prime-2026-09-30/",
+      "title": "Passengers foil bid to crash Dubai-Tel Aviv flight, Israel says, after co-pilot stabs pilot",
+      "exportedAt": "2026-10-20T22:44:42.552Z",
+      "catalogVersion": "1.1.0",
+      "words": 1108,
+      "sha256": "da57115d1f6600326b0ecc40160148364d3d434474d9359b09252e2eaf23e2c1",
+      "boilerplateParagraphsRemoved": 2
+    },
+    {
+      "id": "C04",
+      "url": "https://san.com/cc/artemis-ii-crew-successfully-plunges-into-pacific-after-moon-mission/",
+      "title": "Artemis II crew successfully plunges into Pacific after moon mission",
+      "exportedAt": "2026-10-20T22:45:06.670Z",
+      "catalogVersion": "1.1.0",
+      "words": 482,
+      "sha256": "c23f2add5102412e7734575855355c371416fceb7be9012c8c204dd25ad66a60",
+      "boilerplateParagraphsRemoved": 2
+    },
+    {
+      "id": "C05",
+      "url": "https://thehill.com/homenews/administration/5871825-trump-iran-proposal-totally-unacceptable/",
+      "title": "Trump calls Iran’s proposal ‘totally unacceptable’",
+      "exportedAt": "2026-10-20T22:45:57.551Z",
+      "catalogVersion": "1.1.0",
+      "words": 361,
+      "sha256": "2c47bc8ed94366427702d49d050b522c60dbc52ec0d5b69789729052cb353d6d",
+      "boilerplateParagraphsRemoved": 1
+    },
+    {
+      "id": "C06",
+      "url": "https://www.bbc.com/news/articles/c34gdjk1ne8yo",
+      "title": "Largest attack on Moscow sees Ukraine fire hundreds of drones, mayor says",
+      "exportedAt": "2026-10-20T22:46:25.159Z",
+      "catalogVersion": "1.1.0",
+      "words": 614,
+      "sha256": "9f89ac0e8f454cd99228f78430f3002ace655a92a2ac121564e2e8cf0f242803",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "C07",
+      "url": "https://www.upi.com/Top_News/US/2026/01/12/new-york-city-nurses-strike/2611768229702/",
+      "title": "Nurses strike in New York City, seeking new contract - UPI.com",
+      "exportedAt": "2026-10-20T22:46:42.936Z",
+      "catalogVersion": "1.1.0",
+      "words": 348,
+      "sha256": "3fcf247670019b31307efadff2f0202c21cde2da4661155c777dc2c2d946eeb2",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "C08",
+      "url": "https://www.newsweek.com/hospitals-are-deploying-ai-chatbots-doctors-are-divided-11862567",
+      "title": "Hospitals are deploying AI chatbots. Doctors are divided",
+      "exportedAt": "2026-10-20T23:12:45.686Z",
+      "catalogVersion": "1.1.0",
+      "words": 1451,
+      "sha256": "56dc251083c2cc312193f927aadc534297a4bdbebd95bb54a3bb2af64bbd8d7e",
+      "boilerplateParagraphsRemoved": 3
+    },
+    {
+      "id": "C09",
+      "url": "https://san.com/cc/drivers-prepare-to-race-through-the-capitol-as-indycar-takes-over-dc/",
+      "title": "Drivers prepare to race through the Capitol as IndyCar takes over DC",
+      "exportedAt": "2026-10-20T22:54:31.745Z",
+      "catalogVersion": "1.1.0",
+      "words": 790,
+      "sha256": "42e58603349758bbefcc3088262225cce804ae654e139d6efe7708e033a7b55f",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "C10",
+      "url": "https://www.newsweek.com/donald-trump-poll-independent-vote-democrats-republicans-11346586",
+      "title": "Independent voters pose challenge for Trump ahead of 2026 midterms: poll",
+      "exportedAt": "2026-10-20T22:54:58.409Z",
+      "catalogVersion": "1.1.0",
+      "words": 789,
+      "sha256": "c6bbbd2d969eb535af7feaf321ea9aa6431a7ef39373d9cbf5a73d680e33223e",
+      "boilerplateParagraphsRemoved": 7
+    },
+    {
+      "id": "L01",
+      "url": "https://www.cbsnews.com/news/supreme-court-tariffs-decision-trump/",
+      "title": "Supreme Court rules most Trump tariffs illegal in major setback for economic agenda",
+      "exportedAt": "2026-10-20T23:12:21.272Z",
+      "catalogVersion": "1.1.0",
+      "words": 1547,
+      "sha256": "1d550c5009e26c093fe7e84a616e00361a0372c735ed152eec57935cc0a1b8f8",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "L02",
+      "url": "https://edition.cnn.com/2026/05/13/economy/kevin-warsh-confirmation-trump-fed-chair",
+      "title": "Kevin Warsh confirmed as Fed chair, succeeding Jerome Powell | CNN Business",
+      "exportedAt": "2026-10-20T20:30:09.412Z",
+      "catalogVersion": "1.1.0",
+      "words": 844,
+      "sha256": "76b6f45515fabe2899fd5cbd909ce412029772ebd758111b8d0ca5de263309a5",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "L03",
+      "url": "https://time.com/article/2026/09/30/flydubai-pilot-arrested-crash-attempt-stabbing-cockpit-israel-bound-plane/",
+      "title": "Flydubai Pilot Arrested After 'Apparently' Trying to Crash Israel-Bound Plane, Says Netanyahu",
+      "exportedAt": "2026-10-20T20:43:01.343Z",
+      "catalogVersion": "1.1.0",
+      "words": 502,
+      "sha256": "226e411bf54869886864a74f90eaa3acced12facd276de85c0c317c9110d657e",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "L04",
+      "url": "https://www.nbcnews.com/science/space/artemis-ii-astronauts-return-nasa-moon-mission-rcna273651",
+      "title": "Artemis II astronauts return home, ending record-breaking NASA mission around the moon",
+      "exportedAt": "2026-10-20T20:44:00.871Z",
+      "catalogVersion": "1.1.0",
+      "words": 939,
+      "sha256": "4ad4ce1e24a53dd37b79607aa9b9cbc7c99b7dc8ee0f8ff9eda96dc701064985",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "L05",
+      "url": "https://www.nbcnews.com/world/iran/iran-responded-us-proposal-peace-talks-state-media-reports-rcna344404",
+      "title": "Trump calls Iran’s response to U.S. peace proposal ‘totally unacceptable’",
+      "exportedAt": "2026-10-20T20:44:51.799Z",
+      "catalogVersion": "1.1.0",
+      "words": 676,
+      "sha256": "352f00b3d0225939f9c04f2a11f4a3ab5124e06b6f831437e599e8027438991c",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "L06",
+      "url": "https://www.theguardian.com/us-news/2026/sep/13/charlie-kirk-statue-vandalized-tpusa-arizona",
+      "title": "New Charlie Kirk statue vandalized at Turning Point USA headquarters",
+      "exportedAt": "2026-10-20T20:45:16.327Z",
+      "catalogVersion": "1.1.0",
+      "words": 173,
+      "sha256": "40d9e6afb8cafc6d3dac8312f32c564eaaf5b01b1b85fedcea907f4532e5e81e",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "L07",
+      "url": "https://www.fastcompany.com/91487714/layoffs-have-reached-the-highest-level-since-2009-and-ai-may-not-even-be-to-blame",
+      "title": "Layoffs have reached the highest level since 2009 (and AI may not even be to blame)",
+      "exportedAt": "2026-10-20T20:48:07.751Z",
+      "catalogVersion": "1.1.0",
+      "words": 310,
+      "sha256": "4ba48b58286666a888aeb336b4bf2889ba4f1a26988a524726bd21577816f6d5",
+      "boilerplateParagraphsRemoved": 1
+    },
+    {
+      "id": "L08",
+      "url": "https://www.npr.org/2026/09/05/nx-s1-5957875/trump-administration-to-dig-at-triumphal-arch-site-despite-no-final-federal-approvals",
+      "title": "Trump administration to dig at triumphal arch site despite no final federal approvals",
+      "exportedAt": "2026-10-20T20:48:40.760Z",
+      "catalogVersion": "1.1.0",
+      "words": 870,
+      "sha256": "bab17e20d6bc4e217b8609832d90e8fa255bb4c413a8d87ae2885400977352db",
+      "boilerplateParagraphsRemoved": 2
+    },
+    {
+      "id": "L09",
+      "url": "https://www.huffpost.com/entry/trump-california-election-meltdown_n_6a210f57e4b032392fa96956",
+      "title": "'Under Investigation': Trump Lashes Out At California Election In Midnight Freakout",
+      "exportedAt": "2026-10-20T20:49:11.792Z",
+      "catalogVersion": "1.1.0",
+      "words": 309,
+      "sha256": "af6ecdc455f6abb4849a2bf6b603baf30f4bfcdc8f3dec9a1f51b81b564cd5f6",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "L10",
+      "url": "https://abcnews.com/US/dangerous-heat-invades-us-west-faces-wildfires/story?id=135489151",
+      "title": "Dangerous heat invades US as West faces wildfires",
+      "exportedAt": "2026-10-20T20:56:56.241Z",
+      "catalogVersion": "1.1.0",
+      "words": 287,
+      "sha256": "8634970686390dd588e0e10ec6b3d124861def77404a75dc8c6b7f449212ec09",
+      "boilerplateParagraphsRemoved": 2
+    },
+    {
+      "id": "R01",
+      "url": "https://www.theepochtimes.com/us/supreme-court-rejects-trumps-tariffs-in-landmark-decision-5942584",
+      "title": "Supreme Court Strikes Down Trump’s Global Tariffs in Landmark Decision",
+      "exportedAt": "2026-10-20T22:55:52.506Z",
+      "catalogVersion": "1.1.0",
+      "words": 861,
+      "sha256": "e42f7919e3911e7983d4c9990a1bab38459f354661207865719c0cd78fe63684",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "R02",
+      "url": "https://www.theepochtimes.com/us/senate-confirms-kevin-warsh-as-new-fed-chair-6025168",
+      "title": "Senate Confirms Kevin Warsh as New Fed Chair",
+      "exportedAt": "2026-10-20T22:56:14.314Z",
+      "catalogVersion": "1.1.0",
+      "words": 908,
+      "sha256": "2c4224391e4d7d9f8bf5a9acc435a06d1f89979000a9965c015d23dda9383adf",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "R03",
+      "url": "https://www.theepochtimes.com/world/israel-bound-plane-diverts-to-saudi-arabia-in-suspected-hijacking-attempt-6096695",
+      "title": "Co-Pilot Tried to Crash Israel-Bound Plane, Netanyahu Says",
+      "exportedAt": "2026-10-20T22:56:48.474Z",
+      "catalogVersion": "1.1.0",
+      "words": 1035,
+      "sha256": "e50d4963af151cfa33e2ae2dd029965eac603733a858cecc8ff33f8fe2f6fa63",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "R04",
+      "url": "https://www.theepochtimes.com/science/artemis-ii-mission-ends-with-splashdown-off-san-diego-6010423",
+      "title": "Artemis II Mission Ends With Splashdown Off San Diego",
+      "exportedAt": "2026-10-20T22:57:40.610Z",
+      "catalogVersion": "1.1.0",
+      "words": 975,
+      "sha256": "50c170095683cec863a230961cf2945dd84ab811817ae54b2030698dbb5df2be",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "R05",
+      "url": "https://www.theepochtimes.com/world/iran-sends-response-to-us-peace-proposal-iranian-state-media-6023735",
+      "title": "Trump Calls Iran’s Response to Peace Proposal ‘Totally Unacceptable’",
+      "exportedAt": "2026-10-20T22:58:12.650Z",
+      "catalogVersion": "1.1.0",
+      "words": 648,
+      "sha256": "679c9abcf2e43cc81b074c498461b582b15541cfc96a3907c1affa3667867f46",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "R06",
+      "url": "https://www.thecentersquare.com/national/article_3448f13f-a60a-4ab6-b330-d72f87b81e40.html",
+      "title": "Lawmakers, advocates protest China visit",
+      "exportedAt": "2026-10-20T22:58:31.682Z",
+      "catalogVersion": "1.1.0",
+      "words": 561,
+      "sha256": "67d46b559018bd5726ab4be17b632230133aeed1d39a4a4e4a232d3f4fad18fa",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "R07",
+      "url": "https://www.thecentersquare.com/new_york/article_677b8865-f2af-4e42-8a6f-d47aa8ddc659.html",
+      "title": "ICE's ‘Rotten Apple’ operation targets New York 'sanctuary' policies",
+      "exportedAt": "2026-10-20T22:58:48.789Z",
+      "catalogVersion": "1.1.0",
+      "words": 496,
+      "sha256": "d2fddc650c3b885371154df40d6aba1a74d65e78c2703698f3d2fb77432969d3",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "R08",
+      "url": "https://www.thecentersquare.com/national/article_4bfd710e-00d8-4a9e-8bdb-31b86d7845a5.html",
+      "title": "Democrats tank DHS funding bill for fourth time",
+      "exportedAt": "2026-10-20T22:59:25.554Z",
+      "catalogVersion": "1.1.0",
+      "words": 413,
+      "sha256": "af1a9f353cdedcbdc7aad1886d5f503898fe65ff7f4a9fdd514022f0e9c57ee9",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "R09",
+      "url": "https://www.theepochtimes.com/china/china-stands-to-lose-billions-in-venezuela-after-maduros-capture-5969525",
+      "title": "China Stands to Lose Billions in Venezuela After Maduro’s Capture",
+      "exportedAt": "2026-10-20T22:59:41.378Z",
+      "catalogVersion": "1.1.0",
+      "words": 629,
+      "sha256": "2c7b8eb6fd7b9c29ed7b0c46bf09853d7dd2bbd5e9f8085e469ffd75dd206a0e",
+      "boilerplateParagraphsRemoved": 0
+    },
+    {
+      "id": "R10",
+      "url": "https://www.theepochtimes.com/china/ccp-broadens-stability-controls-as-economic-woes-fuel-social-unrest-6048510",
+      "title": "CCP Broadens Stability Controls as Economic Woes Fuel Social Unrest",
+      "exportedAt": "2026-10-20T22:59:55.602Z",
+      "catalogVersion": "1.1.0",
+      "words": 595,
+      "sha256": "c377649b82e60d10625282640a2c9b99b3195034c374bddc3462daea93cb8168",
+      "boilerplateParagraphsRemoved": 0
+    }
+  ]
+}
