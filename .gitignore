@@ -1,3 +1,4 @@
 node_modules/
 eval/out/
 .claude/scheduled_tasks.lock
+eval/corpus/
