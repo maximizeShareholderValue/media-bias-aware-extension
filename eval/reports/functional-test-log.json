@@ -1,0 +1,954 @@
+{
+  "catalogVersion": "1.1.0",
+  "ruleCount": 39,
+  "generatedAt": "2026-10-20T23:55:38.392Z",
+  "referenceExamples": [
+    {
+      "case": "FT-01",
+      "source": "Table 12",
+      "technique": "LOADED_LANGUAGE",
+      "sentence": "Israel must defend itself from the barbaric terrorists surrounding its borders.",
+      "detected": true,
+      "rules": [
+        "LL-012"
+      ],
+      "phrases": [
+        "barbaric"
+      ]
+    },
+    {
+      "case": "FT-02",
+      "source": "Table 12",
+      "technique": "NAME_CALLING_LABELING",
+      "sentence": "These Hamas sympathizers are nothing but terrorist apologists.",
+      "detected": true,
+      "rules": [
+        "NC-004"
+      ],
+      "phrases": [
+        "terrorist"
+      ]
+    },
+    {
+      "case": "FT-03",
+      "source": "Table 9",
+      "technique": "REPETITION",
+      "sentence": "We must take our country back! Take it back!",
+      "detected": true,
+      "rules": [
+        "RP-001"
+      ],
+      "phrases": [
+        "take our country back! Take"
+      ]
+    },
+    {
+      "case": "FT-04",
+      "source": "Table 12",
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "sentence": "If Israel loses this war, the entire country will cease to exist.",
+      "detected": true,
+      "rules": [
+        "EX-004"
+      ],
+      "phrases": [
+        "will cease to exist"
+      ]
+    },
+    {
+      "case": "FT-05",
+      "source": "Table 12",
+      "technique": "DOUBT",
+      "sentence": "Are these protesters really demanding human rights, or are they secretly supporting Hamas?",
+      "detected": true,
+      "rules": [
+        "DB-003",
+        "DB-003"
+      ],
+      "phrases": [
+        "really",
+        "secretly"
+      ]
+    },
+    {
+      "case": "FT-06",
+      "source": "Table 12",
+      "technique": "APPEAL_TO_FEAR_PREJUDICE",
+      "sentence": "If Hamas is not completely defeated, Israeli families will never be safe again.",
+      "detected": true,
+      "rules": [
+        "FE-001"
+      ],
+      "phrases": [
+        "will never be safe"
+      ]
+    },
+    {
+      "case": "FT-07",
+      "source": "Table 12",
+      "technique": "FLAG_WAVING",
+      "sentence": "True supporters of Israel stand with the IDF.",
+      "detected": true,
+      "rules": [
+        "FW-001"
+      ],
+      "phrases": [
+        "True supporters"
+      ]
+    },
+    {
+      "case": "FT-08",
+      "source": "Table 12",
+      "technique": "CAUSAL_OVERSIMPLIFICATION",
+      "sentence": "There would be peace tomorrow if Hamas simply surrendered.",
+      "detected": true,
+      "rules": [
+        "CO-002",
+        "CO-002"
+      ],
+      "phrases": [
+        "would be peace tomorrow",
+        "simply surrendered"
+      ]
+    },
+    {
+      "case": "FT-09",
+      "source": "Table 12",
+      "technique": "SLOGANS",
+      "sentence": "Israel must win at all costs.",
+      "detected": true,
+      "rules": [
+        "SL-002"
+      ],
+      "phrases": [
+        "at all costs"
+      ]
+    },
+    {
+      "case": "FT-10",
+      "source": "Table 12",
+      "technique": "APPEAL_TO_AUTHORITY",
+      "sentence": "Our military leaders have said the operation is necessary, so there is no reason to question it.",
+      "detected": true,
+      "rules": [
+        "AA-003"
+      ],
+      "phrases": [
+        "there is no reason to question it"
+      ]
+    },
+    {
+      "case": "FT-11",
+      "source": "Table 12",
+      "technique": "BLACK_AND_WHITE_FALLACY",
+      "sentence": "You either support Israel or you support terrorism.",
+      "detected": true,
+      "rules": [
+        "BF-002"
+      ],
+      "phrases": [
+        "You either"
+      ]
+    },
+    {
+      "case": "FT-12",
+      "source": "Table 12",
+      "technique": "THOUGHT_TERMINATING_CLICHES",
+      "sentence": "Israel has the right to defend itself. End of discussion.",
+      "detected": true,
+      "rules": [
+        "TT-001"
+      ],
+      "phrases": [
+        "End of discussion"
+      ]
+    },
+    {
+      "case": "FT-13",
+      "source": "Table 12",
+      "technique": "STRAW_MAN_WHATABOUTISM_RED_HERRING",
+      "sentence": "Instead of criticizing Israel, why aren't you talking about what Hamas did?",
+      "detected": true,
+      "rules": [
+        "SM-001"
+      ],
+      "phrases": [
+        "why aren't you talking"
+      ]
+    },
+    {
+      "case": "FT-14",
+      "source": "Table 12",
+      "technique": "BANDWAGON_REDUCTIO_AD_HITLERUM",
+      "sentence": "The whole world now stands with Israel, and anyone who still questions the operation is on the wrong side of history.",
+      "detected": true,
+      "rules": [
+        "BW-001"
+      ],
+      "phrases": [
+        "wrong side of history"
+      ]
+    }
+  ],
+  "perRule": [
+    {
+      "rule": "LL-007",
+      "technique": "LOADED_LANGUAGE",
+      "tier": "medium",
+      "example": "The radical activists blocked the road for hours.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "LL-007"
+      ],
+      "phrases": [
+        "radical"
+      ]
+    },
+    {
+      "rule": "NC-004",
+      "technique": "NAME_CALLING_LABELING",
+      "tier": "medium",
+      "example": "Local terrorists attacked the outpost overnight.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "NC-004"
+      ],
+      "phrases": [
+        "terrorists"
+      ]
+    },
+    {
+      "rule": "NC-005",
+      "technique": "NAME_CALLING_LABELING",
+      "tier": "medium",
+      "example": "The regime cracked down on dissidents after the protest.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "NC-005"
+      ],
+      "phrases": [
+        "regime"
+      ]
+    },
+    {
+      "rule": "LL-011",
+      "technique": "LOADED_LANGUAGE",
+      "tier": "medium",
+      "example": "The governor slammed the new budget proposal.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "LL-011"
+      ],
+      "phrases": [
+        "slammed"
+      ]
+    },
+    {
+      "rule": "LL-012",
+      "technique": "LOADED_LANGUAGE",
+      "tier": "low",
+      "example": "It was a shameful decision by the board.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "LL-012"
+      ],
+      "phrases": [
+        "shameful"
+      ]
+    },
+    {
+      "rule": "LL-015",
+      "technique": "LOADED_LANGUAGE",
+      "tier": "medium",
+      "example": "The notorious criminal was finally apprehended.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "LL-015"
+      ],
+      "phrases": [
+        "notorious"
+      ]
+    },
+    {
+      "rule": "LL-016",
+      "technique": "LOADED_LANGUAGE",
+      "tier": "medium",
+      "example": "The senator admitted that he lied to investigators.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "LL-016"
+      ],
+      "phrases": [
+        "admitted"
+      ]
+    },
+    {
+      "rule": "NC-001",
+      "technique": "NAME_CALLING_LABELING",
+      "tier": "low",
+      "example": "Illegals are flooding our borders",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "NC-001"
+      ],
+      "phrases": [
+        "Illegals"
+      ]
+    },
+    {
+      "rule": "NC-002",
+      "technique": "NAME_CALLING_LABELING",
+      "tier": "low",
+      "example": "They want to hand benefits to illegal aliens.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "NC-002"
+      ],
+      "phrases": [
+        "illegal aliens"
+      ]
+    },
+    {
+      "rule": "NC-003",
+      "technique": "NAME_CALLING_LABELING",
+      "tier": "low",
+      "example": "He called the inquiry a witch hunt.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "NC-003"
+      ],
+      "phrases": [
+        "witch hunt"
+      ]
+    },
+    {
+      "rule": "EX-001",
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "tier": "low",
+      "example": "Prices have skyrocketed since February.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "EX-001"
+      ],
+      "phrases": [
+        "skyrocketed"
+      ]
+    },
+    {
+      "rule": "EX-002",
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "tier": "medium",
+      "example": "It affects a mere three percent of households.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "EX-002"
+      ],
+      "phrases": [
+        "a mere"
+      ]
+    },
+    {
+      "rule": "EX-003",
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "tier": "high",
+      "example": "Officials said the leak was no big deal.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "EX-003"
+      ],
+      "phrases": [
+        "no big deal"
+      ]
+    },
+    {
+      "rule": "DB-001",
+      "technique": "DOUBT",
+      "tier": "medium",
+      "example": "The so-called experts disagreed with the findings.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "DB-001"
+      ],
+      "phrases": [
+        "so-called"
+      ]
+    },
+    {
+      "rule": "DB-002",
+      "technique": "DOUBT",
+      "tier": "medium",
+      "example": "The minister allegedly favors a quiet deal with donors.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "DB-002"
+      ],
+      "phrases": [
+        "allegedly"
+      ]
+    },
+    {
+      "rule": "DB-003",
+      "technique": "DOUBT",
+      "tier": "low",
+      "example": "Is the mayor really helping residents, or is he secretly helping his donors?",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "DB-003",
+        "DB-003"
+      ],
+      "phrases": [
+        "really",
+        "secretly"
+      ]
+    },
+    {
+      "rule": "DB-004",
+      "technique": "DOUBT",
+      "tier": "medium",
+      "example": "The senator claimed that the bill would pass easily.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "DB-004"
+      ],
+      "phrases": [
+        "claimed"
+      ]
+    },
+    {
+      "rule": "FE-001",
+      "technique": "APPEAL_TO_FEAR_PREJUDICE",
+      "tier": "medium",
+      "example": "Critics warn the plan is an existential threat to the region.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "FE-001"
+      ],
+      "phrases": [
+        "existential threat"
+      ]
+    },
+    {
+      "rule": "FE-002",
+      "technique": "APPEAL_TO_FEAR_PREJUDICE",
+      "tier": "medium",
+      "example": "Residents complain that the neighborhood is under siege from developers.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "FE-002"
+      ],
+      "phrases": [
+        "under siege"
+      ]
+    },
+    {
+      "rule": "FE-003",
+      "technique": "APPEAL_TO_FEAR_PREJUDICE",
+      "tier": "low",
+      "example": "The new rules will wreak havoc on small businesses.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "FE-003"
+      ],
+      "phrases": [
+        "wreak havoc"
+      ]
+    },
+    {
+      "rule": "FW-001",
+      "technique": "FLAG_WAVING",
+      "tier": "high",
+      "example": "True patriots will support the bill.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "FW-001"
+      ],
+      "phrases": [
+        "True patriots"
+      ]
+    },
+    {
+      "rule": "FW-002",
+      "technique": "FLAG_WAVING",
+      "tier": "low",
+      "example": "The agency kept the records secret from the American people.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "FW-002"
+      ],
+      "phrases": [
+        "the American people"
+      ]
+    },
+    {
+      "rule": "CO-001",
+      "technique": "CAUSAL_OVERSIMPLIFICATION",
+      "tier": "high",
+      "example": "The only reason prices rose is the new tax.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "CO-001"
+      ],
+      "phrases": [
+        "The only reason"
+      ]
+    },
+    {
+      "rule": "SL-001",
+      "technique": "SLOGANS",
+      "tier": "high",
+      "example": "Supporters chanted drain the swamp at the rally.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "SL-001"
+      ],
+      "phrases": [
+        "drain the swamp"
+      ]
+    },
+    {
+      "rule": "SL-002",
+      "technique": "SLOGANS",
+      "tier": "medium",
+      "example": "The party must win at all costs.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "SL-002"
+      ],
+      "phrases": [
+        "at all costs"
+      ]
+    },
+    {
+      "rule": "AA-001",
+      "technique": "APPEAL_TO_AUTHORITY",
+      "tier": "medium",
+      "example": "Experts say the policy will fail.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "AA-001"
+      ],
+      "phrases": [
+        "Experts say"
+      ]
+    },
+    {
+      "rule": "AA-002",
+      "technique": "APPEAL_TO_AUTHORITY",
+      "tier": "high",
+      "example": "Critics argue that it fails.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "AA-002"
+      ],
+      "phrases": [
+        "Critics argue"
+      ]
+    },
+    {
+      "rule": "BF-001",
+      "technique": "BLACK_AND_WHITE_FALLACY",
+      "tier": "high",
+      "example": "There is no middle ground on this issue.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "BF-001"
+      ],
+      "phrases": [
+        "no middle ground"
+      ]
+    },
+    {
+      "rule": "BF-002",
+      "technique": "BLACK_AND_WHITE_FALLACY",
+      "tier": "medium",
+      "example": "Either you support the plan or you oppose progress.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "BF-002"
+      ],
+      "phrases": [
+        "Either you"
+      ]
+    },
+    {
+      "rule": "TT-001",
+      "technique": "THOUGHT_TERMINATING_CLICHES",
+      "tier": "high",
+      "example": "The decision is final. End of discussion.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "TT-001"
+      ],
+      "phrases": [
+        "End of discussion"
+      ]
+    },
+    {
+      "rule": "BW-001",
+      "technique": "BANDWAGON_REDUCTIO_AD_HITLERUM",
+      "tier": "medium",
+      "example": "Everyone knows the plan will fail.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "BW-001"
+      ],
+      "phrases": [
+        "Everyone knows"
+      ]
+    },
+    {
+      "rule": "BW-002",
+      "technique": "BANDWAGON_REDUCTIO_AD_HITLERUM",
+      "tier": "low",
+      "example": "He made Stalinist statements about taking guns first.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "BW-002"
+      ],
+      "phrases": [
+        "Stalinist"
+      ]
+    },
+    {
+      "rule": "SM-001",
+      "technique": "STRAW_MAN_WHATABOUTISM_RED_HERRING",
+      "tier": "medium",
+      "example": "But what about the scandal in the other party?",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "SM-001"
+      ],
+      "phrases": [
+        "But what about"
+      ]
+    },
+    {
+      "rule": "EX-004",
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "tier": "low",
+      "example": "This is the greatest threat our civilization has ever faced.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "EX-004"
+      ],
+      "phrases": [
+        "the greatest threat our civilization has ever faced"
+      ]
+    },
+    {
+      "rule": "CO-002",
+      "technique": "CAUSAL_OVERSIMPLIFICATION",
+      "tier": "medium",
+      "example": "The strike would end tomorrow if the union simply gave up.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "CO-002"
+      ],
+      "phrases": [
+        "simply gave up"
+      ]
+    },
+    {
+      "rule": "AA-003",
+      "technique": "APPEAL_TO_AUTHORITY",
+      "tier": "medium",
+      "example": "Our leaders said the plan is necessary, so there is no reason to question it.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "AA-003"
+      ],
+      "phrases": [
+        "there is no reason to question it"
+      ]
+    },
+    {
+      "rule": "LL-013",
+      "technique": "LOADED_LANGUAGE",
+      "tier": "medium",
+      "example": "Migrants are flooding our borders every day.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "LL-013"
+      ],
+      "phrases": [
+        "flooding our borders"
+      ]
+    },
+    {
+      "rule": "LL-014",
+      "technique": "LOADED_LANGUAGE",
+      "tier": "low",
+      "example": "It was a smear campaign built on bogus claims.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "LL-014",
+        "LL-014"
+      ],
+      "phrases": [
+        "smear",
+        "bogus"
+      ]
+    },
+    {
+      "rule": "RP-001",
+      "technique": "REPETITION",
+      "tier": "low",
+      "example": "What this country needs is jobs, jobs, jobs.",
+      "ruleFired": true,
+      "techniqueDetected": true,
+      "detectedBy": [
+        "RP-001"
+      ],
+      "phrases": [
+        "jobs, jobs"
+      ]
+    }
+  ],
+  "perTechnique": [
+    {
+      "technique": "LOADED_LANGUAGE",
+      "rules": 7,
+      "ruleIds": [
+        "LL-007",
+        "LL-011",
+        "LL-012",
+        "LL-015",
+        "LL-016",
+        "LL-013",
+        "LL-014"
+      ],
+      "tiers": {
+        "high": 0,
+        "medium": 5,
+        "low": 2
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "NAME_CALLING_LABELING",
+      "rules": 5,
+      "ruleIds": [
+        "NC-004",
+        "NC-005",
+        "NC-001",
+        "NC-002",
+        "NC-003"
+      ],
+      "tiers": {
+        "high": 0,
+        "medium": 2,
+        "low": 3
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "REPETITION",
+      "rules": 1,
+      "ruleIds": [
+        "RP-001"
+      ],
+      "tiers": {
+        "high": 0,
+        "medium": 0,
+        "low": 1
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "EXAGGERATION_MINIMIZATION",
+      "rules": 4,
+      "ruleIds": [
+        "EX-001",
+        "EX-002",
+        "EX-003",
+        "EX-004"
+      ],
+      "tiers": {
+        "high": 1,
+        "medium": 1,
+        "low": 2
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "DOUBT",
+      "rules": 4,
+      "ruleIds": [
+        "DB-001",
+        "DB-002",
+        "DB-003",
+        "DB-004"
+      ],
+      "tiers": {
+        "high": 0,
+        "medium": 3,
+        "low": 1
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "APPEAL_TO_FEAR_PREJUDICE",
+      "rules": 3,
+      "ruleIds": [
+        "FE-001",
+        "FE-002",
+        "FE-003"
+      ],
+      "tiers": {
+        "high": 0,
+        "medium": 2,
+        "low": 1
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "FLAG_WAVING",
+      "rules": 2,
+      "ruleIds": [
+        "FW-001",
+        "FW-002"
+      ],
+      "tiers": {
+        "high": 1,
+        "medium": 0,
+        "low": 1
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "CAUSAL_OVERSIMPLIFICATION",
+      "rules": 2,
+      "ruleIds": [
+        "CO-001",
+        "CO-002"
+      ],
+      "tiers": {
+        "high": 1,
+        "medium": 1,
+        "low": 0
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "SLOGANS",
+      "rules": 2,
+      "ruleIds": [
+        "SL-001",
+        "SL-002"
+      ],
+      "tiers": {
+        "high": 1,
+        "medium": 1,
+        "low": 0
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "APPEAL_TO_AUTHORITY",
+      "rules": 3,
+      "ruleIds": [
+        "AA-001",
+        "AA-002",
+        "AA-003"
+      ],
+      "tiers": {
+        "high": 1,
+        "medium": 2,
+        "low": 0
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "BLACK_AND_WHITE_FALLACY",
+      "rules": 2,
+      "ruleIds": [
+        "BF-001",
+        "BF-002"
+      ],
+      "tiers": {
+        "high": 1,
+        "medium": 1,
+        "low": 0
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "THOUGHT_TERMINATING_CLICHES",
+      "rules": 1,
+      "ruleIds": [
+        "TT-001"
+      ],
+      "tiers": {
+        "high": 1,
+        "medium": 0,
+        "low": 0
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "BANDWAGON_REDUCTIO_AD_HITLERUM",
+      "rules": 2,
+      "ruleIds": [
+        "BW-001",
+        "BW-002"
+      ],
+      "tiers": {
+        "high": 0,
+        "medium": 1,
+        "low": 1
+      },
+      "referenceExampleDetected": true
+    },
+    {
+      "technique": "STRAW_MAN_WHATABOUTISM_RED_HERRING",
+      "rules": 1,
+      "ruleIds": [
+        "SM-001"
+      ],
+      "tiers": {
+        "high": 0,
+        "medium": 1,
+        "low": 0
+      },
+      "referenceExampleDetected": true
+    }
+  ]
+}
