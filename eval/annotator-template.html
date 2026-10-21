@@ -69,6 +69,13 @@
   .p2item .row input { flex: 1; min-width: 180px; font-size: 13px; }
   .p2item button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
   .locked #artBody { cursor: default; }
+  .banner { background: #2f7a4a; color: #fff; padding: 10px 16px; font-size: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  #p2view .banner { border-radius: 8px; margin-bottom: 12px; }
+  [hidden] { display: none !important; } /* display rules above must not override the hidden attribute */
+  .banner button { background: #fff; color: #1d1d1f; border-color: #fff; font-weight: 600; }
+  .banner button:disabled { opacity: .55; cursor: default; }
+  #p2Btn.wait { opacity: .6; }
+  #p2Btn.ready { background: var(--done); color: #fff; border-color: var(--done); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -81,14 +88,16 @@
       <li>Mark only <b>clear cases</b>. Unsure? Leave it out.</li>
       <li>Select only the <b>words that carry the technique</b>, not the whole sentence.</li>
       <li>Skip <span class="q">grey text</span>: it is quoted speech.</li>
+      <li>One phrase, two techniques? Mark it twice.</li>
+      <li>Many articles have <b>nothing to mark</b>. That is fine: tick "finished" and go to the next one.</li>
       <li>Work <b>alone</b>.</li>
     </ul>
     <h3>Steps</h3>
     <ol>
-      <li><b>Here:</b> mark all 30 articles and tick "finished" on each. Then click <b>Export CSV</b> and send the file.</li>
+      <li><b>Here:</b> mark all 30 articles and tick "finished" on each. Then click <b>Export Phase 1 CSV</b> and send the file.</li>
       <li><b>Then</b> click <b>Phase 2</b> (top bar): mark each of the 19 phrases <b>Valid</b> or <b>Not Valid</b>, then click <b>Export Phase 2 CSV</b> and send the file. Opening Phase 2 locks Step 1.</li>
     </ol>
-    <p class="hint">Use the same browser every time; your work saves automatically. Export CSV at the end of every sitting as a backup.</p>
+    <p class="hint">Use the same browser every time; your work saves automatically. Export Phase 1 CSV at the end of every sitting as a backup.</p>
   </div>
   <p><select id="who"><option value="">Validator…</option><option>V1</option><option>V2</option><option>V3</option></select>
   <button class="primary" id="go">Start</button></p>
@@ -102,16 +111,18 @@
   <span id="savedAt">Not saved yet</span>
   <button id="guideBtn" aria-expanded="false">Guide</button>
   <button id="importBtn">Import CSV</button>
-  <button class="primary" id="exportBtn">Export CSV</button>
+  <button class="primary" id="exportBtn">Export Phase 1 CSV</button>
   <button id="p2Btn">Phase 2</button>
   <input type="file" id="importFile" accept=".csv" hidden>
 </header>
-<div id="storageWarn" hidden><b>Autosave is not working in this browser</b> (private window or blocked site data). Your marks will be lost when you close this page: click <b>Export CSV</b> often, and use <b>Import CSV</b> to continue later.</div>
+<div id="storageWarn" hidden><b>Autosave is not working in this browser</b> (private window or blocked site data). Your marks will be lost when you close this page: click <b>Export Phase 1 CSV</b> often, and use <b>Import CSV</b> to continue later.</div>
+<div id="nextStep" class="banner" hidden></div>
 <div id="guidePanel" class="card" hidden></div>
 <section id="p2view" class="card" hidden>
   <h2 style="margin-top:0">Phase 2: judge the highlighted phrases</h2>
   <p class="hint">For each phrase: <b>Valid</b> if it reasonably shows the technique named, otherwise <b>Not Valid</b>. Unsure? <b>Not Valid</b>. Judge the wording only.</p>
   <div class="p2bar"><span id="p2Count"></span><button class="primary" id="p2Export">Export Phase 2 CSV</button><button id="p2Back">Back to articles (read only)</button></div>
+  <div id="p2Done" class="banner" hidden>All 19 phrases are judged. Click <b>Export Phase 2 CSV</b> and send the file to the researchers. You are done.</div>
   <div id="p2List"></div>
 </section>
 <main>
@@ -156,6 +167,26 @@ var DATA = /*__DATA__*/null;
     return s;
   }
   function phase1Locked() { return !!(state && state.p2.open); }
+  // Article order (thesis 7): the framing set first, News 1 to News 5 in a fixed order (Left, Center,
+  // Right of each event), then the 15 general-set articles in a random order that differs per validator
+  // (seeded by the validator number, so it is the same every time that validator opens the page).
+  // Validators see neutral labels ("Article 7"); the real IDs (which encode the outlet group) appear
+  // only in the exported files.
+  var ARTS = DATA.articles, POS = {};
+  function label(id) { return POS[id] === undefined ? id : "Article " + (POS[id] + 1); }
+  function seeded(seed) {
+    return function () { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; var t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  function articleOrder(validator) {
+    var byId = {};
+    DATA.articles.forEach(function (a) { byId[a.id] = a; });
+    var framing = [];
+    for (var n = 1; n <= 5; n++) ["L", "C", "R"].forEach(function (g) { var a = byId[g + "0" + n]; if (a) framing.push(a); });
+    var general = DATA.articles.filter(function (a) { return framing.indexOf(a) < 0; });
+    var rnd = seeded(2026 + Number(String(validator).replace(/[^0-9]/g, "") || 0));
+    for (var i = general.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var t = general[i]; general[i] = general[j]; general[j] = t; }
+    return framing.concat(general);
+  }
   var P2 = [];
   if (DATA.p2) {
     try { P2 = JSON.parse(decodeURIComponent(escape(atob(DATA.p2)))); } catch (e) { P2 = []; }
@@ -217,10 +248,10 @@ var DATA = /*__DATA__*/null;
   }
 
   function render() {
-    var art = DATA.articles[current];
+    var art = ARTS[current];
     $("articleSel").value = String(current);
-    $("artTitle").textContent = art.title || art.id;
-    $("artMeta").textContent = art.id + (art.url ? " · " + art.url : "");
+    $("artTitle").textContent = art.title || label(art.id);
+    $("artMeta").textContent = label(art.id) + " of " + ARTS.length;
     var anns = state.anns.filter(function (a) { return a.articleId === art.id; }).sort(function (a, b) { return a.start - b.start; });
     $("artBody").innerHTML = paragraphs(art.text).map(function (p) {
       return '<p data-off="' + p.offset + '" data-len="' + p.text.length + '">' + renderPara(p, anns, quoteRanges(p.text)) + "</p>";
@@ -239,14 +270,14 @@ var DATA = /*__DATA__*/null;
     $("doneBox").checked = !!state.done[art.id];
     $("doneBox").disabled = phase1Locked();
     document.body.classList.toggle("locked", phase1Locked());
-    $("p2Btn").textContent = state.p2.open ? "Phase 2" : "Phase 2 (locked until all 30 are finished)";
+    renderNextStep();
     if (state.p2.open) $("artMeta").textContent += " · Phase 1 is locked (read only)";
     var nDone = DATA.articles.filter(function (x) { return state.done[x.id]; }).length;
     $("barFill").style.width = (100 * nDone / DATA.articles.length) + "%";
     $("progText").textContent = nDone + " / " + DATA.articles.length + " done";
     Array.prototype.forEach.call($("articleSel").options, function (o, i) {
-      var x = DATA.articles[i];
-      o.textContent = (state.done[x.id] ? "✓ " : "   ") + x.id + " – " + (x.title || "").slice(0, 50);
+      var x = ARTS[i];
+      o.textContent = (state.done[x.id] ? "✓ " : "   ") + label(x.id) + " – " + (x.title || "").slice(0, 50);
     });
   }
 
@@ -268,7 +299,7 @@ var DATA = /*__DATA__*/null;
     if (!$("artBody").contains(r.commonAncestorContainer)) return;
     var s = absOffset(r.startContainer, r.startOffset), e = absOffset(r.endContainer, r.endOffset);
     if (s === null || e === null || e <= s) return;
-    var text = DATA.articles[current].text;
+    var text = ARTS[current].text;
     while (s < e && /\s/.test(text[s])) s++;
     while (e > s && /\s/.test(text[e - 1])) e--;
     if (e <= s) return;
@@ -284,7 +315,7 @@ var DATA = /*__DATA__*/null;
   }
 
   function addAnn(techKey) {
-    var art = DATA.articles[current];
+    var art = ARTS[current];
     state.seq += 1;
     var text = art.text.slice(pending.start, pending.end);
     state.anns.push({
@@ -317,24 +348,53 @@ var DATA = /*__DATA__*/null;
     a.href = URL.createObjectURL(blob);
     a.download = who + "-phase1-" + new Date().toISOString().slice(0, 10) + ".csv";
     a.click();
+    var wasExported = state.p2.exported1;
     state.p2.exported1 = true;
     save();
     toast("Exported " + state.anns.length + " marks. Send this file to the researchers.");
+    render();
+    // The first export after finishing all 30 articles leads straight on to Phase 2.
+    if (allDone() && !state.p2.open && P2.length && !wasExported) setTimeout(openPhase2, 400);
   }
 
   // ---- Phase 2 -------------------------------------------------------------
   function allDone() { return DATA.articles.every(function (x) { return state.done[x.id]; }); }
+  var LOCK_MSG = "Go to Phase 2 now?\n\nPhase 2 shows the extension's highlights, so Phase 1 will be locked: you can no longer add or remove marks.\n\nMake sure you saved your Phase 1 CSV file.";
+  // The step banner and the Phase 2 button show where the validator is in the two phases.
+  function renderNextStep() {
+    var nDone = DATA.articles.filter(function (x) { return state.done[x.id]; }).length;
+    var b = $("p2Btn"), banner = $("nextStep");
+    if (state.p2.open) {
+      b.textContent = "Phase 2"; b.className = "ready";
+      banner.hidden = true;
+      return;
+    }
+    if (!P2.length || nDone < DATA.articles.length) {
+      b.textContent = "Phase 2 (" + nDone + "/" + DATA.articles.length + " done)"; b.className = "wait";
+      banner.hidden = true;
+      return;
+    }
+    b.textContent = "Go to Phase 2"; b.className = state.p2.exported1 ? "ready" : "wait";
+    banner.hidden = false;
+    banner.innerHTML = "<b>All " + DATA.articles.length + " articles finished.</b>" +
+      '<button id="nsExport">' + (state.p2.exported1 ? "✓ 1. Phase 1 CSV exported (export again)" : "1. Export Phase 1 CSV") + "</button>" +
+      '<button id="nsGo"' + (state.p2.exported1 ? "" : " disabled") + ">2. Go to Phase 2 →</button>";
+    $("nsExport").onclick = exportCsv;
+    $("nsGo").onclick = openPhase2;
+  }
   function openPhase2() {
     if (!P2.length) return toast("This file has no Phase 2 phrases.");
     if (!state.p2.open) {
-      if (!allDone()) return toast("Finish all 30 articles first (tick \"finished\" on each).");
-      if (!state.p2.exported1) return toast("Click Export CSV first and keep the Phase 1 file.");
-      if (!confirm("Open Phase 2?\n\nYou will see the extension's highlights, so Phase 1 will be locked: you can no longer add or remove marks.")) return;
+      var nDone = DATA.articles.filter(function (x) { return state.done[x.id]; }).length;
+      if (!allDone()) return toast("Phase 2 opens after all 30 articles are finished (" + nDone + " of " + DATA.articles.length + " done). Tick \"I have finished this article\" on each.");
+      if (!state.p2.exported1) return toast("First click \"Export Phase 1 CSV\" and keep the file.");
+      if (!confirm(LOCK_MSG)) return;
       state.p2.open = true;
       save();
     }
     $("p2view").hidden = false;
     document.querySelector("main").hidden = true;
+    renderNextStep(); // Phase 2 is open now: hides the step banner and relabels the button
     $("guidePanel").hidden = true;
     renderPhase2();
     window.scrollTo(0, 0);
@@ -352,18 +412,24 @@ var DATA = /*__DATA__*/null;
   function renderPhase2() {
     var n = P2.filter(function (r) { return state.p2.judgment[r[0]]; }).length;
     $("p2Count").textContent = n + " / " + P2.length + " judged";
+    $("p2Done").hidden = n < P2.length;
     $("p2List").innerHTML = "";
     P2.forEach(function (r) {
       var id = r[0], j = state.p2.judgment[id] || "";
       var div = document.createElement("div");
       div.className = "p2item";
-      div.innerHTML = '<div class="head"><b>' + esc(id) + "</b> · " + esc(r[1]) + " · Technique: <b>" + esc(r[4]) + "</b></div>" +
+      div.innerHTML = '<div class="head"><b>' + esc(id) + "</b> · " + esc(label(r[1])) + " · Technique: <b>" + esc(r[4]) + "</b></div>" +
         '<div class="sent">' + sentenceHtml(r[3], r[2]) + "</div>" +
         '<div class="row"><button data-v="Valid"' + (j === "Valid" ? ' class="on"' : "") + ">Valid</button>" +
         '<button data-v="Not Valid"' + (j === "Not Valid" ? ' class="on"' : "") + ">Not Valid</button>" +
         '<input type="text" placeholder="Comment (optional)" value="' + esc(state.p2.comment[id] || "") + '"></div>';
       div.querySelectorAll("button").forEach(function (b) {
-        b.onclick = function () { state.p2.judgment[id] = b.dataset.v; save(); renderPhase2(); };
+        b.onclick = function () {
+          var wasComplete = P2.every(function (x) { return state.p2.judgment[x[0]]; });
+          state.p2.judgment[id] = b.dataset.v; save(); renderPhase2();
+          // The last judgment is usually at the bottom of the list: bring the "all judged" note into view.
+          if (!wasComplete && P2.every(function (x) { return state.p2.judgment[x[0]]; })) $("p2Done").scrollIntoView({ behavior: "smooth", block: "center" });
+        };
       });
       div.querySelector("input").onchange = function (ev) { state.p2.comment[id] = ev.target.value; save(); };
       $("p2List").appendChild(div);
@@ -419,6 +485,9 @@ var DATA = /*__DATA__*/null;
     $("start").hidden = true; $("app").hidden = false;
     $("whoLabel").textContent = who;
     state = load();
+    ARTS = articleOrder(who);
+    POS = {};
+    ARTS.forEach(function (a, i) { POS[a.id] = i; });
     if (!storageWorks()) { $("storageWarn").hidden = false; $("savedAt").textContent = "NOT saved - export CSV"; }
     $("articleSel").innerHTML = DATA.articles.map(function (a, i) { return '<option value="' + i + '"></option>'; }).join("");
     $("techList").innerHTML = techs.map(function (t) {
@@ -437,7 +506,7 @@ var DATA = /*__DATA__*/null;
   $("nextBtn").onclick = function () { if (current < DATA.articles.length - 1) { current++; render(); window.scrollTo(0, 0); } };
   $("doneBox").onchange = function () {
     if (phase1Locked()) { this.checked = !this.checked; return toast("Phase 1 is locked because Phase 2 was opened."); }
-    state.done[DATA.articles[current].id] = this.checked; save(); render();
+    state.done[ARTS[current].id] = this.checked; save(); render();
   };
   $("exportBtn").onclick = exportCsv;
   // The same short guide as the start screen, shown again on demand.

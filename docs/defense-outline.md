@@ -16,6 +16,6 @@
 12. **[after results] Validator agreement (RQ2, Gate 1)**: Fleiss' kappa, percent agreement, Gwet's AC1.
 13. **[after results] Error analysis**: main false-positive causes by technique.
 14. **[after results] Usability (RQ3, RQ4)**: construct means, Cronbach's alpha, task completion T1-T4.
-15. **Cross-outlet framing (8.7)**: framing set of 5 events x L/C/R: 7 highlights in total (Left 4, Center 2, Right 1); 9 of 15 articles none; descriptive only [`eval/reports/framing-comparison.md`].
+15. **Cross-outlet framing (8.7)**: framing set of 5 events x L/C/R: 7 highlights in total (Left 4, Center 2, Right 1); 10 of 15 articles none; descriptive only [`eval/reports/framing-comparison.md`].
 16. **Limitations**: English only; small samples; SemEval label sparsity; quoted speech not analyzed; late-loading pages not scanned; plain local pages for timing; outlet labels are contextual anchors [Ch 5 outline 5.4].
 17. **Conclusions and recommendations** [Ch 5].
