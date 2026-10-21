@@ -27,7 +27,8 @@ const csv = require("./csv.js");
 const M = require("./metrics.js");
 const R = require("./reference-set.js");
 
-const GATE2_REVISED = "Gate 2 (proposed revision, pending adviser approval): pipeline strict FPR < baseline strict FPR";
+// Section 8.3 comparison, not a validation gate (Gate 2 is the SemEval calibration, reported in Chapter 4).
+const BASELINE_CHECK = "Baseline comparison (8.3): pipeline strict FPR < keyword baseline strict FPR";
 
 function parseVote(raw) {
   const v = String(raw || "").trim().toLowerCase();
@@ -172,9 +173,11 @@ function score(input) {
   if (report.phase2) gates.push({ name: "Validation Gate 1: Fleiss' kappa >= " + M.GATES.kappaMin, pass: report.phase2.kappa !== null && report.phase2.kappa >= M.GATES.kappaMin, value: report.phase2.kappa });
   const p = report.fullPipeline.strict.precision;
   gates.push({ name: "EC1: pipeline precision >= " + M.GATES.formalPrecisionMin, pass: p !== null && p >= M.GATES.formalPrecisionMin, value: p });
+  const rc = report.fullPipeline.strict.recall;
+  gates.push({ name: "EC1: pipeline recall >= " + M.GATES.formalRecallMin, pass: rc !== null && rc >= M.GATES.formalRecallMin, value: rc });
   const fp = report.fullPipeline.strict.fpr;
   const fb = report.baseline.strict.fpr;
-  gates.push({ name: GATE2_REVISED, pass: fp !== null && fb !== null && fp < fb, value: fp });
+  gates.push({ name: BASELINE_CHECK, pass: fp !== null && fb !== null && fp < fb, value: fp });
   report.gates = gates;
   report.judgmentsUsable = report.phase2 ? gates[0].pass : null;
   return report;

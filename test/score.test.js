@@ -169,7 +169,10 @@ test("score: reference set, pipeline vs baseline, and the gates", () => {
 
   assert.equal(r.phase2, null);
   assert.equal(r.judgmentsUsable, null);
-  assert.deepEqual(r.gates.map((g) => g.pass), [true, true]); // EC1 0.667 >= 0.50; pipeline FPR 0.333 < baseline 0.6
+  // EC1 precision 0.667 >= 0.50; EC1 recall 1.0 >= 0.30; pipeline FPR 0.333 < baseline 0.6
+  assert.deepEqual(r.gates.map((g) => g.pass), [true, true, true]);
+  assert.match(r.gates[1].name, /EC1: pipeline recall >= 0\.3/);
+  assert.match(r.gates[2].name, /^Baseline comparison \(8\.3\)/);
 });
 
 test("Phase 1 agreement: mean pairwise span F1, IoU >= 0.50 and same technique (7.4)", () => {
