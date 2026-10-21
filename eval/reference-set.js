@@ -4,16 +4,21 @@
  *  - Validators annotate clean article copies independently (Phase 1). Each annotation is the span
  *    text they copied, the technique they chose, and the sentence it sits in.
  *  - locateSpan() turns that text back into character offsets in the article.
- *  - buildReference() keeps a span when at least 2 of the 3 validators marked overlapping text:
+ *  - Two spans match when their token-level Intersection over Union is at least 0.50 (7.2):
+ *    IoU(A, B) = |A ∩ B| / |A ∪ B| over the word tokens each span touches. This is the primary
+ *    rule. The secondary rule, "any overlap" (at least one shared character), is the one
+ *    eval/calibrate.js uses for Gate 2, so the two sets of numbers can be compared.
+ *  - buildReference() keeps a span when at least 2 of the 3 validators marked matching text:
  *    "strict" groups require the same technique, "lenient" groups ignore technique.
- *  - scoreSpans() scores highlights against the reference set with the same overlap rule as
- *    eval/calibrate.js (Gate 2), so the two sets of numbers can be compared.
+ *  - scoreSpans() scores highlights against the reference set with the same matching rule.
  *
  * Pure functions, Node-testable. Not part of the shipped extension.
  */
 "use strict";
 
 const MIN_AGREE = 2;
+const IOU_MIN = 0.5;
+const TOKEN = /[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu;
 
 const QUOTES = "\"'“”‘’";
 
@@ -63,15 +68,66 @@ function overlaps(a, b) {
   return a.articleId === b.articleId && a.start < b.end && b.start < a.end;
 }
 
+/** Word tokens of a text as [{start, end}] character ranges. */
+function tokenize(text) {
+  const out = [];
+  let m;
+  TOKEN.lastIndex = 0;
+  while ((m = TOKEN.exec(text)) !== null) out.push({ start: m.index, end: m.index + m[0].length });
+  return out;
+}
+
 /**
- * annotations: [{validator, articleId, technique, start, end}] (already located).
- * Groups annotations that overlap (chained) within the same article (and technique, unless
- * lenient). A group marked by >= 2 distinct validators becomes one reference span covering
- * the extent of the group. Returns [{articleId, technique, start, end, validators}].
+ * Adds token indexes to spans: tokStart..tokEnd (end exclusive) are the tokens the span's
+ * characters touch. texts: {articleId: text}. Returns new objects; the input is not changed.
+ */
+function withTokens(spans, texts) {
+  const cache = {};
+  return spans.map((s) => {
+    const toks = cache[s.articleId] || (cache[s.articleId] = tokenize(texts[s.articleId] || ""));
+    let tokStart = -1;
+    let tokEnd = -1;
+    toks.forEach((t, i) => {
+      if (t.start < s.end && s.start < t.end) {
+        if (tokStart < 0) tokStart = i;
+        tokEnd = i + 1;
+      }
+    });
+    return Object.assign({}, s, tokStart < 0 ? { tokStart: 0, tokEnd: 0 } : { tokStart: tokStart, tokEnd: tokEnd });
+  });
+}
+
+/** Token-level IoU of two spans that carry tokStart/tokEnd (0 for different articles or no tokens). */
+function iou(a, b) {
+  if (a.articleId !== b.articleId) return 0;
+  if (a.tokStart === undefined || b.tokStart === undefined) throw new Error("iou() needs spans with token indexes: call withTokens() first");
+  const inter = Math.max(0, Math.min(a.tokEnd, b.tokEnd) - Math.max(a.tokStart, b.tokStart));
+  const union = a.tokEnd - a.tokStart + (b.tokEnd - b.tokStart) - inter;
+  return union > 0 ? inter / union : 0;
+}
+
+/** "iou" (primary, IoU >= 0.50) or "overlap" (secondary, any shared character). */
+function matcher(mode) {
+  if (mode === "overlap") return overlaps;
+  if (mode === "iou") return (a, b) => iou(a, b) >= IOU_MIN;
+  throw new Error("unknown match rule: " + mode);
+}
+
+/**
+ * annotations: [{validator, articleId, technique, start, end}] (already located; with "iou"
+ * they also need tokStart/tokEnd from withTokens()). Annotations of the same article (and
+ * technique, unless lenient) that match are grouped, transitively. A group marked by >= 2
+ * distinct validators becomes one reference span. Its extent is the union of the group with
+ * "overlap"; with "iou" it is the group's most central annotation (highest summed IoU with the
+ * others; ties go to the earlier, then the longer span), so a reference span is always a span
+ * a validator actually marked. Returns [{articleId, technique, start, end, validators}].
+ * opts: {lenient, minAgree, match: "iou" (default) | "overlap"}.
  */
 function buildReference(annotations, opts) {
   const lenient = !!(opts && opts.lenient);
   const minAgree = (opts && opts.minAgree) || MIN_AGREE;
+  const mode = (opts && opts.match) || "iou";
+  const same = matcher(mode);
   const buckets = {};
   annotations.forEach((a) => {
     const k = a.articleId + "\u0000" + (lenient ? "" : a.technique);
@@ -80,27 +136,30 @@ function buildReference(annotations, opts) {
   const ref = [];
   Object.keys(buckets).forEach((k) => {
     const list = buckets[k].slice().sort((x, y) => x.start - y.start || x.end - y.end);
-    let group = null;
-    const flush = () => {
-      if (!group) return;
-      const validators = Array.from(new Set(group.items.map((g) => g.validator))).sort();
-      if (validators.length >= minAgree) {
-        const counts = {};
-        group.items.forEach((g) => (counts[g.technique] = (counts[g.technique] || 0) + 1));
-        const technique = Object.keys(counts).sort((x, y) => counts[y] - counts[x] || (x < y ? -1 : 1))[0];
-        ref.push({ articleId: group.items[0].articleId, technique: technique, start: group.start, end: group.end, validators: validators });
-      }
-    };
-    list.forEach((a) => {
-      if (group && a.start < group.end) {
-        group.items.push(a);
-        group.end = Math.max(group.end, a.end);
+    // Connected groups under the matching rule (union-find).
+    const parent = list.map((_, i) => i);
+    const root = (i) => (parent[i] === i ? i : (parent[i] = root(parent[i])));
+    for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) if (same(list[i], list[j])) parent[root(j)] = root(i);
+    const groups = {};
+    list.forEach((a, i) => (groups[root(i)] = groups[root(i)] || []).push(a));
+    Object.keys(groups).forEach((g) => {
+      const items = groups[g];
+      const validators = Array.from(new Set(items.map((x) => x.validator))).sort();
+      if (validators.length < minAgree) return;
+      const counts = {};
+      items.forEach((x) => (counts[x.technique] = (counts[x.technique] || 0) + 1));
+      const technique = Object.keys(counts).sort((x, y) => counts[y] - counts[x] || (x < y ? -1 : 1))[0];
+      let extent;
+      if (mode === "overlap") {
+        extent = { start: Math.min(...items.map((x) => x.start)), end: Math.max(...items.map((x) => x.end)) };
       } else {
-        flush();
-        group = { start: a.start, end: a.end, items: [a] };
+        const central = (x) => items.reduce((sum, y) => sum + (x === y ? 0 : iou(x, y)), 0);
+        extent = items.slice().sort((x, y) => central(y) - central(x) || x.start - y.start || y.end - x.end)[0];
       }
+      const span = { articleId: items[0].articleId, technique: technique, start: extent.start, end: extent.end, validators: validators };
+      if (mode === "iou") Object.assign(span, { tokStart: extent.tokStart, tokEnd: extent.tokEnd });
+      ref.push(span);
     });
-    flush();
   });
   return ref.sort((x, y) => (x.articleId < y.articleId ? -1 : x.articleId > y.articleId ? 1 : x.start - y.start));
 }
@@ -123,10 +182,12 @@ function stats(tp, flagged, found, refTotal) {
  * highlights: [{articleId, technique, start, end}]; reference: output of buildReference.
  * ignoreTechnique: true for the lenient score (any reference span counts).
  * Returns overall and per-technique precision / recall / F1 / FPR.
+ * match: "iou" (default; spans need withTokens()) or "overlap".
  * Per technique, precision is over that technique's highlights and recall over its reference spans.
  */
-function scoreSpans(highlights, reference, ignoreTechnique) {
-  const same = (h, r) => overlaps(h, r) && (ignoreTechnique || h.technique === r.technique);
+function scoreSpans(highlights, reference, ignoreTechnique, match) {
+  const hit = matcher(match || "iou");
+  const same = (h, r) => hit(h, r) && (ignoreTechnique || h.technique === r.technique);
   const hitH = highlights.map((h) => reference.some((r) => same(h, r)));
   const hitR = reference.map((r) => highlights.some((h) => same(h, r)));
   const count = (arr, pred) => arr.filter(pred).length;
@@ -152,4 +213,4 @@ function techniqueResolver(techniques) {
   return (name) => map[norm(name)] || null;
 }
 
-module.exports = { MIN_AGREE: MIN_AGREE, locateSpan: locateSpan, buildReference: buildReference, scoreSpans: scoreSpans, techniqueResolver: techniqueResolver };
+module.exports = { MIN_AGREE: MIN_AGREE, IOU_MIN: IOU_MIN, tokenize: tokenize, withTokens: withTokens, iou: iou, locateSpan: locateSpan, buildReference: buildReference, scoreSpans: scoreSpans, techniqueResolver: techniqueResolver };
