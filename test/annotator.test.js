@@ -29,7 +29,8 @@ test("buildData embeds every article, titles from exports, and only technique de
   assert.equal(d.articles[0].title, "Title L01");
   assert.equal(d.articles[1].title, "");
   assert.equal(d.techniques.length, 14);
-  assert.deepEqual(Object.keys(d.techniques[0]).sort(), ["description", "key", "label"]);
+  assert.deepEqual(Object.keys(d.techniques[0]).sort(), ["description", "example", "key", "label"]);
+  assert.equal(d.techniques[0].description, B.GUIDE[d.techniques[0].key][0], "definition comes from the validator guide");
   assert.match(d.buildId, /^[0-9a-f]{10}$/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
@@ -65,4 +66,17 @@ test("score.js falls back to text search when Start/End no longer match", () => 
   const r = S.score({ articles: { L01: text }, techniques: catalog.techniques, items: [], phase1: [rows, rows, rows], phase2: null });
   assert.equal(r.phase1.located, 3);
   assert.equal(r.phase1.referenceSpans, 1);
+});
+
+test("the annotator carries the guide's definitions and examples, and the examples match no rule", () => {
+  const B = require("../eval/build-annotator.js");
+  const catalog = require("../data/pattern-catalog.json");
+  const PM = require("../content/pattern-matcher.js");
+  assert.deepEqual(Object.keys(B.GUIDE).sort(), Object.keys(catalog.techniques).sort(), "one guide entry per technique");
+  Object.values(B.GUIDE).forEach(([, examples]) => {
+    examples.split(";").map((e) => e.trim().replace(/^"|"$/g, "")).forEach((e) => {
+      const hits = PM.findMatches(e, catalog.patterns, catalog.techniques, { mode: "lexicalOnly" });
+      assert.equal(hits.length, 0, "guide example matches a rule (priming): " + e + " -> " + hits.map((h) => h.id));
+    });
+  });
 });

@@ -51,13 +51,33 @@
   #storageWarn { background: var(--warn); color: #fff; padding: 8px 16px; font-size: 14px; }
   #toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 6px; font-size: 13px; display: none; z-index: 30; }
   .hint, .article p.hint { color: var(--muted); font: 13px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0 0 12px; }
-  #start { max-width: 520px; margin: 60px auto; }
+  #start { max-width: 560px; margin: 40px auto; }
+  .guide h3 { margin: 14px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .guide ul, .guide ol { margin: 0 0 8px; padding-left: 20px; font-size: 14px; }
+  .guide li { margin-bottom: 4px; }
+  #guidePanel { max-width: 1168px; margin: 16px auto 0; }
+  .tech i { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
 </style>
 </head>
 <body>
 <div id="start" class="card">
   <h2 style="margin-top:0">Article annotation (Phase 1)</h2>
-  <p class="hint">Choose your validator number. Your work is saved in this browser automatically. Use <b>Export CSV</b> to send it to the researchers (and as a backup).</p>
+  <div class="guide">
+    <h3>Rules</h3>
+    <ul>
+      <li>Judge the <b>wording only</b>: not the politics, not whether it is true.</li>
+      <li>Mark only <b>clear cases</b>. Unsure? Leave it out.</li>
+      <li>Select only the <b>words that carry the technique</b>, not the whole sentence.</li>
+      <li>Skip <span class="q">grey text</span>: it is quoted speech.</li>
+      <li>Work <b>alone</b>.</li>
+    </ul>
+    <h3>Steps</h3>
+    <ol>
+      <li><b>Here:</b> mark all 30 articles and tick "finished" on each. Then click <b>Export CSV</b> and send the file.</li>
+      <li><b>Then</b>, in your workbook (Phase 2 tab): mark each phrase <b>Valid</b> or <b>Not Valid</b>. Do not come back to change Step 1.</li>
+    </ol>
+    <p class="hint">Use the same browser every time; your work saves automatically. Export CSV at the end of every sitting as a backup.</p>
+  </div>
   <p><select id="who"><option value="">Validator…</option><option>V1</option><option>V2</option><option>V3</option></select>
   <button class="primary" id="go">Start</button></p>
 </div>
@@ -68,11 +88,13 @@
   <select id="articleSel" aria-label="Article"></select>
   <div class="progress"><div class="bar"><div id="barFill"></div></div><span id="progText"></span></div>
   <span id="savedAt">Not saved yet</span>
+  <button id="guideBtn" aria-expanded="false">Guide</button>
   <button id="importBtn">Import CSV</button>
   <button class="primary" id="exportBtn">Export CSV</button>
   <input type="file" id="importFile" accept=".csv" hidden>
 </header>
 <div id="storageWarn" hidden><b>Autosave is not working in this browser</b> (private window or blocked site data). Your marks will be lost when you close this page: click <b>Export CSV</b> often, and use <b>Import CSV</b> to continue later.</div>
+<div id="guidePanel" class="card" hidden></div>
 <main>
   <section class="card article">
     <h2 id="artTitle"></h2>
@@ -97,7 +119,7 @@ var DATA = /*__DATA__*/null;
 (function () {
   "use strict";
   var COLORS = ["#f4a259", "#e76f51", "#8ab17d", "#2a9d8f", "#e9c46a", "#b56576", "#6d597a", "#457b9d", "#f28482", "#84a59d", "#c9ada7", "#90be6d", "#bc6c25", "#7f5539"];
-  var techs = DATA.techniques.map(function (t, i) { return { key: t.key, label: t.label, description: t.description, color: COLORS[i % COLORS.length] }; });
+  var techs = DATA.techniques.map(function (t, i) { return { key: t.key, label: t.label, description: t.description, example: t.example || "", color: COLORS[i % COLORS.length] }; });
   var byKey = {};
   techs.forEach(function (t) { byKey[t.key] = t; });
   var who = null, state = null, current = 0, pending = null;
@@ -300,7 +322,8 @@ var DATA = /*__DATA__*/null;
     if (!storageWorks()) { $("storageWarn").hidden = false; $("savedAt").textContent = "NOT saved - export CSV"; }
     $("articleSel").innerHTML = DATA.articles.map(function (a, i) { return '<option value="' + i + '"></option>'; }).join("");
     $("techList").innerHTML = techs.map(function (t) {
-      return '<div class="tech" style="border-color:' + t.color + '"><b>' + esc(t.label) + "</b><span>" + esc(t.description) + "</span></div>";
+      return '<div class="tech" style="border-color:' + t.color + '"><b>' + esc(t.label) + "</b><span>" + esc(t.description) + "</span>" +
+        (t.example ? "<i>e.g. " + esc(t.example) + "</i>" : "") + "</div>";
     }).join("");
     $("picker").innerHTML = techs.map(function (t) {
       return '<button data-k="' + t.key + '"><span class="dot" style="background:' + t.color + '"></span>' + esc(t.label) + "</button>";
@@ -314,6 +337,15 @@ var DATA = /*__DATA__*/null;
   $("nextBtn").onclick = function () { if (current < DATA.articles.length - 1) { current++; render(); window.scrollTo(0, 0); } };
   $("doneBox").onchange = function () { state.done[DATA.articles[current].id] = this.checked; save(); render(); };
   $("exportBtn").onclick = exportCsv;
+  // The same short guide as the start screen, shown again on demand.
+  $("guidePanel").innerHTML = document.querySelector("#start .guide").innerHTML;
+  $("guideBtn").onclick = function () {
+    var open = $("guidePanel").hidden;
+    $("guidePanel").hidden = !open;
+    $("guidePanel").className = "card guide";
+    this.setAttribute("aria-expanded", String(open));
+    this.textContent = open ? "Hide guide" : "Guide";
+  };
   $("importBtn").onclick = function () { $("importFile").click(); };
   $("importFile").onchange = function () { if (this.files[0]) importCsv(this.files[0]); this.value = ""; };
   // Mouse: act when the button is released. Touch: the selection is adjusted with handles after
