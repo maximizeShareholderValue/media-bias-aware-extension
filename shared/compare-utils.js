@@ -43,7 +43,7 @@
     "pbs.org", "dw.com", "inquirer.net", "philstar.com", "gmanetwork.com", "rappler.com",
     // Center
     "reuters.com", "bbc.com", "bbc.co.uk", "economist.com", "ft.com", "upi.com", "thehill.com", "csmonitor.com",
-    "forbes.com", "latimes.com", "france24.com", "abs-cbn.com", "straitstimes.com", "channelnewsasia.com",
+    "forbes.com", "latimes.com", "france24.com", "news.abs-cbn.com", "straitstimes.com", "channelnewsasia.com",
     "japantimes.co.jp", "semafor.com", "foreignpolicy.com",
     // Right (incl. Center-Right)
     "foxnews.com", "nypost.com", "wsj.com", "breitbart.com", "dailywire.com", "washingtontimes.com",
