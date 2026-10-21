@@ -248,6 +248,15 @@
     else window.open(url, "_blank", "noopener");
   }
 
+  // One-sentence definitions of the ownership types (FR-CHK-03).
+  var OWNERSHIP_DEFINITIONS = {
+    "Corporate Chain": "Owned by a company that runs several media outlets.",
+    Independent: "Not owned by a larger media company or a government.",
+    "State-Affiliated": "Owned or mainly funded by a government.",
+    "Foundation-Funded": "Owned by or mainly funded through a non-profit foundation or donations.",
+    "Religious Organization": "Owned or run by a religious organization."
+  };
+
   // Ownership is only claimed when we have it (curated list); otherwise say so and send the reader to the MBFC review.
   function ownershipKnown(outlet) {
     return !!outlet.ownershipType && outlet.ownershipType !== "Unknown";
@@ -275,7 +284,25 @@
     var badge = document.createElement("span");
     badge.className = "ownership-badge" + (known ? "" : " ownership-badge--unknown");
     badge.textContent = known ? outlet.ownershipType : "Ownership not recorded";
-    sourceContent.appendChild(badge);
+    // FR-CHK-03: one-sentence definition of the ownership type, on hover, keyboard focus or tap.
+    var definition = known && OWNERSHIP_DEFINITIONS[outlet.ownershipType];
+    if (definition) {
+      var wrap = document.createElement("span");
+      wrap.className = "ownership-wrap";
+      var tip = document.createElement("span");
+      tip.className = "ownership-tip";
+      tip.id = "ownershipTip";
+      tip.setAttribute("role", "tooltip");
+      tip.textContent = definition;
+      badge.tabIndex = 0;
+      badge.setAttribute("aria-describedby", tip.id);
+      badge.addEventListener("click", () => wrap.classList.toggle("ownership-wrap--open"));
+      wrap.appendChild(badge);
+      wrap.appendChild(tip);
+      sourceContent.appendChild(wrap);
+    } else {
+      sourceContent.appendChild(badge);
+    }
 
     var grid = document.createElement("div");
     grid.className = "info-grid";
