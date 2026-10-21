@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T23:55:16.159Z",
+  "generatedAt": "2026-10-21T15:28:38.148Z",
   "budgetMs": 3000,
   "runsPerArticle": 10,
   "machine": {
@@ -13,9 +13,9 @@
   "overall": {
     "articles": 31,
     "measurements": 310,
-    "medianMs": 63,
-    "p95Ms": 123,
-    "maxMs": 185,
+    "medianMs": 67,
+    "p95Ms": 127,
+    "maxMs": 252,
     "allUnderBudget": true
   },
   "gate3Article": {
@@ -26,20 +26,26 @@
     "paragraphs": 60,
     "highlights": 1,
     "runs": [
-      156,
-      140,
-      119,
-      146,
-      117,
-      149,
+      130,
+      127,
+      132,
       131,
-      136,
+      131,
       134,
-      116
+      140,
+      142,
+      139,
+      128
     ],
-    "medianMs": 135,
-    "maxMs": 156,
-    "minMs": 116
+    "medianMs": 131.5,
+    "maxMs": 142,
+    "minMs": 127,
+    "stagesMedianMs": {
+      "extraction": 2.7,
+      "catalog": 2.95,
+      "matching": 120.45,
+      "rendering": 0.2
+    }
   },
   "perArticle": [
     {
@@ -50,20 +56,26 @@
       "paragraphs": 39,
       "highlights": 1,
       "runs": [
-        168,
-        112,
-        106,
-        110,
-        116,
-        107,
-        93,
-        99,
+        252,
+        141,
+        143,
+        117,
         105,
-        114
+        112,
+        111,
+        108,
+        124,
+        176
       ],
-      "medianMs": 108.5,
-      "maxMs": 168,
-      "minMs": 93
+      "medianMs": 120.5,
+      "maxMs": 252,
+      "minMs": 105,
+      "stagesMedianMs": {
+        "extraction": 2.7,
+        "catalog": 3.15,
+        "matching": 106.5,
+        "rendering": 0.3
+      }
     },
     {
       "id": "C02",
@@ -73,20 +85,26 @@
       "paragraphs": 12,
       "highlights": 0,
       "runs": [
-        43,
-        43,
-        41,
-        55,
-        93,
-        67,
-        79,
-        63,
-        50,
-        57
+        92,
+        84,
+        90,
+        60,
+        59,
+        80,
+        69,
+        66,
+        54,
+        62
       ],
-      "medianMs": 56,
-      "maxMs": 93,
-      "minMs": 41
+      "medianMs": 67.5,
+      "maxMs": 92,
+      "minMs": 54,
+      "stagesMedianMs": {
+        "extraction": 2.25,
+        "catalog": 4.65,
+        "matching": 57.7,
+        "rendering": 0
+      }
     },
     {
       "id": "C03",
@@ -96,20 +114,26 @@
       "paragraphs": 32,
       "highlights": 0,
       "runs": [
-        119,
-        79,
-        81,
-        88,
-        75,
-        80,
-        74,
-        84,
-        88,
-        82
+        112,
+        106,
+        99,
+        127,
+        100,
+        101,
+        147,
+        107,
+        99,
+        102
       ],
-      "medianMs": 81.5,
-      "maxMs": 119,
-      "minMs": 74
+      "medianMs": 104,
+      "maxMs": 147,
+      "minMs": 99,
+      "stagesMedianMs": {
+        "extraction": 2.55,
+        "catalog": 4.15,
+        "matching": 94.9,
+        "rendering": 0
+      }
     },
     {
       "id": "C04",
@@ -119,20 +143,26 @@
       "paragraphs": 18,
       "highlights": 0,
       "runs": [
-        55,
-        49,
-        48,
-        52,
-        48,
-        50,
-        52,
-        50,
-        56,
-        77
+        62,
+        63,
+        67,
+        61,
+        74,
+        67,
+        63,
+        65,
+        66,
+        63
       ],
-      "medianMs": 51,
-      "maxMs": 77,
-      "minMs": 48
+      "medianMs": 64,
+      "maxMs": 74,
+      "minMs": 61,
+      "stagesMedianMs": {
+        "extraction": 1.7,
+        "catalog": 2.75,
+        "matching": 55.4,
+        "rendering": 0
+      }
     },
     {
       "id": "C05",
@@ -142,20 +172,26 @@
       "paragraphs": 10,
       "highlights": 1,
       "runs": [
+        51,
+        56,
         54,
-        53,
-        43,
-        43,
-        41,
-        44,
-        42,
-        43,
-        62,
-        44
+        58,
+        51,
+        54,
+        51,
+        51,
+        49,
+        51
       ],
-      "medianMs": 43.5,
-      "maxMs": 62,
-      "minMs": 41
+      "medianMs": 51,
+      "maxMs": 58,
+      "minMs": 49,
+      "stagesMedianMs": {
+        "extraction": 1.9,
+        "catalog": 2.6,
+        "matching": 43.35,
+        "rendering": 0.2
+      }
     },
     {
       "id": "C06",
@@ -165,20 +201,26 @@
       "paragraphs": 22,
       "highlights": 0,
       "runs": [
-        56,
-        62,
-        60,
-        58,
-        62,
-        59,
-        58,
-        50,
-        54,
-        54
+        71,
+        73,
+        74,
+        74,
+        83,
+        74,
+        75,
+        65,
+        65,
+        72
       ],
-      "medianMs": 58,
-      "maxMs": 62,
-      "minMs": 50
+      "medianMs": 73.5,
+      "maxMs": 83,
+      "minMs": 65,
+      "stagesMedianMs": {
+        "extraction": 1.7,
+        "catalog": 3.3,
+        "matching": 62.75,
+        "rendering": 0
+      }
     },
     {
       "id": "C07",
@@ -188,20 +230,26 @@
       "paragraphs": 14,
       "highlights": 0,
       "runs": [
-        42,
-        41,
-        49,
-        44,
-        43,
-        41,
-        41,
-        41,
-        41,
-        60
+        54,
+        57,
+        57,
+        54,
+        62,
+        46,
+        51,
+        46,
+        48,
+        52
       ],
-      "medianMs": 41.5,
-      "maxMs": 60,
-      "minMs": 41
+      "medianMs": 53,
+      "maxMs": 62,
+      "minMs": 46,
+      "stagesMedianMs": {
+        "extraction": 1.45,
+        "catalog": 2.55,
+        "matching": 44.95,
+        "rendering": 0
+      }
     },
     {
       "id": "C08",
@@ -211,20 +259,26 @@
       "paragraphs": 36,
       "highlights": 1,
       "runs": [
-        123,
-        131,
-        111,
-        104,
-        123,
-        145,
-        103,
-        97,
-        101,
+        114,
+        110,
+        106,
+        106,
+        107,
+        109,
+        108,
+        117,
+        113,
         114
       ],
-      "medianMs": 112.5,
-      "maxMs": 145,
-      "minMs": 97
+      "medianMs": 109.5,
+      "maxMs": 117,
+      "minMs": 106,
+      "stagesMedianMs": {
+        "extraction": 2.25,
+        "catalog": 2.5,
+        "matching": 99.3,
+        "rendering": 0.2
+      }
     },
     {
       "id": "C09",
@@ -234,20 +288,26 @@
       "paragraphs": 21,
       "highlights": 1,
       "runs": [
-        70,
+        79,
+        75,
+        83,
+        72,
         77,
-        67,
-        73,
-        61,
-        65,
-        68,
-        64,
-        68,
-        68
+        74,
+        74,
+        74,
+        71,
+        78
       ],
-      "medianMs": 68,
-      "maxMs": 77,
-      "minMs": 61
+      "medianMs": 74.5,
+      "maxMs": 83,
+      "minMs": 71,
+      "stagesMedianMs": {
+        "extraction": 1.7,
+        "catalog": 2.8,
+        "matching": 66.85,
+        "rendering": 0.1
+      }
     },
     {
       "id": "C10",
@@ -257,20 +317,26 @@
       "paragraphs": 16,
       "highlights": 0,
       "runs": [
-        63,
-        63,
+        74,
+        81,
+        71,
+        76,
+        65,
+        64,
+        67,
         64,
         66,
-        63,
-        67,
-        68,
-        71,
-        72,
-        72
+        75
       ],
-      "medianMs": 66.5,
-      "maxMs": 72,
-      "minMs": 63
+      "medianMs": 69,
+      "maxMs": 81,
+      "minMs": 64,
+      "stagesMedianMs": {
+        "extraction": 1.4,
+        "catalog": 2.75,
+        "matching": 62.05,
+        "rendering": 0
+      }
     },
     {
       "id": "L01",
@@ -280,20 +346,26 @@
       "paragraphs": 32,
       "highlights": 2,
       "runs": [
-        120,
-        109,
-        114,
-        124,
-        106,
-        105,
+        127,
         105,
         104,
-        99,
-        99
+        106,
+        104,
+        109,
+        100,
+        103,
+        105,
+        116
       ],
-      "medianMs": 105.5,
-      "maxMs": 124,
-      "minMs": 99
+      "medianMs": 105,
+      "maxMs": 127,
+      "minMs": 100,
+      "stagesMedianMs": {
+        "extraction": 1.75,
+        "catalog": 2.5,
+        "matching": 97.2,
+        "rendering": 0.3
+      }
     },
     {
       "id": "L02",
@@ -303,20 +375,26 @@
       "paragraphs": 17,
       "highlights": 0,
       "runs": [
-        62,
         68,
+        70,
+        68,
+        72,
+        72,
         67,
-        69,
-        62,
-        63,
-        69,
+        74,
         76,
-        67,
-        63
+        78,
+        75
       ],
-      "medianMs": 67,
-      "maxMs": 76,
-      "minMs": 62
+      "medianMs": 72,
+      "maxMs": 78,
+      "minMs": 67,
+      "stagesMedianMs": {
+        "extraction": 1.4,
+        "catalog": 2.55,
+        "matching": 63.85,
+        "rendering": 0
+      }
     },
     {
       "id": "L03",
@@ -326,20 +404,26 @@
       "paragraphs": 14,
       "highlights": 0,
       "runs": [
-        47,
-        47,
-        62,
-        46,
-        49,
-        56,
-        59,
+        55,
         58,
-        52,
-        49
+        54,
+        55,
+        53,
+        51,
+        53,
+        61,
+        51,
+        53
       ],
-      "medianMs": 50.5,
-      "maxMs": 62,
-      "minMs": 46
+      "medianMs": 53.5,
+      "maxMs": 61,
+      "minMs": 51,
+      "stagesMedianMs": {
+        "extraction": 1.4,
+        "catalog": 3.85,
+        "matching": 45.95,
+        "rendering": 0
+      }
     },
     {
       "id": "L04",
@@ -349,20 +433,26 @@
       "paragraphs": 25,
       "highlights": 0,
       "runs": [
-        71,
-        68,
-        76,
-        83,
-        74,
-        68,
         75,
-        70,
-        70,
-        69
+        75,
+        78,
+        75,
+        78,
+        76,
+        73,
+        79,
+        74,
+        75
       ],
-      "medianMs": 70.5,
-      "maxMs": 83,
-      "minMs": 68
+      "medianMs": 75,
+      "maxMs": 79,
+      "minMs": 73,
+      "stagesMedianMs": {
+        "extraction": 1.6,
+        "catalog": 3.05,
+        "matching": 67.35,
+        "rendering": 0
+      }
     },
     {
       "id": "L05",
@@ -372,20 +462,26 @@
       "paragraphs": 23,
       "highlights": 2,
       "runs": [
-        58,
-        61,
-        62,
-        57,
-        56,
-        58,
-        56,
-        58,
-        58,
-        56
+        64,
+        63,
+        63,
+        65,
+        63,
+        68,
+        63,
+        65,
+        69,
+        66
       ],
-      "medianMs": 58,
-      "maxMs": 62,
-      "minMs": 56
+      "medianMs": 64.5,
+      "maxMs": 69,
+      "minMs": 63,
+      "stagesMedianMs": {
+        "extraction": 1.6,
+        "catalog": 3,
+        "matching": 56.1,
+        "rendering": 0.3
+      }
     },
     {
       "id": "L06",
@@ -395,20 +491,26 @@
       "paragraphs": 7,
       "highlights": 0,
       "runs": [
-        32,
-        34,
-        34,
-        32,
-        39,
-        30,
-        33,
-        32,
-        39,
-        34
+        36,
+        36,
+        35,
+        36,
+        36,
+        40,
+        36,
+        36,
+        35,
+        35
       ],
-      "medianMs": 33.5,
-      "maxMs": 39,
-      "minMs": 30
+      "medianMs": 36,
+      "maxMs": 40,
+      "minMs": 35,
+      "stagesMedianMs": {
+        "extraction": 1.2,
+        "catalog": 2.1,
+        "matching": 29.3,
+        "rendering": 0
+      }
     },
     {
       "id": "L07",
@@ -418,20 +520,26 @@
       "paragraphs": 7,
       "highlights": 1,
       "runs": [
-        45,
-        40,
-        40,
+        44,
+        47,
+        49,
         43,
-        38,
-        41,
-        40,
-        39,
-        41,
-        42
+        43,
+        42,
+        44,
+        46,
+        46,
+        43
       ],
-      "medianMs": 40.5,
-      "maxMs": 45,
-      "minMs": 38
+      "medianMs": 44,
+      "maxMs": 49,
+      "minMs": 42,
+      "stagesMedianMs": {
+        "extraction": 1.15,
+        "catalog": 2.1,
+        "matching": 36.05,
+        "rendering": 0.2
+      }
     },
     {
       "id": "L08",
@@ -441,20 +549,26 @@
       "paragraphs": 19,
       "highlights": 1,
       "runs": [
-        69,
-        75,
-        72,
-        71,
-        71,
-        74,
         76,
-        77,
         75,
-        67
+        73,
+        74,
+        75,
+        78,
+        72,
+        72,
+        99,
+        71
       ],
-      "medianMs": 73,
-      "maxMs": 77,
-      "minMs": 67
+      "medianMs": 74.5,
+      "maxMs": 99,
+      "minMs": 71,
+      "stagesMedianMs": {
+        "extraction": 1.5,
+        "catalog": 2.75,
+        "matching": 66.95,
+        "rendering": 0.2
+      }
     },
     {
       "id": "L09",
@@ -464,20 +578,26 @@
       "paragraphs": 12,
       "highlights": 1,
       "runs": [
-        36,
-        39,
-        41,
-        71,
-        42,
-        37,
+        43,
         40,
-        36,
+        45,
+        41,
+        51,
+        49,
+        44,
         42,
-        38
+        42,
+        45
       ],
-      "medianMs": 39.5,
-      "maxMs": 71,
-      "minMs": 36
+      "medianMs": 43.5,
+      "maxMs": 51,
+      "minMs": 40,
+      "stagesMedianMs": {
+        "extraction": 1.4,
+        "catalog": 2.25,
+        "matching": 36.05,
+        "rendering": 0.2
+      }
     },
     {
       "id": "L10",
@@ -487,20 +607,26 @@
       "paragraphs": 13,
       "highlights": 0,
       "runs": [
-        37,
+        49,
+        42,
         40,
         40,
-        40,
-        40,
-        38,
-        39,
-        37,
-        40,
-        39
+        43,
+        45,
+        41,
+        42,
+        42,
+        44
       ],
-      "medianMs": 39.5,
-      "maxMs": 40,
-      "minMs": 37
+      "medianMs": 42,
+      "maxMs": 49,
+      "minMs": 40,
+      "stagesMedianMs": {
+        "extraction": 1.35,
+        "catalog": 3.2,
+        "matching": 33.95,
+        "rendering": 0
+      }
     },
     {
       "id": "R01",
@@ -510,20 +636,26 @@
       "paragraphs": 31,
       "highlights": 0,
       "runs": [
-        74,
-        70,
         75,
-        69,
-        72,
-        69,
-        68,
-        70,
-        68,
-        69
+        80,
+        75,
+        80,
+        80,
+        76,
+        78,
+        76,
+        82,
+        80
       ],
-      "medianMs": 69.5,
-      "maxMs": 75,
-      "minMs": 68
+      "medianMs": 79,
+      "maxMs": 82,
+      "minMs": 75,
+      "stagesMedianMs": {
+        "extraction": 1.65,
+        "catalog": 2.7,
+        "matching": 69.6,
+        "rendering": 0
+      }
     },
     {
       "id": "R02",
@@ -533,20 +665,26 @@
       "paragraphs": 34,
       "highlights": 0,
       "runs": [
-        70,
+        80,
+        80,
+        82,
+        84,
+        79,
+        84,
+        82,
         76,
-        70,
-        70,
-        72,
-        73,
-        76,
-        81,
-        77,
-        77
+        82,
+        79
       ],
-      "medianMs": 74.5,
-      "maxMs": 81,
-      "minMs": 70
+      "medianMs": 81,
+      "maxMs": 84,
+      "minMs": 76,
+      "stagesMedianMs": {
+        "extraction": 1.85,
+        "catalog": 3.1,
+        "matching": 72.2,
+        "rendering": 0
+      }
     },
     {
       "id": "R03",
@@ -556,20 +694,26 @@
       "paragraphs": 38,
       "highlights": 0,
       "runs": [
-        77,
-        94,
-        145,
-        185,
-        103,
-        87,
         78,
-        92,
-        84,
-        85
+        80,
+        78,
+        85,
+        82,
+        82,
+        83,
+        81,
+        82,
+        80
       ],
-      "medianMs": 89.5,
-      "maxMs": 185,
-      "minMs": 77
+      "medianMs": 81.5,
+      "maxMs": 85,
+      "minMs": 78,
+      "stagesMedianMs": {
+        "extraction": 1.75,
+        "catalog": 2.6,
+        "matching": 73.4,
+        "rendering": 0
+      }
     },
     {
       "id": "R04",
@@ -579,20 +723,26 @@
       "paragraphs": 28,
       "highlights": 0,
       "runs": [
-        80,
+        76,
+        76,
+        76,
+        75,
         77,
-        68,
-        70,
+        74,
+        77,
+        75,
         73,
-        86,
-        77,
-        79,
-        78,
-        80
+        76
       ],
-      "medianMs": 77.5,
-      "maxMs": 86,
-      "minMs": 68
+      "medianMs": 76,
+      "maxMs": 77,
+      "minMs": 73,
+      "stagesMedianMs": {
+        "extraction": 1.55,
+        "catalog": 3.5,
+        "matching": 67.6,
+        "rendering": 0
+      }
     },
     {
       "id": "R05",
@@ -602,20 +752,26 @@
       "paragraphs": 21,
       "highlights": 1,
       "runs": [
-        67,
-        65,
-        65,
-        74,
+        64,
         58,
+        59,
+        70,
+        65,
+        70,
+        66,
+        63,
         61,
-        62,
-        61,
-        60,
-        58
+        60
       ],
-      "medianMs": 61.5,
-      "maxMs": 74,
-      "minMs": 58
+      "medianMs": 63.5,
+      "maxMs": 70,
+      "minMs": 58,
+      "stagesMedianMs": {
+        "extraction": 1.4,
+        "catalog": 2.7,
+        "matching": 54.4,
+        "rendering": 0.2
+      }
     },
     {
       "id": "R06",
@@ -625,20 +781,26 @@
       "paragraphs": 18,
       "highlights": 3,
       "runs": [
-        54,
+        58,
         57,
-        56,
-        47,
-        51,
         55,
-        50,
-        54,
-        50,
-        55
+        60,
+        59,
+        55,
+        53,
+        61,
+        57,
+        57
       ],
-      "medianMs": 54,
-      "maxMs": 57,
-      "minMs": 47
+      "medianMs": 57,
+      "maxMs": 61,
+      "minMs": 53,
+      "stagesMedianMs": {
+        "extraction": 1.55,
+        "catalog": 2.55,
+        "matching": 49.1,
+        "rendering": 0.35
+      }
     },
     {
       "id": "R07",
@@ -648,20 +810,26 @@
       "paragraphs": 11,
       "highlights": 0,
       "runs": [
-        66,
         53,
-        46,
-        48,
-        53,
-        52,
+        54,
+        54,
+        51,
         57,
-        49,
-        49,
-        62
+        57,
+        52,
+        51,
+        53,
+        54
       ],
-      "medianMs": 52.5,
-      "maxMs": 66,
-      "minMs": 46
+      "medianMs": 53.5,
+      "maxMs": 57,
+      "minMs": 51,
+      "stagesMedianMs": {
+        "extraction": 1.55,
+        "catalog": 2.55,
+        "matching": 45.3,
+        "rendering": 0
+      }
     },
     {
       "id": "R08",
@@ -671,20 +839,26 @@
       "paragraphs": 11,
       "highlights": 0,
       "runs": [
-        48,
-        45,
+        47,
+        51,
+        49,
+        47,
+        49,
+        51,
+        49,
         49,
         50,
-        42,
-        43,
-        43,
-        63,
-        58,
-        74
+        48
       ],
-      "medianMs": 48.5,
-      "maxMs": 74,
-      "minMs": 42
+      "medianMs": 49,
+      "maxMs": 51,
+      "minMs": 47,
+      "stagesMedianMs": {
+        "extraction": 1.35,
+        "catalog": 2.5,
+        "matching": 41.3,
+        "rendering": 0
+      }
     },
     {
       "id": "R09",
@@ -694,20 +868,26 @@
       "paragraphs": 17,
       "highlights": 2,
       "runs": [
-        125,
-        103,
-        77,
-        55,
-        55,
-        59,
+        56,
+        57,
         54,
-        63,
-        66,
+        56,
+        61,
+        68,
+        58,
+        58,
+        59,
         60
       ],
-      "medianMs": 61.5,
-      "maxMs": 125,
-      "minMs": 54
+      "medianMs": 58,
+      "maxMs": 68,
+      "minMs": 54,
+      "stagesMedianMs": {
+        "extraction": 1.5,
+        "catalog": 2.7,
+        "matching": 50.45,
+        "rendering": 0.3
+      }
     },
     {
       "id": "R10",
@@ -717,20 +897,26 @@
       "paragraphs": 20,
       "highlights": 2,
       "runs": [
-        68,
-        76,
-        66,
-        57,
-        62,
+        60,
+        59,
+        72,
+        63,
+        61,
         65,
-        67,
-        70,
-        64,
-        60
+        60,
+        61,
+        60,
+        62
       ],
-      "medianMs": 65.5,
-      "maxMs": 76,
-      "minMs": 57
+      "medianMs": 61,
+      "maxMs": 72,
+      "minMs": 59,
+      "stagesMedianMs": {
+        "extraction": 1.5,
+        "catalog": 2.3,
+        "matching": 53.55,
+        "rendering": 0.3
+      }
     },
     {
       "id": "GATE3-2000",
@@ -740,20 +926,26 @@
       "paragraphs": 60,
       "highlights": 1,
       "runs": [
-        156,
-        140,
-        119,
-        146,
-        117,
-        149,
+        130,
+        127,
+        132,
         131,
-        136,
+        131,
         134,
-        116
+        140,
+        142,
+        139,
+        128
       ],
-      "medianMs": 135,
-      "maxMs": 156,
-      "minMs": 116
+      "medianMs": 131.5,
+      "maxMs": 142,
+      "minMs": 127,
+      "stagesMedianMs": {
+        "extraction": 2.7,
+        "catalog": 2.95,
+        "matching": 120.45,
+        "rendering": 0.2
+      }
     }
   ]
 }
