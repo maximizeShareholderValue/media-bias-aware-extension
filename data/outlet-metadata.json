@@ -2,7 +2,7 @@
   "$schemaVersion": "1.0.0",
   "datasetVersion": "0.3.0",
   "lastUpdated": "2026-10-06",
-  "_readme": "Static outlet transparency lookup table, keyed by registrable domain. 8849-entry dataset built from the full Media Bias/Fact Check (MBFC) rating database (8838 unique domains from a 10859-row MBFC export), merged with AllSides community ideology ratings for domains MBFC didn't rate, plus a handful of hand-curated entries with richer fields (parentCompany/founded/headquarters/monthlyReaders/ownershipDetail) where available. `ownershipType` is 'Unknown' for MBFC/AllSides-sourced entries since neither source classifies ownership structure - only the originally hand-curated entries have real ownership data. The 4 Philippine outlets (SMNI, Rappler, ABS-CBN News, GMA News) were seeded as illustrative placeholders for the thesis UI mockup's demo scenario; any of the four now showing an MBFC sourceNote have been superseded by a real MBFC rating, the rest remain unverified placeholders pending a proper Philippine media-monitoring source.",
+  "_readme": "Static outlet transparency lookup table, keyed by registrable domain. 8847-entry dataset built from the full Media Bias/Fact Check (MBFC) rating database (8838 unique domains from a 10859-row MBFC export), merged with AllSides community ideology ratings for domains MBFC didn't rate, plus a handful of hand-curated entries with richer fields (parentCompany/founded/headquarters/monthlyReaders/ownershipDetail) where available. `ownershipType` is 'Unknown' for MBFC/AllSides-sourced entries since neither source classifies ownership structure - only the originally hand-curated entries have real ownership data. Two illustrative placeholder entries (ABS-CBN News, SMNI) used for an early UI mockup were removed in October 2026 because their ratings were not independently verified.",
   "fields": {
     "domain": "Registrable domain used to match the current tab's URL.",
     "name": "Human-readable outlet name.",
@@ -1373,23 +1373,6 @@
       "mbfcUrl": "https://mediabiasfactcheck.com/abq-times-bias/",
       "country": "USA",
       "mediaType": "Website"
-    },
-    {
-      "domain": "abs-cbn.com",
-      "name": "ABS-CBN News",
-      "ideology": "Center",
-      "factualReliability": "High",
-      "ownershipType": "Corporate Chain",
-      "parentCompany": "ABS-CBN Corporation",
-      "founded": 1946,
-      "headquarters": "Quezon City, Philippines",
-      "monthlyReaders": "20M",
-      "sourceNote": "Illustrative placeholder rating for UI testing, not independently verified.",
-      "ownershipDetail": "Owned by ABS-CBN Corporation, controlled by the Lopez family.",
-      "ownershipSource": "Curated by the authors from public company information; see MBFC review for more.",
-      "mbfcUrl": "https://mediabiasfactcheck.com/abs-cbn-news/",
-      "country": "Philippines",
-      "mediaType": "TV Station"
     },
     {
       "domain": "abtglobal.com",
@@ -55995,11 +55978,14 @@
       "name": "ABS-CBN",
       "ideology": "Center",
       "factualReliability": "High",
-      "ownershipType": "Unknown",
+      "ownershipType": "Corporate Chain",
       "sourceNote": "Per Media Bias/Fact Check (MBFC) rating. Country: Philippines.",
       "mbfcUrl": "https://mediabiasfactcheck.com/abs-cbn-news/",
       "country": "Philippines",
-      "mediaType": "TV Station"
+      "mediaType": "TV Station",
+      "parentCompany": "ABS-CBN Corporation",
+      "ownershipDetail": "Owned by ABS-CBN Corporation, controlled by the Lopez family.",
+      "ownershipSource": "Curated by the authors from public company information; see MBFC review for more."
     },
     {
       "domain": "news.amomama.com",
@@ -73741,19 +73727,6 @@
       "mbfcUrl": "https://mediabiasfactcheck.com/smithsonian-magazine/",
       "country": "USA",
       "mediaType": "Magazine"
-    },
-    {
-      "domain": "smni.com",
-      "name": "SMNI",
-      "ideology": "Right",
-      "factualReliability": "Low",
-      "ownershipType": "Religious Organization",
-      "parentCompany": "Swara Sug Media Corporation",
-      "founded": 2011,
-      "headquarters": "Manila, Philippines",
-      "monthlyReaders": "12M",
-      "sourceNote": "Illustrative placeholder rating for UI testing, not independently verified.",
-      "ownershipDetail": "SMNI (Sonshine Media Network International) is a Philippine broadcast network operated by Swara Sug Media Corporation, a company affiliated with the Kingdom of Jesus Christ religious organization. It is widely known for favorable coverage of allied political figures; treat this rating as a UI-testing placeholder pending a properly cited source."
     },
     {
       "domain": "smobserved.com",
