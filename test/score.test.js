@@ -62,29 +62,75 @@ test("locateSpan uses the Sentence Context to pick between repeated spans", () =
 test("reference set keeps spans marked by at least 2 of 3 validators (7.2)", () => {
   const a = (validator, technique, s) => Object.assign({ validator, articleId: "A1", technique }, at(A1, s));
   const ann = [a("V1", "LL", "smear campaign"), a("V2", "LL", "smear"), a("V3", "LL", "bogus"), a("V1", "NC", "radical left"), a("V2", "LL", "radical left")];
-  const strict = R.buildReference(ann);
+  const overlap = { match: "overlap" };
+  const strict = R.buildReference(ann, overlap);
   assert.equal(strict.length, 1);
   assert.deepEqual(strict[0], { articleId: "A1", technique: "LL", start: A1.indexOf("smear"), end: A1.indexOf("smear") + 14, validators: ["V1", "V2"] });
-  const lenient = R.buildReference(ann, { lenient: true });
+  const lenient = R.buildReference(ann, { lenient: true, match: "overlap" });
   assert.equal(lenient.length, 2, "radical left counts when technique is ignored");
+  // IoU: "smear" vs "smear campaign" = 1/2, so they still agree; the longer span is kept on the tie.
+  const iouRef = R.buildReference(R.withTokens(ann, { A1 }));
+  assert.equal(iouRef.length, 1);
+  assert.equal(A1.slice(iouRef[0].start, iouRef[0].end), "smear campaign");
 });
 
 test("the same validator marking a span twice is not agreement", () => {
   const a = (validator, s) => Object.assign({ validator, articleId: "A1", technique: "LL" }, at(A1, s));
-  assert.equal(R.buildReference([a("V1", "smear"), a("V1", "smear campaign")]).length, 0);
+  assert.equal(R.buildReference(R.withTokens([a("V1", "smear"), a("V1", "smear campaign")], { A1 })).length, 0);
 });
 
 test("scoreSpans: strict needs the same technique, lenient takes any", () => {
   const ref = [{ articleId: "A1", technique: "LL", start: 0, end: 10 }];
   const hl = [{ articleId: "A1", technique: "NC", start: 4, end: 8 }];
-  const strict = R.scoreSpans(hl, ref, false);
+  const strict = R.scoreSpans(hl, ref, false, "overlap");
   assert.equal(strict.tp, 0);
   assert.equal(strict.recall, 0);
-  const lenient = R.scoreSpans(hl, ref, true);
+  const lenient = R.scoreSpans(hl, ref, true, "overlap");
   assert.equal(lenient.tp, 1);
   assert.equal(lenient.recall, 1);
-  assert.equal(R.scoreSpans([], ref, false).precision, null);
-  assert.equal(R.scoreSpans(hl, [{ articleId: "A2", technique: "NC", start: 0, end: 10 }], false).tp, 0, "other article");
+  assert.equal(R.scoreSpans([], ref, false, "overlap").precision, null);
+  assert.equal(R.scoreSpans(hl, [{ articleId: "A2", technique: "NC", start: 0, end: 10 }], false, "overlap").tp, 0, "other article");
+});
+
+// Thesis 7.2 example: a one-word detection inside a twelve-word reference span has IoU 1/12.
+const T12 = "Officials said the sweeping plan would wreck every small farm in the valley.";
+const spanOf = (s) => Object.assign({ articleId: "T", technique: "LL" }, at(T12, s));
+const tok = (list) => R.withTokens(list, { T: T12 });
+
+test("token IoU follows the thesis definition (7.2)", () => {
+  assert.equal(R.tokenize(T12).length, 13);
+  assert.equal(R.tokenize("It's a smear—bogus!").length, 4, "apostrophes stay inside a word; dashes and punctuation split");
+  const [ref, one, half, partWord] = tok([spanOf("said the sweeping plan would wreck every small farm in the valley"), spanOf("wreck"), spanOf("wreck every small farm in the valley"), spanOf("reck")]);
+  close(R.iou(one, ref), 1 / 12);
+  close(R.iou(half, ref), 7 / 12);
+  assert.equal(R.iou(partWord, one), 1, "a span touching part of a word counts that word");
+  assert.equal(R.iou(one, Object.assign({}, one, { articleId: "U" })), 0, "other article");
+  assert.throws(() => R.iou(spanOf("wreck"), ref), /withTokens/);
+});
+
+test("IoU >= 0.50 is the primary match; any overlap is the secondary", () => {
+  const ref = tok([spanOf("said the sweeping plan would wreck every small farm in the valley")]);
+  const hl = tok([spanOf("wreck"), spanOf("wreck every small farm in the valley")]);
+  const primary = R.scoreSpans(hl, ref, false, "iou");
+  assert.equal(primary.tp, 1, "only the 7-of-12-token highlight matches");
+  close(primary.precision, 0.5);
+  assert.equal(R.scoreSpans(hl, ref, false, "overlap").tp, 2, "any overlap accepts both");
+  assert.equal(R.scoreSpans(hl, ref, false).tp, 1, "IoU is the default");
+  close(R.iou(...tok([spanOf("wreck every"), spanOf("wreck every small farm")])), 0.5); // exactly 0.50 matches
+  assert.equal(R.scoreSpans(tok([spanOf("wreck every")]), tok([spanOf("wreck every small farm")]), false).tp, 1);
+  assert.equal(R.scoreSpans(tok([spanOf("wreck")]), tok([spanOf("wreck every small")]), false).tp, 0, "1/3 < 0.50");
+});
+
+test("IoU reference grouping: annotations that do not reach 0.50 are separate instances", () => {
+  const a = (validator, s) => Object.assign({ validator }, spanOf(s));
+  const ann = tok([a("V1", "wreck"), a("V2", "said the sweeping plan would wreck every small farm in the valley")]);
+  assert.equal(R.buildReference(ann).length, 0, "IoU 1/12: no two validators agree");
+  assert.equal(R.buildReference(ann, { match: "overlap" }).length, 1, "any overlap would have merged them");
+  const three = tok([a("V1", "wreck every small farm"), a("V2", "wreck every small farm in the valley"), a("V3", "would wreck every small farm")]);
+  const ref = R.buildReference(three);
+  assert.equal(ref.length, 1);
+  assert.deepEqual(ref[0].validators, ["V1", "V2", "V3"]);
+  assert.equal(T12.slice(ref[0].start, ref[0].end), "wreck every small farm", "the most central annotation is the reference span");
 });
 
 test("techniqueResolver accepts sheet labels, SemEval-style names and catalog keys", () => {

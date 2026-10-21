@@ -10,6 +10,8 @@
  * Span, Technique, Sentence Context, Comment). Spans marked by at least 2 of the 3 validators form
  * the reference set. The full pipeline's highlights and the keyword baseline's (8.3) are scored
  * against it: precision, recall, F1 and FPR, strict (same technique) and lenient (any technique).
+ * Spans match when their token IoU is >= 0.50 (primary, used for the gates); "any overlap" scores
+ * are reported alongside (secondary, the rule used in Gate 2 calibration).
  *
  * Phase 2 (9.3): the Valid / Not Valid judgments of each highlight give Fleiss' kappa (Gate 1).
  * When Gate 1 fails, the judgments must not be used.
@@ -124,13 +126,21 @@ function score(input) {
     });
   });
 
-  const strictRef = R.buildReference(located);
-  const lenientRef = R.buildReference(located, { lenient: true });
+  // Primary match: token IoU >= 0.50 (7.2). Secondary: any overlap, as in Gate 2 calibration.
+  const tokens = R.withTokens(located, input.articles);
+  const strictRef = R.buildReference(tokens);
+  const lenientRef = R.buildReference(tokens, { lenient: true });
+  const strictAny = R.buildReference(located, { match: "overlap" });
+  const lenientAny = R.buildReference(located, { lenient: true, match: "overlap" });
   const scored = new Set(Object.keys(input.articles));
-  const spans = (list) => list.filter((it) => scored.has(it.articleId)).map((it) => ({ articleId: it.articleId, technique: it.technique, start: it.start, end: it.end }));
+  const spans = (list) => R.withTokens(list.filter((it) => scored.has(it.articleId)).map((it) => ({ articleId: it.articleId, technique: it.technique, start: it.start, end: it.end })), input.articles);
   const pipeline = spans(input.items.filter((it) => it.inFullPipeline));
   const baseline = spans(input.items);
-  const system = (h) => ({ strict: R.scoreSpans(h, strictRef, false), lenient: R.scoreSpans(h, lenientRef, true) });
+  const system = (h) => ({
+    strict: R.scoreSpans(h, strictRef, false, "iou"),
+    lenient: R.scoreSpans(h, lenientRef, true, "iou"),
+    anyOverlap: { strict: R.scoreSpans(h, strictAny, false, "overlap"), lenient: R.scoreSpans(h, lenientAny, true, "overlap") }
+  });
 
   const report = {
     articles: scored.size,
@@ -141,6 +151,7 @@ function score(input) {
       ambiguous: ambiguous,
       referenceSpans: strictRef.length,
       referenceSpansAnyTechnique: lenientRef.length,
+      referenceSpansAnyOverlap: strictAny.length,
       allThreeAgreed: strictRef.length ? strictRef.filter((r) => r.validators.length === 3).length / strictRef.length : null
     },
     fullPipeline: system(pipeline),
@@ -164,7 +175,8 @@ function format(report) {
   const lines = [];
   const p1 = report.phase1;
   lines.push("Articles: " + report.articles + "   Phase 1 annotations: " + p1.annotations + " (located " + p1.located + ")");
-  lines.push("Reference spans (>= 2 of 3 validators): " + p1.referenceSpans + " same technique, " + p1.referenceSpansAnyTechnique + " any technique;  all 3 agreed on " + pct(p1.allThreeAgreed));
+  lines.push("Reference spans (>= 2 of 3 validators, IoU >= 0.50): " + p1.referenceSpans + " same technique, " + p1.referenceSpansAnyTechnique + " any technique;  all 3 agreed on " + pct(p1.allThreeAgreed) +
+    ";  " + p1.referenceSpansAnyOverlap + " same technique under any overlap");
   if (p1.unlocated.length) {
     lines.push("\nWARNING: " + p1.unlocated.length + " annotations could not be used - fix them in the sheet and re-run:");
     p1.unlocated.forEach((u) => lines.push("  " + u.validator + " " + (u.annotationId || "") + " [" + u.articleId + "] \"" + u.span + "\" (" + u.technique + "): " + u.problem));
@@ -183,13 +195,12 @@ function format(report) {
 
   lines.push("\n| System | Score | Flagged | TP | FP | Precision | Recall | F1 | FPR |\n|---|---|---|---|---|---|---|---|---|");
   [["Full pipeline", report.fullPipeline], ["Keyword baseline", report.baseline]].forEach(([name, s]) => {
-    ["strict", "lenient"].forEach((mode) => {
-      const x = s[mode];
+    [["strict (IoU >= 0.50)", s.strict], ["lenient (IoU >= 0.50)", s.lenient], ["strict (any overlap)", s.anyOverlap.strict], ["lenient (any overlap)", s.anyOverlap.lenient]].forEach(([mode, x]) => {
       lines.push("| " + name + " | " + mode + " | " + x.flagged + " | " + x.tp + " | " + x.fp + " | " + pct(x.precision) + " | " + pct(x.recall) + " | " + (x.f1 === null ? "n/a" : x.f1.toFixed(3)) + " | " + pct(x.fpr) + " |");
     });
   });
 
-  lines.push("\nPer technique (strict):\n| Technique | Reference | Pipeline flagged | Pipeline precision | Pipeline recall | Baseline flagged | Baseline precision | Baseline recall |\n|---|---|---|---|---|---|---|---|");
+  lines.push("\nPer technique (strict, IoU >= 0.50):\n| Technique | Reference | Pipeline flagged | Pipeline precision | Pipeline recall | Baseline flagged | Baseline precision | Baseline recall |\n|---|---|---|---|---|---|---|---|");
   const f = report.fullPipeline.strict.perTechnique;
   const b = report.baseline.strict.perTechnique;
   Array.from(new Set(Object.keys(f).concat(Object.keys(b)))).sort().forEach((t) => {
