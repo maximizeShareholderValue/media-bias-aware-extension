@@ -139,8 +139,10 @@ async function openBrowser(opts) {
   };
 
   const navigate = (url) => b.send("Page.navigate", { url }, pageSession);
+  /** Any DevTools command on the current test tab (e.g. Input.dispatchMouseEvent, Page.captureScreenshot). */
+  const pageCmd = (method, params) => b.send(method, params || {}, pageSession);
 
-  return { send: b.send, close: b.close, version: version, page, toTab, load, navigate, heapUsed, newTab };
+  return { send: b.send, close: b.close, version: version, page, toTab, load, navigate, heapUsed, newTab, pageCmd };
 }
 
 module.exports = { ROOT: ROOT, DEFAULT_CHROME: DEFAULT_CHROME, sleep: sleep, launchChrome: launchChrome, openBrowser: openBrowser };

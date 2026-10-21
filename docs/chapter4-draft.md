@@ -1,5 +1,7 @@
 # Chapter 4 draft: system, functional testing, Gate 3 and calibration (Gate 2)
 
+> **Superseded.** Chapter 4 is now written in the thesis Google Doc. Some numbers here are out of date (Gate 3 was re-run with stage timings: median 67 ms, 95th percentile 127 ms, maximum 252 ms; the test counts have changed). Use the Doc and the reports in `eval/reports/`.
+
 > Working draft for the thesis. Numbers come from the files named in each section; re-check them against those files before pasting. Formal evaluation (validators, EC1-EC2, Gate 1) and usability (EC3-EC4, Gate 4) follow after 26 October 2026.
 
 
