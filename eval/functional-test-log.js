@@ -275,4 +275,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { run: run, detect: detect, REFERENCE: REFERENCE };
+module.exports = { run: run, detect: detect, REFERENCE: REFERENCE, PER_RULE: PER_RULE };
