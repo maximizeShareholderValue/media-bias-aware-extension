@@ -208,7 +208,7 @@ test("CLI runs end to end on files", () => {
   const out = path.join(dir, "results.json");
   const stdout = execFileSync(process.execPath, [path.join(__dirname, "../eval/score.js"), "--articles", path.join(dir, "articles"), "--detections", path.join(dir, "detections.json"),
     "--phase1", path.join(dir, "v1.csv"), path.join(dir, "v2.csv"), path.join(dir, "v3.csv"), "--out", out], { encoding: "utf8" });
-  assert.match(stdout, /Reference spans \(>= 2 of 3 validators\): 2/);
+  assert.match(stdout, /Reference spans \(>= 2 of 3 validators, IoU >= 0\.50\): 2/);
   assert.match(stdout, /wreak havoc/);
   close(JSON.parse(fs.readFileSync(out, "utf8")).fullPipeline.strict.precision, 2 / 3);
   fs.rmSync(dir, { recursive: true, force: true });
