@@ -18,6 +18,25 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
+// Definitions and examples from the Validator Annotation Guide (Google Doc), word for word. The examples
+// are neutral: none of them matches any of the 39 rules (checked with lexical-only matching), to avoid priming.
+const GUIDE = {
+  LOADED_LANGUAGE: ["Emotionally charged words meant to sway the reader", "\"a ruinous plan\"; \"a spineless retreat\""],
+  NAME_CALLING_LABELING: ["A label for a person or group that the audience fears, dislikes or admires", "\"career bureaucrats\"; \"a puppet of Beijing\""],
+  REPETITION: ["The same word or message repeated to push it", "\"Never again. Never again.\""],
+  EXAGGERATION_MINIMIZATION: ["Making something much bigger or smaller than it is", "\"the most important vote ever cast\"; \"just a small hiccup\""],
+  DOUBT: ["Undermining someone's credibility without evidence", "\"Can we trust anything he says?\"; \"his supposed expertise\""],
+  APPEAL_TO_FEAR_PREJUDICE: ["Creating fear or relying on prejudice to win support", "\"our children will pay the price\"; \"our streets will become war zones\""],
+  FLAG_WAVING: ["Appealing to national, religious or group identity", "\"any patriot would agree\"; \"for the sake of our homeland\""],
+  CAUSAL_OVERSIMPLIFICATION: ["One simple cause for a complex problem; scapegoating", "\"prices rose for one reason only: the new governor\""],
+  SLOGANS: ["Short, catchy rallying phrases", "\"Jobs, not handouts\"; \"Make it right\""],
+  APPEAL_TO_AUTHORITY: ["A claim is true because an authority says so", "\"a top scientist says so, so it must be true\""],
+  BLACK_AND_WHITE_FALLACY: ["Only two options presented", "\"either we act now or we lose everything\""],
+  THOUGHT_TERMINATING_CLICHES: ["A phrase that shuts down discussion", "\"Rules are rules.\"; \"That's just politics.\""],
+  STRAW_MAN_WHATABOUTISM_RED_HERRING: ["Deflecting to another issue or distorting the opponent's view", "\"But the other party did worse last year.\"; \"They want to abolish all borders.\""],
+  BANDWAGON_REDUCTIO_AD_HITLERUM: ["Claiming that most people already support it, or linking a view to a hated figure", "\"millions are already switching\"; \"sounds like something Stalin would do\""]
+};
+
 function buildData(articlesDir, exportsDir, catalog) {
   const articles = fs
     .readdirSync(articlesDir)
@@ -31,7 +50,12 @@ function buildData(articlesDir, exportsDir, catalog) {
       if (exp && fs.existsSync(exp)) meta = JSON.parse(fs.readFileSync(exp, "utf8"));
       return { id: id, title: meta.title || "", url: meta.url || "", text: text };
     });
-  const techniques = Object.keys(catalog.techniques).map((k) => ({ key: k, label: catalog.techniques[k].label, description: catalog.techniques[k].description }));
+  const techniques = Object.keys(catalog.techniques).map((k) => ({
+    key: k,
+    label: catalog.techniques[k].label,
+    description: GUIDE[k] ? GUIDE[k][0] : catalog.techniques[k].description,
+    example: GUIDE[k] ? GUIDE[k][1] : ""
+  }));
   const buildId = crypto.createHash("sha1").update(JSON.stringify(articles.map((a) => [a.id, a.text]))).digest("hex").slice(0, 10);
   return { buildId: buildId, techniques: techniques, articles: articles };
 }
@@ -64,4 +88,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { buildData: buildData, render: render };
+module.exports = { buildData: buildData, render: render, GUIDE: GUIDE };
