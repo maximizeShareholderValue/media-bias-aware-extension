@@ -94,6 +94,24 @@ function fleissKappa(counts) {
   };
 }
 
+/**
+ * Gwet's AC1 (thesis 9.3), reported next to kappa because it is stable when one category
+ * dominates (the kappa paradox). Same input as fleissKappa. Uses the same Po; chance agreement
+ * Pe' = (1 / (k - 1)) * sum_j pi_j (1 - pi_j), which for two categories is 2 pi (1 - pi).
+ * Returns { ac1, observedAgreement, expectedAgreement } (ac1 null when there are no items).
+ */
+function gwetAC1(counts) {
+  var f = fleissKappa(counts);
+  if (!f.items) return { ac1: null, observedAgreement: null, expectedAgreement: null };
+  var k = counts[0].length;
+  var PeG =
+    f.proportions.reduce(function (a, p) {
+      return a + p * (1 - p);
+    }, 0) /
+    (k - 1);
+  return { ac1: PeG === 1 ? null : (f.observedAgreement - PeG) / (1 - PeG), observedAgreement: f.observedAgreement, expectedAgreement: PeG };
+}
+
 /** Per-item [Valid count, Not Valid count] rows for Fleiss' kappa from boolean votes. */
 function toCounts(voteLists) {
   return voteLists.map(function (votes) {
@@ -126,4 +144,4 @@ function checkGates(report, stage) {
   return gates;
 }
 
-module.exports = { GATES: GATES, isValidated: isValidated, precision: precision, summarize: summarize, fleissKappa: fleissKappa, toCounts: toCounts, checkGates: checkGates };
+module.exports = { GATES: GATES, isValidated: isValidated, precision: precision, summarize: summarize, fleissKappa: fleissKappa, gwetAC1: gwetAC1, toCounts: toCounts, checkGates: checkGates };
