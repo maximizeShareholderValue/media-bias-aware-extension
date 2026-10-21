@@ -129,7 +129,11 @@
       return lastRunResult;
     }
 
+    // NFR-PERF-01 stage timings (measurement only).
+    var stages = { extraction: 0, catalog: 0, matching: 0, rendering: 0 };
+    var mark = performance.now();
     var article = extractArticle();
+    stages.extraction = performance.now() - mark;
     if (!article.paragraphs.length) {
       lastRunResult = { articleFound: false, reason: article.reason || "no_article" };
       return lastRunResult;
@@ -137,8 +141,10 @@
     lastArticle = article;
 
     var catalog;
+    mark = performance.now();
     try {
       catalog = await requestPatternCatalog();
+      stages.catalog = performance.now() - mark;
     } catch (e) {
       console.warn("[bias-aware] pattern catalog unavailable:", e.message);
       lastRunResult = { articleFound: true, error: "catalog_unavailable" };
@@ -173,13 +179,17 @@
 
       // One malformed paragraph must not abort the scan of the rest of the article.
       try {
+        var t0 = performance.now();
         var candidates = PatternMatcher.findMatches(text, catalog.patterns, catalog.techniques);
         var resolved = ConflictResolver.resolveWithAudit(candidates);
+        var t1 = performance.now();
+        stages.matching += t1 - t0;
         resolved.suppressed.forEach(function (m) {
           auditLog.suppressed.push(Object.assign({ paragraphIndex: paragraphIndex }, m));
         });
         if (!resolved.active.length) return;
         Highlighter.renderHighlights(p, text, resolved.active);
+        stages.rendering += performance.now() - t1;
         resolved.active.forEach(function (m) {
           techniqueCounts[m.category] = (techniqueCounts[m.category] || 0) + 1;
           totalMatches++;
@@ -211,7 +221,13 @@
       ruleCount: catalog.patterns.length,
       wordCount: wordCount,
       suppressedCount: auditLog.suppressed.length,
-      elapsedMs: Math.round(elapsed)
+      elapsedMs: Math.round(elapsed),
+      stagesMs: {
+        extraction: Math.round(stages.extraction * 10) / 10,
+        catalog: Math.round(stages.catalog * 10) / 10,
+        matching: Math.round(stages.matching * 10) / 10,
+        rendering: Math.round(stages.rendering * 10) / 10
+      }
     };
     return lastRunResult;
   }

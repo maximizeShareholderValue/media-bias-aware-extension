@@ -18,7 +18,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const http = require("http");
-const { spawn } = require("child_process");
+const { launchChrome } = require("./browser.js");
 
 const ROOT = path.join(__dirname, "..");
 const args = process.argv.slice(2);
@@ -66,39 +66,6 @@ function page(a, run) {
   );
 }
 
-/**
- * DevTools protocol over --remote-debugging-pipe (Chrome reads fd 3, writes fd 4, messages end
- * with NUL). Branded Chrome ignores --load-extension, so the extension is loaded with
- * Extensions.loadUnpacked, which is only available on the pipe transport.
- */
-function launchChrome(profile) {
-  const chrome = spawn(CHROME, ["--headless=new", "--remote-debugging-pipe", "--enable-unsafe-extension-debugging",
-    "--user-data-dir=" + profile, "--no-first-run", "about:blank"], { stdio: ["ignore", "ignore", "ignore", "pipe", "pipe"] });
-  const toChrome = chrome.stdio[3];
-  const fromChrome = chrome.stdio[4];
-  let id = 0;
-  let buf = "";
-  const waiting = {};
-  fromChrome.on("data", (chunk) => {
-    buf += chunk.toString("utf8");
-    let i;
-    while ((i = buf.indexOf("\0")) >= 0) {
-      const d = JSON.parse(buf.slice(0, i));
-      buf = buf.slice(i + 1);
-      if (d.id && waiting[d.id]) {
-        waiting[d.id](d);
-        delete waiting[d.id];
-      }
-    }
-  });
-  const send = (method, params, sessionId) =>
-    new Promise((r) => {
-      const i = ++id;
-      waiting[i] = r;
-      toChrome.write(JSON.stringify(Object.assign({ id: i, method, params: params || {} }, sessionId ? { sessionId } : {})) + "\0");
-    });
-  return { chrome, send };
-}
 
 async function main() {
   const articles = loadArticles();
@@ -111,8 +78,7 @@ async function main() {
   await new Promise((r) => server.listen(0, "127.0.0.1", r));
   const base = "http://127.0.0.1:" + server.address().port;
 
-  const profile = fs.mkdtempSync(path.join(os.tmpdir(), "gate3-"));
-  const { chrome, send } = launchChrome(profile);
+  const { chrome, send } = launchChrome(CHROME);
   const version = (await send("Browser.getVersion")).result;
   version.Browser = version.product;
   const loaded = await send("Extensions.loadUnpacked", { path: ROOT });
@@ -146,6 +112,7 @@ async function main() {
   for (const a of articles) {
     const url = base + "/a/" + a.id + ".html";
     const times = [];
+    const stageRuns = [];
     let last = null;
     for (let run = 0; run < RUNS; run++) {
       await send("Page.navigate", { url: url + "?run=" + run }, pageSession);
@@ -163,11 +130,17 @@ async function main() {
         throw new Error("no timing result for " + a.id + ": " + JSON.stringify(dbg.result).slice(0, 600));
       }
       times.push(res.elapsedMs);
+      if (res.stagesMs) stageRuns.push(res.stagesMs);
       last = res;
     }
+    const med = (xs) => {
+      const s = xs.slice().sort((x, y) => x - y);
+      return s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2;
+    };
     const sorted = times.slice().sort((x, y) => x - y);
-    const median = sorted.length % 2 ? sorted[(sorted.length - 1) / 2] : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
-    results.push({ id: a.id, synthetic: !!a.synthetic, words: a.words, extensionWordCount: last.wordCount, paragraphs: last.paragraphCount, highlights: last.matchCount, runs: times, medianMs: median, maxMs: sorted[sorted.length - 1], minMs: sorted[0] });
+    const median = med(times);
+    const stagesMedianMs = stageRuns.length ? Object.fromEntries(Object.keys(stageRuns[0]).map((k) => [k, Math.round(med(stageRuns.map((s) => s[k])) * 10) / 10])) : null;
+    results.push({ id: a.id, synthetic: !!a.synthetic, words: a.words, extensionWordCount: last.wordCount, paragraphs: last.paragraphCount, highlights: last.matchCount, runs: times, medianMs: median, maxMs: sorted[sorted.length - 1], minMs: sorted[0], stagesMedianMs: stagesMedianMs });
     console.log(a.id.padEnd(11) + String(a.words).padStart(5) + " words  median " + String(median).padStart(5) + " ms  max " + String(sorted[sorted.length - 1]).padStart(5) + " ms  highlights " + last.matchCount);
   }
 
@@ -200,8 +173,12 @@ async function main() {
     "**Method:** the unpacked extension runs in Chrome; each article is served as a plain news page from a local web server and loaded fresh " + RUNS + " times. The time is the extension's own measurement (`elapsedMs`) from the start of its pipeline (article extraction, catalog load, detection, conflict resolution and highlight rendering) to the end.", "",
     "**Result:** " + (report.overall.allUnderBudget ? "PASS" : "FAIL") + ": all " + all.length + " measurements under " + BUDGET_MS + " ms. Median " + report.overall.medianMs + " ms, 95th percentile " + report.overall.p95Ms + " ms, maximum " + report.overall.maxMs + " ms.",
     "Synthetic 2,000-word article (" + report.gate3Article.words + " words): median " + report.gate3Article.medianMs + " ms, maximum " + report.gate3Article.maxMs + " ms.", "",
-    "| Article | Words | Highlights | Median (ms) | Min (ms) | Max (ms) |", "|---|---|---|---|---|---|"];
-  results.forEach((r) => L.push("| " + [r.id, r.words, r.highlights, r.medianMs, r.minMs, r.maxMs].join(" | ") + " |"));
+    "Stage columns (NFR-PERF-01) are the median per article of the extension's own stage timers: extraction (Readability and paragraph matching), catalog loading, rule matching with conflict resolution, and highlight rendering. The total also includes reading the settings.", "",
+    "| Article | Words | Highlights | Median (ms) | Min (ms) | Max (ms) | Extraction | Catalog | Matching | Rendering |", "|---|---|---|---|---|---|---|---|---|---|"];
+  results.forEach((r) => {
+    const s = r.stagesMedianMs || {};
+    L.push("| " + [r.id, r.words, r.highlights, r.medianMs, r.minMs, r.maxMs, s.extraction, s.catalog, s.matching, s.rendering].join(" | ") + " |");
+  });
   fs.writeFileSync(path.join(OUT, "gate3-timing.md"), L.join("\n") + "\n");
   console.log("\n" + L.slice(4, 9).join("\n"));
 }

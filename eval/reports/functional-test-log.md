@@ -87,3 +87,62 @@ Catalog 1.1.0 (39 rules). Generated 2026-10-21 by `node eval/functional-test-log
 | Thought-Terminating Clichés | 1 | 1 | 0 | 0 | TT-001 |
 | Bandwagon / Reductio ad Hitlerum | 2 | 0 | 1 | 1 | BW-001, BW-002 |
 | Straw Men / Whataboutism / Red Herring | 1 | 0 | 1 | 0 | SM-001 |
+
+## D. Sentence boundaries on a controlled corpus (8.4 item 2)
+
+13 of 15 texts split exactly as the hand-marked gold. Boundary precision 100.0%, recall 83.3% (12 gold boundaries).
+
+| Case | Text | Gold sentences | Detected sentences | Result |
+|---|---|---|---|---|
+| SB-01 | The U.S. Senate voted on Tuesday. The bill passed 52 to 48. | 2 | [The U.S. Senate voted on Tuesday.] [The bill passed 52 to 48.] | Pass |
+| SB-02 | Dr. Smith said the rate rose 3.5 percent. Markets fell. | 2 | [Dr. Smith said the rate rose 3.5 percent.] [Markets fell.] | Pass |
+| SB-03 | "This is a disaster," the mayor said. Critics disagreed. | 2 | ["This is a disaster," the mayor said.] [Critics disagreed.] | Pass |
+| SB-04 | Is the plan working? Officials say yes! | 2 | [Is the plan working?] [Officials say yes!] | Pass |
+| SB-05 | Prices rose in Jan. and Feb. according to the report. | 1 | [Prices rose in Jan. and Feb. according to the report.] | Pass |
+| SB-06 | The company, based in Washington, D.C., hired 200 workers. | 1 | [The company, based in Washington, D.C., hired 200 workers.] | Pass |
+| SB-07 | He waited... Then he left. | 2 | [He waited... Then he left.] | **Fail** |
+| SB-08 | Officials met at 3 p.m. on Monday. No deal was reached. | 2 | [Officials met at 3 p.m. on Monday.] [No deal was reached.] | Pass |
+| SB-09 | Mr. and Mrs. Jones arrived late. They apologized. | 2 | [Mr. and Mrs. Jones arrived late.] [They apologized.] | Pass |
+| SB-10 | The vote was 7-2. Justice Roberts wrote the opinion. | 2 | [The vote was 7-2.] [Justice Roberts wrote the opinion.] | Pass |
+| SB-11 | She asked, "Why now?" Nobody answered. | 2 | [She asked, "Why now?" Nobody answered.] | **Fail** |
+| SB-12 | Inflation hit 9.1% in 2022. It has since eased. | 2 | [Inflation hit 9.1% in 2022.] [It has since eased.] | Pass |
+| SB-13 | The St. Louis team won. Fans celebrated. | 2 | [The St. Louis team won.] [Fans celebrated.] | Pass |
+| SB-14 | NASA's Artemis II crew returned safely. The mission lasted 10 days. | 2 | [NASA's Artemis II crew returned safely.] [The mission lasted 10 days.] | Pass |
+| SB-15 | One sentence without a final period | 1 | [One sentence without a final period] | Pass |
+
+## E. Part-of-speech tagging on hand-annotated words (8.4 item 3)
+
+28 of 30 words tagged correctly (93.3%).
+
+| Case | Sentence | Word | Gold | Tagger output | Result |
+|---|---|---|---|---|---|
+| POS-01 | The governor slammed the proposal. | slammed | Verb | Verb, PastTense | Pass |
+| POS-02 | It was a shameful decision. | shameful | Adjective | Adjective | Pass |
+| POS-03 | The radical activists blocked the road. | radical | Adjective | Noun, Actor, Singular | **Fail** |
+| POS-04 | The regime cracked down on dissent. | regime | Noun | Noun, Singular | Pass |
+| POS-05 | Prices skyrocketed last year. | skyrocketed | Verb | Verb, PastTense | Pass |
+| POS-06 | The so-called experts disagreed. | experts | Noun | Noun, Plural | Pass |
+| POS-07 | He allegedly took the money. | allegedly | Adverb | Adverb | Pass |
+| POS-08 | The senator claimed victory. | claimed | Verb | Verb, PastTense | Pass |
+| POS-09 | The claim was false. | claim | Noun | Noun, Singular | Pass |
+| POS-10 | It is a mere formality. | mere | Adjective | Adjective | Pass |
+| POS-11 | They plan to attack the city. | attack | Verb | Verb, PresentTense, Infinitive | Pass |
+| POS-12 | The attack killed ten people. | attack | Noun | Noun, Singular | Pass |
+| POS-13 | Critics say the plan will fail. | say | Verb | Verb, PresentTense, Infinitive | Pass |
+| POS-14 | Critics say the plan will fail. | fail | Verb | Verb, PresentTense, Infinitive | Pass |
+| POS-15 | The flood was catastrophic. | catastrophic | Adjective | Adjective | Pass |
+| POS-16 | Migrants are flooding the border. | flooding | Verb | Verb, PresentTense, Gerund | Pass |
+| POS-17 | The flooding damaged homes. | flooding | Noun | Noun, Singular | Pass |
+| POS-18 | Officials refused to comment. | refused | Verb | Verb, PastTense | Pass |
+| POS-19 | The notorious gang returned. | notorious | Adjective | Adjective | Pass |
+| POS-20 | She spoke quickly. | quickly | Adverb | Adverb | Pass |
+| POS-21 | Experts warn of an existential threat. | existential | Adjective | Adjective | Pass |
+| POS-22 | Experts warn of an existential threat. | threat | Noun | Noun, Singular | Pass |
+| POS-23 | The record was broken. | record | Noun | Noun, Singular | Pass |
+| POS-24 | They record every call. | record | Verb | Verb, PresentTense, Infinitive | Pass |
+| POS-25 | Everyone knows the truth. | knows | Verb | Verb, PresentTense | Pass |
+| POS-26 | True patriots support the bill. | patriots | Noun | Noun, Plural, Actor | Pass |
+| POS-27 | True patriots support the bill. | support | Verb | Verb, PresentTense, Infinitive | Pass |
+| POS-28 | The terrorists fled the scene. | terrorists | Noun | Noun, Plural | Pass |
+| POS-29 | It was a total disaster. | total | Adjective | Noun, Singular | **Fail** |
+| POS-30 | It was a total disaster. | disaster | Noun | Noun, Singular | Pass |

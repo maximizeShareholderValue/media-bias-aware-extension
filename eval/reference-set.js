@@ -202,6 +202,33 @@ function scoreSpans(highlights, reference, ignoreTechnique, match) {
   return Object.assign(overall, { perTechnique: perTechnique });
 }
 
+/**
+ * Phase 1 agreement (thesis 7.4): span-level F1 between each pair of validators, pooled over all
+ * articles, and its mean over the pairs (Hripcsak & Rothschild, 2005). Two annotations agree when
+ * they match under `match` (default IoU >= 0.50; spans need withTokens()) and carry the same
+ * technique. For a pair (A, B): precision = share of A's annotations that agree with one of B's,
+ * recall = share of B's that agree with one of A's, F1 = their harmonic mean.
+ * Returns { pairs: [{a, b, annotationsA, annotationsB, f1}], meanF1 }.
+ */
+function pairwiseF1(annotations, match) {
+  const hit = matcher(match || "iou");
+  const same = (x, y) => x.technique === y.technique && hit(x, y);
+  const validators = Array.from(new Set(annotations.map((x) => x.validator))).sort();
+  const pairs = [];
+  for (let i = 0; i < validators.length; i++) {
+    for (let j = i + 1; j < validators.length; j++) {
+      const A = annotations.filter((x) => x.validator === validators[i]);
+      const B = annotations.filter((x) => x.validator === validators[j]);
+      const p = ratio(A.filter((x) => B.some((y) => same(x, y))).length, A.length);
+      const r = ratio(B.filter((y) => A.some((x) => same(x, y))).length, B.length);
+      // No agreement at all is an F1 of 0, not undefined.
+      pairs.push({ a: validators[i], b: validators[j], annotationsA: A.length, annotationsB: B.length, f1: p === 0 && r === 0 ? 0 : f1(p, r) });
+    }
+  }
+  const scored = pairs.filter((x) => x.f1 !== null);
+  return { pairs: pairs, meanF1: scored.length ? scored.reduce((s, x) => s + x.f1, 0) / scored.length : null };
+}
+
 /** Maps a sheet technique name ("Name Calling / Labeling", "Loaded_Language", "DOUBT") to its catalog key. */
 function techniqueResolver(techniques) {
   const norm = (s) => String(s || "").toLowerCase().replace(/[^a-z]/g, "");
@@ -213,4 +240,4 @@ function techniqueResolver(techniques) {
   return (name) => map[norm(name)] || null;
 }
 
-module.exports = { MIN_AGREE: MIN_AGREE, IOU_MIN: IOU_MIN, tokenize: tokenize, withTokens: withTokens, iou: iou, locateSpan: locateSpan, buildReference: buildReference, scoreSpans: scoreSpans, techniqueResolver: techniqueResolver };
+module.exports = { MIN_AGREE: MIN_AGREE, IOU_MIN: IOU_MIN, tokenize: tokenize, withTokens: withTokens, iou: iou, locateSpan: locateSpan, buildReference: buildReference, scoreSpans: scoreSpans, pairwiseF1: pairwiseF1, techniqueResolver: techniqueResolver };

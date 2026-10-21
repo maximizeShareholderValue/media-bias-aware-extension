@@ -12,6 +12,7 @@ const { execFileSync } = require("child_process");
 const R = require("../eval/reference-set.js");
 const S = require("../eval/score.js");
 const csv = require("../eval/csv.js");
+const M = require("../eval/metrics.js");
 const catalog = require("../data/pattern-catalog.json");
 
 const close = (a, b, eps = 1e-3) => assert.ok(Math.abs(a - b) < eps, `${a} !~ ${b}`);
@@ -169,6 +170,40 @@ test("score: reference set, pipeline vs baseline, and the gates", () => {
   assert.equal(r.phase2, null);
   assert.equal(r.judgmentsUsable, null);
   assert.deepEqual(r.gates.map((g) => g.pass), [true, true]); // EC1 0.667 >= 0.50; pipeline FPR 0.333 < baseline 0.6
+});
+
+test("Phase 1 agreement: mean pairwise span F1, IoU >= 0.50 and same technique (7.4)", () => {
+  // V1-V2 agree on "smear" (IoU 1/2) only: 1 of 2 each way, F1 0.5. V1-V3 agree on "radical left"
+  // (Name Calling): F1 0.5. V2-V3 share nothing ("The radical left" is Loaded Language for V2): F1 0.
+  const a = run().phase1.agreement;
+  assert.deepEqual(a.pairs.map((x) => x.a + x.b), ["V1V2", "V1V3", "V2V3"]);
+  assert.deepEqual(a.pairs.map((x) => x.f1), [0.5, 0.5, 0]);
+  close(a.meanF1, 1 / 3);
+});
+
+test("Gwet's AC1 stays high where kappa collapses (kappa paradox, 9.3)", () => {
+  // 10 phrases: 9 judged Valid by all three, 1 split 2-1. Po = (9 + 1/3) / 10 = 0.9333.
+  // pi(Valid) = 29/30. kappa: Pe = (29/30)^2 + (1/30)^2 = 0.93556 -> kappa = -0.0345.
+  // AC1: Pe' = 2 * (29/30) * (1/30) = 0.06444 -> AC1 = (0.93333 - 0.06444) / 0.93556 = 0.9287.
+  const votes = Array.from({ length: 9 }, () => [true, true, true]).concat([[true, true, false]]);
+  const counts = M.toCounts(votes);
+  close(M.fleissKappa(counts).kappa, -0.034483);
+  const g = M.gwetAC1(counts);
+  close(g.observedAgreement, 0.933333);
+  close(g.expectedAgreement, 0.064444);
+  close(g.ac1, 0.928741);
+  assert.equal(M.gwetAC1([]).ac1, null);
+});
+
+test("Phase 2 report: percent agreement, AC1 and the Valid / Not Valid distribution", () => {
+  const rows = [P2HEAD, ["a", "", "", "", "", "", "", "Valid", "Valid", "Valid"], ["b", "", "", "", "", "", "", "Valid", "Valid", "Not Valid"]];
+  const k = run({ rows, key: KEY }).phase2;
+  assert.equal(k.judgments, 6);
+  assert.equal(k.validJudgments, 5);
+  close(k.observedAgreement, 2 / 3);
+  // pi = 5/6, Pe' = 2 * 5/6 * 1/6 = 0.2778, AC1 = (0.6667 - 0.2778) / 0.7222 = 0.5385
+  close(k.gwetAC1, 0.538462);
+  assert.match(S.format(run({ rows, key: KEY })), /Gwet's AC1=0\.538/);
 });
 
 test("detections in articles nobody annotated are left out", () => {
