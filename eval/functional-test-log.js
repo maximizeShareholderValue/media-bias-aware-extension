@@ -88,6 +88,97 @@ const PER_RULE = {
   "RP-001": "What this country needs is jobs, jobs, jobs."
 };
 
+// Part D (8.4 item 2): controlled sentence corpus. Gold = the sentences a careful reader marks,
+// written by hand; the hard cases (abbreviations, decimals, quotes, ellipses) are deliberate.
+const SENTENCES = [
+  ["The U.S. Senate voted on Tuesday.", "The bill passed 52 to 48."],
+  ["Dr. Smith said the rate rose 3.5 percent.", "Markets fell."],
+  ["\"This is a disaster,\" the mayor said.", "Critics disagreed."],
+  ["Is the plan working?", "Officials say yes!"],
+  ["Prices rose in Jan. and Feb. according to the report."],
+  ["The company, based in Washington, D.C., hired 200 workers."],
+  ["He waited...", "Then he left."],
+  ["Officials met at 3 p.m. on Monday.", "No deal was reached."],
+  ["Mr. and Mrs. Jones arrived late.", "They apologized."],
+  ["The vote was 7-2.", "Justice Roberts wrote the opinion."],
+  ["She asked, \"Why now?\"", "Nobody answered."],
+  ["Inflation hit 9.1% in 2022.", "It has since eased."],
+  ["The St. Louis team won.", "Fans celebrated."],
+  ["NASA's Artemis II crew returned safely.", "The mission lasted 10 days."],
+  ["One sentence without a final period"]
+];
+
+// Part E (8.4 item 3): hand-annotated part of speech of words the rules' Linguistic Conditions
+// depend on, including words whose tag changes with use (attack, record, flooding, claim).
+const POS = [
+  ["The governor slammed the proposal.", "slammed", "Verb"],
+  ["It was a shameful decision.", "shameful", "Adjective"],
+  ["The radical activists blocked the road.", "radical", "Adjective"],
+  ["The regime cracked down on dissent.", "regime", "Noun"],
+  ["Prices skyrocketed last year.", "skyrocketed", "Verb"],
+  ["The so-called experts disagreed.", "experts", "Noun"],
+  ["He allegedly took the money.", "allegedly", "Adverb"],
+  ["The senator claimed victory.", "claimed", "Verb"],
+  ["The claim was false.", "claim", "Noun"],
+  ["It is a mere formality.", "mere", "Adjective"],
+  ["They plan to attack the city.", "attack", "Verb"],
+  ["The attack killed ten people.", "attack", "Noun"],
+  ["Critics say the plan will fail.", "say", "Verb"],
+  ["Critics say the plan will fail.", "fail", "Verb"],
+  ["The flood was catastrophic.", "catastrophic", "Adjective"],
+  ["Migrants are flooding the border.", "flooding", "Verb"],
+  ["The flooding damaged homes.", "flooding", "Noun"],
+  ["Officials refused to comment.", "refused", "Verb"],
+  ["The notorious gang returned.", "notorious", "Adjective"],
+  ["She spoke quickly.", "quickly", "Adverb"],
+  ["Experts warn of an existential threat.", "existential", "Adjective"],
+  ["Experts warn of an existential threat.", "threat", "Noun"],
+  ["The record was broken.", "record", "Noun"],
+  ["They record every call.", "record", "Verb"],
+  ["Everyone knows the truth.", "knows", "Verb"],
+  ["True patriots support the bill.", "patriots", "Noun"],
+  ["True patriots support the bill.", "support", "Verb"],
+  ["The terrorists fled the scene.", "terrorists", "Noun"],
+  ["It was a total disaster.", "total", "Adjective"],
+  ["It was a total disaster.", "disaster", "Noun"]
+];
+
+/** Start offsets of sentences 2..n, from a list of sentences joined by single spaces. */
+function boundaries(sentences) {
+  const out = [];
+  let pos = 0;
+  sentences.forEach((s, i) => {
+    if (i > 0) out.push(pos);
+    pos += s.length + 1;
+  });
+  return out;
+}
+
+function sentenceTest() {
+  const rows = SENTENCES.map((gold, i) => {
+    const text = gold.join(" ");
+    const terms = PatternMatcher._internals.flattenTerms(text);
+    const gotB = terms.sentences.slice(1).map((s) => terms[s.first].offset.start);
+    const cuts = [0].concat(gotB, [text.length]);
+    const got = cuts.slice(0, -1).map((c, k) => text.slice(c, cuts[k + 1]).trim());
+    const goldB = boundaries(gold);
+    return { case: "SB-" + String(i + 1).padStart(2, "0"), text: text, gold: gold, predicted: got, goldBoundaries: goldB, predictedBoundaries: gotB, correct: goldB.join() === gotB.join() };
+  });
+  const goldN = rows.reduce((s, r) => s + r.goldBoundaries.length, 0);
+  const gotN = rows.reduce((s, r) => s + r.predictedBoundaries.length, 0);
+  const hit = rows.reduce((s, r) => s + r.predictedBoundaries.filter((b) => r.goldBoundaries.includes(b)).length, 0);
+  return { rows: rows, textsCorrect: rows.filter((r) => r.correct).length, boundaryPrecision: gotN ? hit / gotN : null, boundaryRecall: goldN ? hit / goldN : null, goldBoundaries: goldN, predictedBoundaries: gotN };
+}
+
+function posTest() {
+  const rows = POS.map(([sentence, word, gold], i) => {
+    const t = PatternMatcher._internals.flattenTerms(sentence).find((x) => x.normal === word || x.text === word);
+    const tags = t ? t.tags : [];
+    return { case: "POS-" + String(i + 1).padStart(2, "0"), sentence: sentence, word: word, gold: gold, tags: tags, correct: tags.includes(gold) };
+  });
+  return { rows: rows, correct: rows.filter((r) => r.correct).length, accuracy: rows.filter((r) => r.correct).length / rows.length };
+}
+
 function run() {
   const partA = REFERENCE.map(([source, technique, sentence], i) => {
     const hits = detect(sentence).filter((m) => m.technique === technique);
@@ -126,7 +217,7 @@ function run() {
     return { technique: t, rules: rules.length, ruleIds: rules.map((p) => p.id), tiers: tiers, referenceExampleDetected: a ? a.detected : null };
   });
 
-  return { catalogVersion: catalog.catalogVersion, ruleCount: catalog.patterns.length, generatedAt: new Date().toISOString(), referenceExamples: partA, perRule: partB, perTechnique: partC };
+  return { catalogVersion: catalog.catalogVersion, ruleCount: catalog.patterns.length, generatedAt: new Date().toISOString(), referenceExamples: partA, perRule: partB, perTechnique: partC, sentenceBoundaries: sentenceTest(), posTagging: posTest() };
 }
 
 function toMarkdown(r) {
@@ -151,6 +242,17 @@ function toMarkdown(r) {
   L.push("", "## C. Rules per technique (input for Table 9a)", "");
   L.push("| Technique | Rules | High | Medium | Low | Rule IDs |", "|---|---|---|---|---|---|");
   r.perTechnique.forEach((x) => L.push("| " + [label(x.technique), x.rules, x.tiers.high || 0, x.tiers.medium || 0, x.tiers.low || 0, x.ruleIds.join(", ")].join(" | ") + " |"));
+  const pc = (x) => (x * 100).toFixed(1) + "%";
+  const sb = r.sentenceBoundaries;
+  L.push("", "## D. Sentence boundaries on a controlled corpus (8.4 item 2)", "");
+  L.push(sb.textsCorrect + " of " + sb.rows.length + " texts split exactly as the hand-marked gold. Boundary precision " + pc(sb.boundaryPrecision) + ", recall " + pc(sb.boundaryRecall) + " (" + sb.goldBoundaries + " gold boundaries).", "");
+  L.push("| Case | Text | Gold sentences | Detected sentences | Result |", "|---|---|---|---|---|");
+  sb.rows.forEach((x) => L.push("| " + [x.case, esc(x.text), x.gold.length, esc(x.predicted.map((s) => "[" + s + "]").join(" ")), yes(x.correct)].join(" | ") + " |"));
+  const pt = r.posTagging;
+  L.push("", "## E. Part-of-speech tagging on hand-annotated words (8.4 item 3)", "");
+  L.push(pt.correct + " of " + pt.rows.length + " words tagged correctly (" + pc(pt.accuracy) + ").", "");
+  L.push("| Case | Sentence | Word | Gold | Tagger output | Result |", "|---|---|---|---|---|---|");
+  pt.rows.forEach((x) => L.push("| " + [x.case, esc(x.sentence), x.word, x.gold, x.tags.join(", ") || "(not found)", yes(x.correct)].join(" | ") + " |"));
   return L.join("\n") + "\n";
 }
 
@@ -165,6 +267,9 @@ function main() {
   console.log("Reference examples: " + a + "/" + r.referenceExamples.length + " techniques detected");
   console.log("Rules on their test sentence: " + b + "/" + r.perRule.length);
   r.perRule.filter((x) => !x.ruleFired).forEach((x) => console.log("  " + x.rule + ": " + (x.techniqueDetected ? "technique detected by " + x.detectedBy.join(",") : "NOT detected") + " | " + x.example));
+  const sb = r.sentenceBoundaries;
+  console.log("Sentence boundaries: " + sb.textsCorrect + "/" + sb.rows.length + " texts exact; boundary precision " + sb.boundaryPrecision.toFixed(3) + ", recall " + sb.boundaryRecall.toFixed(3));
+  console.log("POS tagging: " + r.posTagging.correct + "/" + r.posTagging.rows.length + " words correct");
   console.log("Wrote " + path.join(outDir, "functional-test-log.md"));
 }
 
