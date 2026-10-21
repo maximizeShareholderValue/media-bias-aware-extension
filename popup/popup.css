@@ -256,6 +256,30 @@ body {
 
 .ownership-badge--unknown { background: #eceff3; color: #4a5565; }
 
+/* FR-CHK-03 ownership-type definition: shown on hover, keyboard focus or tap. */
+.ownership-wrap { position: relative; display: inline-block; }
+.ownership-wrap .ownership-badge { cursor: help; }
+.ownership-wrap .ownership-badge:focus-visible { outline: 2px solid #6a2fa0; outline-offset: 2px; }
+.ownership-tip {
+  display: none;
+  position: absolute;
+  top: calc(100% - 8px);
+  left: 0;
+  z-index: 5;
+  width: 220px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  background: #1f2937;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.35;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+.ownership-wrap:hover .ownership-tip,
+.ownership-wrap:focus-within .ownership-tip,
+.ownership-wrap--open .ownership-tip { display: block; }
+
 .info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
