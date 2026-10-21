@@ -1,0 +1,456 @@
+{
+  "generatedAt": "2026-10-21T15:27:09.656Z",
+  "runsPerScenario": 10,
+  "budgetMs": 3000,
+  "layouts": [
+    {
+      "id": "semantic",
+      "description": "Semantic markup: <article> with <p> paragraphs",
+      "articleFound": true,
+      "extractedParagraphs": 8,
+      "goldParagraphs": 8,
+      "goldFound": 8,
+      "extractedCorrect": 8,
+      "extractionRecall": 1,
+      "extractionPrecision": 1,
+      "extraneous": [],
+      "highlights": 4,
+      "highlightSpans": 4,
+      "spansPerRule": {
+        "LL-011": 1,
+        "DB-001": 1,
+        "EX-001": 1,
+        "AA-001": 1
+      },
+      "highlightAttributesOk": true,
+      "textIntact": true,
+      "linksIntact": true,
+      "crossMarkupSplit": null,
+      "tooltip": {
+        "shown": true,
+        "showsRule": true,
+        "showsExplanation": true,
+        "hiddenAfterBlur": true
+      }
+    },
+    {
+      "id": "div-only",
+      "description": "No <p> elements: paragraphs are plain <div>s in a story container",
+      "articleFound": true,
+      "extractedParagraphs": 8,
+      "goldParagraphs": 8,
+      "goldFound": 8,
+      "extractedCorrect": 8,
+      "extractionRecall": 1,
+      "extractionPrecision": 1,
+      "extraneous": [],
+      "highlights": 4,
+      "highlightSpans": 4,
+      "spansPerRule": {
+        "LL-011": 1,
+        "DB-001": 1,
+        "EX-001": 1,
+        "AA-001": 1
+      },
+      "highlightAttributesOk": true,
+      "textIntact": true,
+      "linksIntact": true,
+      "crossMarkupSplit": null,
+      "tooltip": {
+        "shown": true,
+        "showsRule": true,
+        "showsExplanation": true,
+        "hiddenAfterBlur": true
+      }
+    },
+    {
+      "id": "cluttered",
+      "description": "Article between navigation, sidebar, ads, related links, comments, newsletter box and footer",
+      "articleFound": true,
+      "extractedParagraphs": 9,
+      "goldParagraphs": 8,
+      "goldFound": 8,
+      "extractedCorrect": 8,
+      "extractionRecall": 1,
+      "extractionPrecision": 0.8888888888888888,
+      "extraneous": [
+        "Sign up for our daily newsletter to get the top stories in your inbox every morning."
+      ],
+      "highlights": 4,
+      "highlightSpans": 4,
+      "spansPerRule": {
+        "LL-011": 1,
+        "DB-001": 1,
+        "EX-001": 1,
+        "AA-001": 1
+      },
+      "highlightAttributesOk": true,
+      "textIntact": true,
+      "linksIntact": true,
+      "crossMarkupSplit": null,
+      "tooltip": {
+        "shown": true,
+        "showsRule": true,
+        "showsExplanation": true,
+        "hiddenAfterBlur": true
+      }
+    },
+    {
+      "id": "inline-markup",
+      "description": "Links, <em> and <strong> inside paragraphs, including a highlighted phrase that crosses a link",
+      "articleFound": true,
+      "extractedParagraphs": 8,
+      "goldParagraphs": 8,
+      "goldFound": 8,
+      "extractedCorrect": 8,
+      "extractionRecall": 1,
+      "extractionPrecision": 1,
+      "extraneous": [],
+      "highlights": 4,
+      "highlightSpans": 5,
+      "spansPerRule": {
+        "LL-011": 1,
+        "DB-001": 1,
+        "EX-001": 1,
+        "AA-001": 2
+      },
+      "highlightAttributesOk": true,
+      "textIntact": true,
+      "linksIntact": true,
+      "crossMarkupSplit": true,
+      "tooltip": {
+        "shown": true,
+        "showsRule": true,
+        "showsExplanation": true,
+        "hiddenAfterBlur": true
+      }
+    },
+    {
+      "id": "sectioned",
+      "description": "Subheadings, a photo with caption and a pull quote between paragraphs",
+      "articleFound": true,
+      "extractedParagraphs": 9,
+      "goldParagraphs": 8,
+      "goldFound": 8,
+      "extractedCorrect": 8,
+      "extractionRecall": 1,
+      "extractionPrecision": 0.8888888888888888,
+      "extraneous": [
+        "The crossing outside her children's school had been flooded twice this spring."
+      ],
+      "highlights": 4,
+      "highlightSpans": 4,
+      "spansPerRule": {
+        "LL-011": 1,
+        "DB-001": 1,
+        "EX-001": 1,
+        "AA-001": 1
+      },
+      "highlightAttributesOk": true,
+      "textIntact": true,
+      "linksIntact": true,
+      "crossMarkupSplit": null,
+      "tooltip": {
+        "shown": true,
+        "showsRule": true,
+        "showsExplanation": true,
+        "hiddenAfterBlur": true
+      }
+    },
+    {
+      "id": "script-inserted",
+      "description": "Article body inserted by a script when the page loads (DOMContentLoaded)",
+      "articleFound": true,
+      "extractedParagraphs": 8,
+      "goldParagraphs": 8,
+      "goldFound": 8,
+      "extractedCorrect": 8,
+      "extractionRecall": 1,
+      "extractionPrecision": 1,
+      "extraneous": [],
+      "highlights": 4,
+      "highlightSpans": 4,
+      "spansPerRule": {
+        "LL-011": 1,
+        "DB-001": 1,
+        "EX-001": 1,
+        "AA-001": 1
+      },
+      "highlightAttributesOk": true,
+      "textIntact": true,
+      "linksIntact": true,
+      "crossMarkupSplit": null,
+      "tooltip": {
+        "shown": true,
+        "showsRule": true,
+        "showsExplanation": true,
+        "hiddenAfterBlur": true
+      }
+    }
+  ],
+  "lateInsert": {
+    "description": "Article body inserted 1.5 s after load",
+    "highlightSpans": 0
+  },
+  "scenarios": [
+    {
+      "id": "S1-threshold",
+      "description": "2,000-word threshold: an article at the 2,000-word limit",
+      "words": 1975,
+      "runs": [
+        164,
+        166,
+        171,
+        171,
+        176,
+        182,
+        186,
+        186,
+        187,
+        189
+      ],
+      "medianMs": 179,
+      "maxMs": 189,
+      "underBudget": true,
+      "stagesMedianMs": {
+        "extraction": 2.8,
+        "catalog": 4.4,
+        "matching": 158.6,
+        "rendering": 4.1
+      },
+      "highlights": 30,
+      "techniques": 4,
+      "suppressedOverlaps": 0,
+      "paragraphs": 61,
+      "heapWithExtensionMB": 5.659461975097656,
+      "heapWithoutExtensionMB": 0.41735076904296875
+    },
+    {
+      "id": "S2-dynamic",
+      "description": "Dynamically loaded page: the 2,000-word body is inserted by a script on DOMContentLoaded",
+      "words": 1975,
+      "runs": [
+        133,
+        134,
+        172,
+        176,
+        200,
+        205,
+        219,
+        222,
+        226,
+        248
+      ],
+      "medianMs": 202.5,
+      "maxMs": 248,
+      "underBudget": true,
+      "stagesMedianMs": {
+        "extraction": 3.5,
+        "catalog": 4.2,
+        "matching": 183.5,
+        "rendering": 5
+      },
+      "highlights": 30,
+      "techniques": 4,
+      "suppressedOverlaps": 0,
+      "paragraphs": 61,
+      "heapWithExtensionMB": 5.732551574707031,
+      "heapWithoutExtensionMB": 0.4820899963378906
+    },
+    {
+      "id": "S3-dense-dom",
+      "description": "Dense DOM: the 2,000-word article inside a page with about 21,000 extra elements",
+      "words": 1975,
+      "runs": [
+        216,
+        241,
+        249,
+        256,
+        284,
+        302,
+        331,
+        377,
+        402,
+        409
+      ],
+      "medianMs": 293,
+      "maxMs": 409,
+      "underBudget": true,
+      "stagesMedianMs": {
+        "extraction": 84,
+        "catalog": 4.5,
+        "matching": 164.1,
+        "rendering": 6.6
+      },
+      "highlights": 30,
+      "techniques": 4,
+      "suppressedOverlaps": 0,
+      "paragraphs": 61,
+      "heapWithExtensionMB": 5.736637115478516,
+      "heapWithoutExtensionMB": 0.41735076904296875
+    },
+    {
+      "id": "S4-overlapping",
+      "description": "Overlapping matches: every paragraph holds a phrase where two rules overlap (LL-013 and FW-002)",
+      "words": 1993,
+      "runs": [
+        97,
+        100,
+        101,
+        103,
+        104,
+        119,
+        136,
+        161,
+        165,
+        174
+      ],
+      "medianMs": 111.5,
+      "maxMs": 174,
+      "underBudget": true,
+      "stagesMedianMs": {
+        "extraction": 1.9,
+        "catalog": 2.7,
+        "matching": 99.1,
+        "rendering": 3.6
+      },
+      "highlights": 69,
+      "techniques": 4,
+      "suppressedOverlaps": 46,
+      "paragraphs": 46,
+      "heapWithExtensionMB": 5.82080078125,
+      "heapWithoutExtensionMB": 0.41735076904296875
+    },
+    {
+      "id": "S6-multi-pattern",
+      "description": "Simultaneous multi-pattern detections: all 39 rules' test sentences, repeated to 2,000 words",
+      "words": 1999,
+      "runs": [
+        137,
+        141,
+        141,
+        145,
+        146,
+        158,
+        160,
+        160,
+        163,
+        193
+      ],
+      "medianMs": 152,
+      "maxMs": 193,
+      "underBudget": true,
+      "stagesMedianMs": {
+        "extraction": 2.2,
+        "catalog": 3.2,
+        "matching": 131.3,
+        "rendering": 9.6
+      },
+      "highlights": 265,
+      "techniques": 14,
+      "suppressedOverlaps": 0,
+      "paragraphs": 63,
+      "heapWithExtensionMB": 5.744632720947266,
+      "heapWithoutExtensionMB": 0.41735076904296875
+    }
+  ],
+  "repeatedInjection": {
+    "id": "S5-repeated",
+    "description": "Repeated highlight injection: highlights turned off and on 10 times on the 2,000-word page",
+    "firstRunHighlights": 30,
+    "cycles": [
+      {
+        "elapsedMs": 113,
+        "highlights": 30,
+        "spansAfterOff": 0,
+        "spansAfterOn": 30,
+        "heapMB": 5.6798095703125,
+        "offOk": true
+      },
+      {
+        "elapsedMs": 125,
+        "highlights": 30,
+        "spansAfterOff": 0,
+        "spansAfterOn": 30,
+        "heapMB": 5.710193634033203,
+        "offOk": true
+      },
+      {
+        "elapsedMs": 107,
+        "highlights": 30,
+        "spansAfterOff": 0,
+        "spansAfterOn": 30,
+        "heapMB": 5.723369598388672,
+        "offOk": true
+      },
+      {
+        "elapsedMs": 114,
+        "highlights": 30,
+        "spansAfterOff": 0,
+        "spansAfterOn": 30,
+        "heapMB": 5.745231628417969,
+        "offOk": true
+      },
+      {
+        "elapsedMs": 106,
+        "highlights": 30,
+        "spansAfterOff": 0,
+        "spansAfterOn": 30,
+        "heapMB": 5.755714416503906,
+        "offOk": true
+      },
+      {
+        "elapsedMs": 116,
+        "highlights": 30,
+        "spansAfterOff": 0,
+        "spansAfterOn": 30,
+        "heapMB": 5.763763427734375,
+        "offOk": true
+      },
+      {
+        "elapsedMs": 112,
+        "highlights": 30,
+        "spansAfterOff": 0,
+        "spansAfterOn": 30,
+        "heapMB": 5.765186309814453,
+        "offOk": true
+      },
+      {
+        "elapsedMs": 129,
+        "highlights": 30,
+        "spansAfterOff": 0,
+        "spansAfterOn": 30,
+        "heapMB": 5.845062255859375,
+        "offOk": true
+      },
+      {
+        "elapsedMs": 118,
+        "highlights": 30,
+        "spansAfterOff": 0,
+        "spansAfterOn": 30,
+        "heapMB": 5.850894927978516,
+        "offOk": true
+      },
+      {
+        "elapsedMs": 114,
+        "highlights": 30,
+        "spansAfterOff": 0,
+        "spansAfterOn": 30,
+        "heapMB": 5.857933044433594,
+        "offOk": true
+      }
+    ],
+    "noDuplicates": true,
+    "medianMs": 114,
+    "maxMs": 129,
+    "underBudget": true,
+    "heapGrowthMB": 0.17812347412109375
+  },
+  "browser": "Chrome/155.0.8059.85",
+  "machine": {
+    "os": "Windows_NT 10.0.26200 (x64)",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12450HX",
+    "logicalCores": 12,
+    "ramGB": 12
+  }
+}

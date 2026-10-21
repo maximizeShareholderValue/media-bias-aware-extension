@@ -89,7 +89,11 @@ function scorePhase2(rows, key) {
     }
     complete.push(votes);
   });
-  const k = M.fleissKappa(M.toCounts(complete));
+  const counts = M.toCounts(complete);
+  const k = M.fleissKappa(counts);
+  const g = M.gwetAC1(counts);
+  const judgments = complete.length * 3;
+  const validJudgments = complete.reduce((s, v) => s + v.filter(Boolean).length, 0);
   return {
     rated: complete.length,
     incomplete: incomplete,
@@ -97,6 +101,10 @@ function scorePhase2(rows, key) {
     kappa: k.kappa,
     observedAgreement: k.observedAgreement,
     expectedAgreement: k.expectedAgreement,
+    gwetAC1: g.ac1,
+    judgments: judgments,
+    validJudgments: validJudgments,
+    validJudgmentShare: judgments ? validJudgments / judgments : null,
     percentUnanimous: complete.length ? complete.filter((v) => v.every((x) => x === v[0])).length / complete.length : null,
     validatedShare: complete.length ? complete.filter(M.isValidated).length / complete.length : null
   };
@@ -152,7 +160,8 @@ function score(input) {
       referenceSpans: strictRef.length,
       referenceSpansAnyTechnique: lenientRef.length,
       referenceSpansAnyOverlap: strictAny.length,
-      allThreeAgreed: strictRef.length ? strictRef.filter((r) => r.validators.length === 3).length / strictRef.length : null
+      allThreeAgreed: strictRef.length ? strictRef.filter((r) => r.validators.length === 3).length / strictRef.length : null,
+      agreement: R.pairwiseF1(tokens) // 7.4: mean pairwise span-level F1, IoU >= 0.50, same technique
     },
     fullPipeline: system(pipeline),
     baseline: system(baseline),
@@ -177,6 +186,8 @@ function format(report) {
   lines.push("Articles: " + report.articles + "   Phase 1 annotations: " + p1.annotations + " (located " + p1.located + ")");
   lines.push("Reference spans (>= 2 of 3 validators, IoU >= 0.50): " + p1.referenceSpans + " same technique, " + p1.referenceSpansAnyTechnique + " any technique;  all 3 agreed on " + pct(p1.allThreeAgreed) +
     ";  " + p1.referenceSpansAnyOverlap + " same technique under any overlap");
+  const f3 = (x) => (x === null || x === undefined ? "n/a" : x.toFixed(3));
+  lines.push("Phase 1 agreement (7.4): mean pairwise span F1 = " + f3(p1.agreement.meanF1) + "  (" + p1.agreement.pairs.map((x) => x.a + "-" + x.b + " " + f3(x.f1)).join(", ") + ")");
   if (p1.unlocated.length) {
     lines.push("\nWARNING: " + p1.unlocated.length + " annotations could not be used - fix them in the sheet and re-run:");
     p1.unlocated.forEach((u) => lines.push("  " + u.validator + " " + (u.annotationId || "") + " [" + u.articleId + "] \"" + u.span + "\" (" + u.technique + "): " + u.problem));
@@ -187,6 +198,8 @@ function format(report) {
     lines.push("\nPhase 2: " + k.rated + " highlights rated by all 3" + (k.incomplete ? " (" + k.incomplete + " incomplete)" : "") +
       "   Fleiss' kappa: " + (k.kappa === null ? "undefined (all judgments in one category)" : k.kappa.toFixed(3)) +
       "   unanimous=" + pct(k.percentUnanimous) + "   validated (>= 2 Valid)=" + pct(k.validatedShare));
+    lines.push("  Percent agreement (Po)=" + pct(k.observedAgreement) + "   Gwet's AC1=" + (k.gwetAC1 === null ? "n/a" : k.gwetAC1.toFixed(3)) +
+      " (supplementary; Gate 1 is decided by kappa)   judgments: " + k.validJudgments + " Valid / " + (k.judgments - k.validJudgments) + " Not Valid (" + pct(k.validJudgmentShare) + " Valid)");
     if (k.unrecognizedValues) lines.push("WARNING: " + k.unrecognizedValues + " rows had values that are not Valid / Not Valid.");
   }
   lines.push("");
