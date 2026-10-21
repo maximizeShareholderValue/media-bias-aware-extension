@@ -1,0 +1,517 @@
+{
+  "generatedAt": "2026-10-21T15:03:06.067Z",
+  "catalogVersion": "1.1.0",
+  "detectionsGeneratedAt": "2026-10-20T23:15:33.791Z",
+  "articles": [
+    {
+      "event": 1,
+      "id": "L01",
+      "lean": "Left",
+      "title": "Supreme Court rules most Trump tariffs illegal in major setback for economic agenda",
+      "words": 1547,
+      "cues": 2,
+      "per1000Words": 1.292824822236587,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 1,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 1,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": [
+        {
+          "phrase": "lambasted",
+          "technique": "LOADED_LANGUAGE",
+          "rule": "LL-011"
+        },
+        {
+          "phrase": "claimed",
+          "technique": "DOUBT",
+          "rule": "DB-004"
+        }
+      ]
+    },
+    {
+      "event": 1,
+      "id": "C01",
+      "lean": "Center",
+      "title": "Trump vows to reimpose tariffs despite 'unpatriotic' Supreme Court decision",
+      "words": 1366,
+      "cues": 1,
+      "per1000Words": 0.7320644216691069,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 1,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": [
+        {
+          "phrase": "blasted",
+          "technique": "LOADED_LANGUAGE",
+          "rule": "LL-011"
+        }
+      ]
+    },
+    {
+      "event": 1,
+      "id": "R01",
+      "lean": "Right",
+      "title": "Supreme Court Strikes Down Trump’s Global Tariffs in Landmark Decision",
+      "words": 861,
+      "cues": 0,
+      "per1000Words": 0,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": []
+    },
+    {
+      "event": 2,
+      "id": "L02",
+      "lean": "Left",
+      "title": "Kevin Warsh confirmed as Fed chair, succeeding Jerome Powell | CNN Business",
+      "words": 844,
+      "cues": 0,
+      "per1000Words": 0,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": []
+    },
+    {
+      "event": 2,
+      "id": "C02",
+      "lean": "Center",
+      "title": "Warsh confirmed as Federal Reserve chief to follow Jerome Powell - UPI.com",
+      "words": 384,
+      "cues": 0,
+      "per1000Words": 0,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": []
+    },
+    {
+      "event": 2,
+      "id": "R02",
+      "lean": "Right",
+      "title": "Senate Confirms Kevin Warsh as New Fed Chair",
+      "words": 908,
+      "cues": 0,
+      "per1000Words": 0,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": []
+    },
+    {
+      "event": 3,
+      "id": "L03",
+      "lean": "Left",
+      "title": "Flydubai Pilot Arrested After 'Apparently' Trying to Crash Israel-Bound Plane, Says Netanyahu",
+      "words": 502,
+      "cues": 0,
+      "per1000Words": 0,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": []
+    },
+    {
+      "event": 3,
+      "id": "C03",
+      "lean": "Center",
+      "title": "Passengers foil bid to crash Dubai-Tel Aviv flight, Israel says, after co-pilot stabs pilot",
+      "words": 1108,
+      "cues": 0,
+      "per1000Words": 0,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": []
+    },
+    {
+      "event": 3,
+      "id": "R03",
+      "lean": "Right",
+      "title": "Co-Pilot Tried to Crash Israel-Bound Plane, Netanyahu Says",
+      "words": 1035,
+      "cues": 0,
+      "per1000Words": 0,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": []
+    },
+    {
+      "event": 4,
+      "id": "L04",
+      "lean": "Left",
+      "title": "Artemis II astronauts return home, ending record-breaking NASA mission around the moon",
+      "words": 939,
+      "cues": 0,
+      "per1000Words": 0,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": []
+    },
+    {
+      "event": 4,
+      "id": "C04",
+      "lean": "Center",
+      "title": "Artemis II crew successfully plunges into Pacific after moon mission",
+      "words": 482,
+      "cues": 0,
+      "per1000Words": 0,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": []
+    },
+    {
+      "event": 4,
+      "id": "R04",
+      "lean": "Right",
+      "title": "Artemis II Mission Ends With Splashdown Off San Diego",
+      "words": 975,
+      "cues": 0,
+      "per1000Words": 0,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": []
+    },
+    {
+      "event": 5,
+      "id": "L05",
+      "lean": "Left",
+      "title": "Trump calls Iran’s response to U.S. peace proposal ‘totally unacceptable’",
+      "words": 676,
+      "cues": 2,
+      "per1000Words": 2.9585798816568047,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 1,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 1,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": [
+        {
+          "phrase": "regime",
+          "technique": "NAME_CALLING_LABELING",
+          "rule": "NC-005"
+        },
+        {
+          "phrase": "analysts say",
+          "technique": "APPEAL_TO_AUTHORITY",
+          "rule": "AA-001"
+        }
+      ]
+    },
+    {
+      "event": 5,
+      "id": "C05",
+      "lean": "Center",
+      "title": "Trump calls Iran’s proposal ‘totally unacceptable’",
+      "words": 361,
+      "cues": 1,
+      "per1000Words": 2.770083102493075,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 1,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": [
+        {
+          "phrase": "slammed",
+          "technique": "LOADED_LANGUAGE",
+          "rule": "LL-011"
+        }
+      ]
+    },
+    {
+      "event": 5,
+      "id": "R05",
+      "lean": "Right",
+      "title": "Trump Calls Iran’s Response to Peace Proposal ‘Totally Unacceptable’",
+      "words": 648,
+      "cues": 1,
+      "per1000Words": 1.5432098765432098,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 1,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      },
+      "phrases": [
+        {
+          "phrase": "regime",
+          "technique": "NAME_CALLING_LABELING",
+          "rule": "NC-005"
+        }
+      ]
+    }
+  ],
+  "byLean": [
+    {
+      "lean": "Left",
+      "articles": 5,
+      "words": 4508,
+      "cues": 4,
+      "meanPerArticle": 0.8,
+      "sdPerArticle": 1.0954451150103324,
+      "per1000Words": 0.8873114463176575,
+      "articlesWithNoCue": 3,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 1,
+        "NAME_CALLING_LABELING": 1,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 1,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 1,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      }
+    },
+    {
+      "lean": "Center",
+      "articles": 5,
+      "words": 3701,
+      "cues": 2,
+      "meanPerArticle": 0.4,
+      "sdPerArticle": 0.5477225575051662,
+      "per1000Words": 0.5403944879762227,
+      "articlesWithNoCue": 3,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 2,
+        "NAME_CALLING_LABELING": 0,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      }
+    },
+    {
+      "lean": "Right",
+      "articles": 5,
+      "words": 4427,
+      "cues": 1,
+      "meanPerArticle": 0.2,
+      "sdPerArticle": 0.447213595499958,
+      "per1000Words": 0.225886604924328,
+      "articlesWithNoCue": 4,
+      "perTechnique": {
+        "LOADED_LANGUAGE": 0,
+        "NAME_CALLING_LABELING": 1,
+        "REPETITION": 0,
+        "EXAGGERATION_MINIMIZATION": 0,
+        "DOUBT": 0,
+        "APPEAL_TO_FEAR_PREJUDICE": 0,
+        "FLAG_WAVING": 0,
+        "CAUSAL_OVERSIMPLIFICATION": 0,
+        "SLOGANS": 0,
+        "APPEAL_TO_AUTHORITY": 0,
+        "BLACK_AND_WHITE_FALLACY": 0,
+        "THOUGHT_TERMINATING_CLICHES": 0,
+        "BANDWAGON_REDUCTIO_AD_HITLERUM": 0,
+        "STRAW_MAN_WHATABOUTISM_RED_HERRING": 0
+      }
+    }
+  ]
+}
