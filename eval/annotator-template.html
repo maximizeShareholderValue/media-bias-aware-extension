@@ -424,7 +424,12 @@ var DATA = /*__DATA__*/null;
         '<button data-v="Not Valid"' + (j === "Not Valid" ? ' class="on"' : "") + ">Not Valid</button>" +
         '<input type="text" placeholder="Comment (optional)" value="' + esc(state.p2.comment[id] || "") + '"></div>';
       div.querySelectorAll("button").forEach(function (b) {
-        b.onclick = function () { state.p2.judgment[id] = b.dataset.v; save(); renderPhase2(); };
+        b.onclick = function () {
+          var wasComplete = P2.every(function (x) { return state.p2.judgment[x[0]]; });
+          state.p2.judgment[id] = b.dataset.v; save(); renderPhase2();
+          // The last judgment is usually at the bottom of the list: bring the "all judged" note into view.
+          if (!wasComplete && P2.every(function (x) { return state.p2.judgment[x[0]]; })) $("p2Done").scrollIntoView({ behavior: "smooth", block: "center" });
+        };
       });
       div.querySelector("input").onchange = function (ev) { state.p2.comment[id] = ev.target.value; save(); };
       $("p2List").appendChild(div);
