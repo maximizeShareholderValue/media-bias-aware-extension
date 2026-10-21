@@ -1,7 +1,7 @@
 {
   "catalogVersion": "1.1.0",
   "ruleCount": 39,
-  "generatedAt": "2026-10-20T23:55:38.392Z",
+  "generatedAt": "2026-10-21T15:20:40.483Z",
   "referenceExamples": [
     {
       "case": "FT-01",
@@ -950,5 +950,612 @@
       },
       "referenceExampleDetected": true
     }
-  ]
+  ],
+  "sentenceBoundaries": {
+    "rows": [
+      {
+        "case": "SB-01",
+        "text": "The U.S. Senate voted on Tuesday. The bill passed 52 to 48.",
+        "gold": [
+          "The U.S. Senate voted on Tuesday.",
+          "The bill passed 52 to 48."
+        ],
+        "predicted": [
+          "The U.S. Senate voted on Tuesday.",
+          "The bill passed 52 to 48."
+        ],
+        "goldBoundaries": [
+          34
+        ],
+        "predictedBoundaries": [
+          34
+        ],
+        "correct": true
+      },
+      {
+        "case": "SB-02",
+        "text": "Dr. Smith said the rate rose 3.5 percent. Markets fell.",
+        "gold": [
+          "Dr. Smith said the rate rose 3.5 percent.",
+          "Markets fell."
+        ],
+        "predicted": [
+          "Dr. Smith said the rate rose 3.5 percent.",
+          "Markets fell."
+        ],
+        "goldBoundaries": [
+          42
+        ],
+        "predictedBoundaries": [
+          42
+        ],
+        "correct": true
+      },
+      {
+        "case": "SB-03",
+        "text": "\"This is a disaster,\" the mayor said. Critics disagreed.",
+        "gold": [
+          "\"This is a disaster,\" the mayor said.",
+          "Critics disagreed."
+        ],
+        "predicted": [
+          "\"This is a disaster,\" the mayor said.",
+          "Critics disagreed."
+        ],
+        "goldBoundaries": [
+          38
+        ],
+        "predictedBoundaries": [
+          38
+        ],
+        "correct": true
+      },
+      {
+        "case": "SB-04",
+        "text": "Is the plan working? Officials say yes!",
+        "gold": [
+          "Is the plan working?",
+          "Officials say yes!"
+        ],
+        "predicted": [
+          "Is the plan working?",
+          "Officials say yes!"
+        ],
+        "goldBoundaries": [
+          21
+        ],
+        "predictedBoundaries": [
+          21
+        ],
+        "correct": true
+      },
+      {
+        "case": "SB-05",
+        "text": "Prices rose in Jan. and Feb. according to the report.",
+        "gold": [
+          "Prices rose in Jan. and Feb. according to the report."
+        ],
+        "predicted": [
+          "Prices rose in Jan. and Feb. according to the report."
+        ],
+        "goldBoundaries": [],
+        "predictedBoundaries": [],
+        "correct": true
+      },
+      {
+        "case": "SB-06",
+        "text": "The company, based in Washington, D.C., hired 200 workers.",
+        "gold": [
+          "The company, based in Washington, D.C., hired 200 workers."
+        ],
+        "predicted": [
+          "The company, based in Washington, D.C., hired 200 workers."
+        ],
+        "goldBoundaries": [],
+        "predictedBoundaries": [],
+        "correct": true
+      },
+      {
+        "case": "SB-07",
+        "text": "He waited... Then he left.",
+        "gold": [
+          "He waited...",
+          "Then he left."
+        ],
+        "predicted": [
+          "He waited... Then he left."
+        ],
+        "goldBoundaries": [
+          13
+        ],
+        "predictedBoundaries": [],
+        "correct": false
+      },
+      {
+        "case": "SB-08",
+        "text": "Officials met at 3 p.m. on Monday. No deal was reached.",
+        "gold": [
+          "Officials met at 3 p.m. on Monday.",
+          "No deal was reached."
+        ],
+        "predicted": [
+          "Officials met at 3 p.m. on Monday.",
+          "No deal was reached."
+        ],
+        "goldBoundaries": [
+          35
+        ],
+        "predictedBoundaries": [
+          35
+        ],
+        "correct": true
+      },
+      {
+        "case": "SB-09",
+        "text": "Mr. and Mrs. Jones arrived late. They apologized.",
+        "gold": [
+          "Mr. and Mrs. Jones arrived late.",
+          "They apologized."
+        ],
+        "predicted": [
+          "Mr. and Mrs. Jones arrived late.",
+          "They apologized."
+        ],
+        "goldBoundaries": [
+          33
+        ],
+        "predictedBoundaries": [
+          33
+        ],
+        "correct": true
+      },
+      {
+        "case": "SB-10",
+        "text": "The vote was 7-2. Justice Roberts wrote the opinion.",
+        "gold": [
+          "The vote was 7-2.",
+          "Justice Roberts wrote the opinion."
+        ],
+        "predicted": [
+          "The vote was 7-2.",
+          "Justice Roberts wrote the opinion."
+        ],
+        "goldBoundaries": [
+          18
+        ],
+        "predictedBoundaries": [
+          18
+        ],
+        "correct": true
+      },
+      {
+        "case": "SB-11",
+        "text": "She asked, \"Why now?\" Nobody answered.",
+        "gold": [
+          "She asked, \"Why now?\"",
+          "Nobody answered."
+        ],
+        "predicted": [
+          "She asked, \"Why now?\" Nobody answered."
+        ],
+        "goldBoundaries": [
+          22
+        ],
+        "predictedBoundaries": [],
+        "correct": false
+      },
+      {
+        "case": "SB-12",
+        "text": "Inflation hit 9.1% in 2022. It has since eased.",
+        "gold": [
+          "Inflation hit 9.1% in 2022.",
+          "It has since eased."
+        ],
+        "predicted": [
+          "Inflation hit 9.1% in 2022.",
+          "It has since eased."
+        ],
+        "goldBoundaries": [
+          28
+        ],
+        "predictedBoundaries": [
+          28
+        ],
+        "correct": true
+      },
+      {
+        "case": "SB-13",
+        "text": "The St. Louis team won. Fans celebrated.",
+        "gold": [
+          "The St. Louis team won.",
+          "Fans celebrated."
+        ],
+        "predicted": [
+          "The St. Louis team won.",
+          "Fans celebrated."
+        ],
+        "goldBoundaries": [
+          24
+        ],
+        "predictedBoundaries": [
+          24
+        ],
+        "correct": true
+      },
+      {
+        "case": "SB-14",
+        "text": "NASA's Artemis II crew returned safely. The mission lasted 10 days.",
+        "gold": [
+          "NASA's Artemis II crew returned safely.",
+          "The mission lasted 10 days."
+        ],
+        "predicted": [
+          "NASA's Artemis II crew returned safely.",
+          "The mission lasted 10 days."
+        ],
+        "goldBoundaries": [
+          40
+        ],
+        "predictedBoundaries": [
+          40
+        ],
+        "correct": true
+      },
+      {
+        "case": "SB-15",
+        "text": "One sentence without a final period",
+        "gold": [
+          "One sentence without a final period"
+        ],
+        "predicted": [
+          "One sentence without a final period"
+        ],
+        "goldBoundaries": [],
+        "predictedBoundaries": [],
+        "correct": true
+      }
+    ],
+    "textsCorrect": 13,
+    "boundaryPrecision": 1,
+    "boundaryRecall": 0.8333333333333334,
+    "goldBoundaries": 12,
+    "predictedBoundaries": 10
+  },
+  "posTagging": {
+    "rows": [
+      {
+        "case": "POS-01",
+        "sentence": "The governor slammed the proposal.",
+        "word": "slammed",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PastTense"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-02",
+        "sentence": "It was a shameful decision.",
+        "word": "shameful",
+        "gold": "Adjective",
+        "tags": [
+          "Adjective"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-03",
+        "sentence": "The radical activists blocked the road.",
+        "word": "radical",
+        "gold": "Adjective",
+        "tags": [
+          "Noun",
+          "Actor",
+          "Singular"
+        ],
+        "correct": false
+      },
+      {
+        "case": "POS-04",
+        "sentence": "The regime cracked down on dissent.",
+        "word": "regime",
+        "gold": "Noun",
+        "tags": [
+          "Noun",
+          "Singular"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-05",
+        "sentence": "Prices skyrocketed last year.",
+        "word": "skyrocketed",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PastTense"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-06",
+        "sentence": "The so-called experts disagreed.",
+        "word": "experts",
+        "gold": "Noun",
+        "tags": [
+          "Noun",
+          "Plural"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-07",
+        "sentence": "He allegedly took the money.",
+        "word": "allegedly",
+        "gold": "Adverb",
+        "tags": [
+          "Adverb"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-08",
+        "sentence": "The senator claimed victory.",
+        "word": "claimed",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PastTense"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-09",
+        "sentence": "The claim was false.",
+        "word": "claim",
+        "gold": "Noun",
+        "tags": [
+          "Noun",
+          "Singular"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-10",
+        "sentence": "It is a mere formality.",
+        "word": "mere",
+        "gold": "Adjective",
+        "tags": [
+          "Adjective"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-11",
+        "sentence": "They plan to attack the city.",
+        "word": "attack",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PresentTense",
+          "Infinitive"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-12",
+        "sentence": "The attack killed ten people.",
+        "word": "attack",
+        "gold": "Noun",
+        "tags": [
+          "Noun",
+          "Singular"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-13",
+        "sentence": "Critics say the plan will fail.",
+        "word": "say",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PresentTense",
+          "Infinitive"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-14",
+        "sentence": "Critics say the plan will fail.",
+        "word": "fail",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PresentTense",
+          "Infinitive"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-15",
+        "sentence": "The flood was catastrophic.",
+        "word": "catastrophic",
+        "gold": "Adjective",
+        "tags": [
+          "Adjective"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-16",
+        "sentence": "Migrants are flooding the border.",
+        "word": "flooding",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PresentTense",
+          "Gerund"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-17",
+        "sentence": "The flooding damaged homes.",
+        "word": "flooding",
+        "gold": "Noun",
+        "tags": [
+          "Noun",
+          "Singular"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-18",
+        "sentence": "Officials refused to comment.",
+        "word": "refused",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PastTense"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-19",
+        "sentence": "The notorious gang returned.",
+        "word": "notorious",
+        "gold": "Adjective",
+        "tags": [
+          "Adjective"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-20",
+        "sentence": "She spoke quickly.",
+        "word": "quickly",
+        "gold": "Adverb",
+        "tags": [
+          "Adverb"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-21",
+        "sentence": "Experts warn of an existential threat.",
+        "word": "existential",
+        "gold": "Adjective",
+        "tags": [
+          "Adjective"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-22",
+        "sentence": "Experts warn of an existential threat.",
+        "word": "threat",
+        "gold": "Noun",
+        "tags": [
+          "Noun",
+          "Singular"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-23",
+        "sentence": "The record was broken.",
+        "word": "record",
+        "gold": "Noun",
+        "tags": [
+          "Noun",
+          "Singular"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-24",
+        "sentence": "They record every call.",
+        "word": "record",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PresentTense",
+          "Infinitive"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-25",
+        "sentence": "Everyone knows the truth.",
+        "word": "knows",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PresentTense"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-26",
+        "sentence": "True patriots support the bill.",
+        "word": "patriots",
+        "gold": "Noun",
+        "tags": [
+          "Noun",
+          "Plural",
+          "Actor"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-27",
+        "sentence": "True patriots support the bill.",
+        "word": "support",
+        "gold": "Verb",
+        "tags": [
+          "Verb",
+          "PresentTense",
+          "Infinitive"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-28",
+        "sentence": "The terrorists fled the scene.",
+        "word": "terrorists",
+        "gold": "Noun",
+        "tags": [
+          "Noun",
+          "Plural"
+        ],
+        "correct": true
+      },
+      {
+        "case": "POS-29",
+        "sentence": "It was a total disaster.",
+        "word": "total",
+        "gold": "Adjective",
+        "tags": [
+          "Noun",
+          "Singular"
+        ],
+        "correct": false
+      },
+      {
+        "case": "POS-30",
+        "sentence": "It was a total disaster.",
+        "word": "disaster",
+        "gold": "Noun",
+        "tags": [
+          "Noun",
+          "Singular"
+        ],
+        "correct": true
+      }
+    ],
+    "correct": 28,
+    "accuracy": 0.9333333333333333
+  }
 }
