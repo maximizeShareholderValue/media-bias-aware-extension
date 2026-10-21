@@ -51,13 +51,45 @@
   #storageWarn { background: var(--warn); color: #fff; padding: 8px 16px; font-size: 14px; }
   #toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 6px; font-size: 13px; display: none; z-index: 30; }
   .hint, .article p.hint { color: var(--muted); font: 13px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0 0 12px; }
-  #start { max-width: 520px; margin: 60px auto; }
+  #start { max-width: 560px; margin: 40px auto; }
+  .guide h3 { margin: 14px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .guide ul, .guide ol { margin: 0 0 8px; padding-left: 20px; font-size: 14px; }
+  .guide li { margin-bottom: 4px; }
+  #guidePanel { max-width: 1168px; margin: 16px auto 0; }
+  .tech i { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  #p2view { max-width: 900px; margin: 16px auto; }
+  .p2bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .p2bar span { flex: 1; color: var(--muted); font-size: 13px; }
+  .p2item { border-top: 1px solid var(--line); padding: 12px 0; }
+  .p2item .head { font-size: 12.5px; color: var(--muted); }
+  .p2item .head b { color: var(--ink); }
+  .p2item .sent { font-family: Georgia, "Times New Roman", serif; font-size: 16px; line-height: 1.6; margin: 6px 0; }
+  .p2item .sent strong { background: #e9c46a55; box-shadow: inset 0 -2px #e9c46a; }
+  .p2item .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .p2item .row input { flex: 1; min-width: 180px; font-size: 13px; }
+  .p2item button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .locked #artBody { cursor: default; }
 </style>
 </head>
 <body>
 <div id="start" class="card">
   <h2 style="margin-top:0">Article annotation (Phase 1)</h2>
-  <p class="hint">Choose your validator number. Your work is saved in this browser automatically. Use <b>Export CSV</b> to send it to the researchers (and as a backup).</p>
+  <div class="guide">
+    <h3>Rules</h3>
+    <ul>
+      <li>Judge the <b>wording only</b>: not the politics, not whether it is true.</li>
+      <li>Mark only <b>clear cases</b>. Unsure? Leave it out.</li>
+      <li>Select only the <b>words that carry the technique</b>, not the whole sentence.</li>
+      <li>Skip <span class="q">grey text</span>: it is quoted speech.</li>
+      <li>Work <b>alone</b>.</li>
+    </ul>
+    <h3>Steps</h3>
+    <ol>
+      <li><b>Here:</b> mark all 30 articles and tick "finished" on each. Then click <b>Export CSV</b> and send the file.</li>
+      <li><b>Then</b> click <b>Phase 2</b> (top bar): mark each of the 19 phrases <b>Valid</b> or <b>Not Valid</b>, then click <b>Export Phase 2 CSV</b> and send the file. Opening Phase 2 locks Step 1.</li>
+    </ol>
+    <p class="hint">Use the same browser every time; your work saves automatically. Export CSV at the end of every sitting as a backup.</p>
+  </div>
   <p><select id="who"><option value="">Validator…</option><option>V1</option><option>V2</option><option>V3</option></select>
   <button class="primary" id="go">Start</button></p>
 </div>
@@ -68,11 +100,20 @@
   <select id="articleSel" aria-label="Article"></select>
   <div class="progress"><div class="bar"><div id="barFill"></div></div><span id="progText"></span></div>
   <span id="savedAt">Not saved yet</span>
+  <button id="guideBtn" aria-expanded="false">Guide</button>
   <button id="importBtn">Import CSV</button>
   <button class="primary" id="exportBtn">Export CSV</button>
+  <button id="p2Btn">Phase 2</button>
   <input type="file" id="importFile" accept=".csv" hidden>
 </header>
 <div id="storageWarn" hidden><b>Autosave is not working in this browser</b> (private window or blocked site data). Your marks will be lost when you close this page: click <b>Export CSV</b> often, and use <b>Import CSV</b> to continue later.</div>
+<div id="guidePanel" class="card" hidden></div>
+<section id="p2view" class="card" hidden>
+  <h2 style="margin-top:0">Phase 2: judge the highlighted phrases</h2>
+  <p class="hint">For each phrase: <b>Valid</b> if it reasonably shows the technique named, otherwise <b>Not Valid</b>. Unsure? <b>Not Valid</b>. Judge the wording only.</p>
+  <div class="p2bar"><span id="p2Count"></span><button class="primary" id="p2Export">Export Phase 2 CSV</button><button id="p2Back">Back to articles (read only)</button></div>
+  <div id="p2List"></div>
+</section>
 <main>
   <section class="card article">
     <h2 id="artTitle"></h2>
@@ -97,7 +138,7 @@ var DATA = /*__DATA__*/null;
 (function () {
   "use strict";
   var COLORS = ["#f4a259", "#e76f51", "#8ab17d", "#2a9d8f", "#e9c46a", "#b56576", "#6d597a", "#457b9d", "#f28482", "#84a59d", "#c9ada7", "#90be6d", "#bc6c25", "#7f5539"];
-  var techs = DATA.techniques.map(function (t, i) { return { key: t.key, label: t.label, description: t.description, color: COLORS[i % COLORS.length] }; });
+  var techs = DATA.techniques.map(function (t, i) { return { key: t.key, label: t.label, description: t.description, example: t.example || "", color: COLORS[i % COLORS.length] }; });
   var byKey = {};
   techs.forEach(function (t) { byKey[t.key] = t; });
   var who = null, state = null, current = 0, pending = null;
@@ -105,8 +146,19 @@ var DATA = /*__DATA__*/null;
 
   function storeKey() { return "annotator:" + DATA.buildId + ":" + who; }
   function load() {
-    try { var raw = localStorage.getItem(storeKey()); if (raw) return JSON.parse(raw); } catch (e) {}
-    return { anns: [], done: {}, seq: 0 };
+    var s = null;
+    try { var raw = localStorage.getItem(storeKey()); if (raw) s = JSON.parse(raw); } catch (e) {}
+    return withPhase2(s || { anns: [], done: {}, seq: 0 });
+  }
+  // Phase 2 state: exported1 = the Phase 1 CSV was exported; open = Phase 2 opened (Phase 1 frozen).
+  function withPhase2(s) {
+    s.p2 = s.p2 || { exported1: false, open: false, judgment: {}, comment: {} };
+    return s;
+  }
+  function phase1Locked() { return !!(state && state.p2.open); }
+  var P2 = [];
+  if (DATA.p2) {
+    try { P2 = JSON.parse(decodeURIComponent(escape(atob(DATA.p2)))); } catch (e) { P2 = []; }
   }
   function storageWorks() {
     try { var k = "annotator:probe"; localStorage.setItem(k, "1"); var ok = localStorage.getItem(k) === "1"; localStorage.removeItem(k); return ok; } catch (e) { return false; }
@@ -185,6 +237,10 @@ var DATA = /*__DATA__*/null;
       $("annList").appendChild(row);
     });
     $("doneBox").checked = !!state.done[art.id];
+    $("doneBox").disabled = phase1Locked();
+    document.body.classList.toggle("locked", phase1Locked());
+    $("p2Btn").textContent = state.p2.open ? "Phase 2" : "Phase 2 (locked until all 30 are finished)";
+    if (state.p2.open) $("artMeta").textContent += " · Phase 1 is locked (read only)";
     var nDone = DATA.articles.filter(function (x) { return state.done[x.id]; }).length;
     $("barFill").style.width = (100 * nDone / DATA.articles.length) + "%";
     $("progText").textContent = nDone + " / " + DATA.articles.length + " done";
@@ -207,6 +263,7 @@ var DATA = /*__DATA__*/null;
   function onSelect() {
     var sel = window.getSelection();
     if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+    if (phase1Locked()) { toast("Phase 1 is locked because Phase 2 was opened."); return; }
     var r = sel.getRangeAt(0);
     if (!$("artBody").contains(r.commonAncestorContainer)) return;
     var s = absOffset(r.startContainer, r.startOffset), e = absOffset(r.endContainer, r.endOffset);
@@ -240,6 +297,7 @@ var DATA = /*__DATA__*/null;
     save(); render();
   }
   function removeAnn(id) {
+    if (phase1Locked()) { toast("Phase 1 is locked because Phase 2 was opened."); return; }
     var a = state.anns.filter(function (x) { return x.id === id; })[0];
     if (!a || !confirm("Remove “" + a.span + "” (" + byKey[a.technique].label + ")?")) return;
     state.anns = state.anns.filter(function (x) { return x.id !== id; });
@@ -259,7 +317,70 @@ var DATA = /*__DATA__*/null;
     a.href = URL.createObjectURL(blob);
     a.download = who + "-phase1-" + new Date().toISOString().slice(0, 10) + ".csv";
     a.click();
+    state.p2.exported1 = true;
+    save();
     toast("Exported " + state.anns.length + " marks. Send this file to the researchers.");
+  }
+
+  // ---- Phase 2 -------------------------------------------------------------
+  function allDone() { return DATA.articles.every(function (x) { return state.done[x.id]; }); }
+  function openPhase2() {
+    if (!P2.length) return toast("This file has no Phase 2 phrases.");
+    if (!state.p2.open) {
+      if (!allDone()) return toast("Finish all 30 articles first (tick \"finished\" on each).");
+      if (!state.p2.exported1) return toast("Click Export CSV first and keep the Phase 1 file.");
+      if (!confirm("Open Phase 2?\n\nYou will see the extension's highlights, so Phase 1 will be locked: you can no longer add or remove marks.")) return;
+      state.p2.open = true;
+      save();
+    }
+    $("p2view").hidden = false;
+    document.querySelector("main").hidden = true;
+    $("guidePanel").hidden = true;
+    renderPhase2();
+    window.scrollTo(0, 0);
+  }
+  function closePhase2() {
+    $("p2view").hidden = true;
+    document.querySelector("main").hidden = false;
+    render();
+  }
+  function sentenceHtml(sentence, phrase) {
+    var i = sentence.toLowerCase().indexOf(phrase.toLowerCase());
+    if (i < 0) return esc(sentence);
+    return esc(sentence.slice(0, i)) + "<strong>" + esc(sentence.slice(i, i + phrase.length)) + "</strong>" + esc(sentence.slice(i + phrase.length));
+  }
+  function renderPhase2() {
+    var n = P2.filter(function (r) { return state.p2.judgment[r[0]]; }).length;
+    $("p2Count").textContent = n + " / " + P2.length + " judged";
+    $("p2List").innerHTML = "";
+    P2.forEach(function (r) {
+      var id = r[0], j = state.p2.judgment[id] || "";
+      var div = document.createElement("div");
+      div.className = "p2item";
+      div.innerHTML = '<div class="head"><b>' + esc(id) + "</b> · " + esc(r[1]) + " · Technique: <b>" + esc(r[4]) + "</b></div>" +
+        '<div class="sent">' + sentenceHtml(r[3], r[2]) + "</div>" +
+        '<div class="row"><button data-v="Valid"' + (j === "Valid" ? ' class="on"' : "") + ">Valid</button>" +
+        '<button data-v="Not Valid"' + (j === "Not Valid" ? ' class="on"' : "") + ">Not Valid</button>" +
+        '<input type="text" placeholder="Comment (optional)" value="' + esc(state.p2.comment[id] || "") + '"></div>';
+      div.querySelectorAll("button").forEach(function (b) {
+        b.onclick = function () { state.p2.judgment[id] = b.dataset.v; save(); renderPhase2(); };
+      });
+      div.querySelector("input").onchange = function (ev) { state.p2.comment[id] = ev.target.value; save(); };
+      $("p2List").appendChild(div);
+    });
+  }
+  // Same columns as the workbook's Phase 2 tab, so eval/phase2-from-workbooks.js reads it unchanged.
+  function exportPhase2() {
+    var missing = P2.filter(function (r) { return !state.p2.judgment[r[0]]; }).length;
+    if (missing && !confirm(missing + " phrase(s) are not judged yet. Export anyway?")) return;
+    var rows = [["Phrase ID", "Article ID", "Flagged Phrase", "Sentence Context", "Assigned Technique", "Judgment", "Comment (optional)"]];
+    P2.forEach(function (r) { rows.push([r[0], r[1], r[2], r[3], r[4], state.p2.judgment[r[0]] || "", state.p2.comment[r[0]] || ""]); });
+    var blob = new Blob([rows.map(function (x) { return x.map(csvCell).join(","); }).join("\r\n") + "\r\n"], { type: "text/csv" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = who + "-phase2-" + new Date().toISOString().slice(0, 10) + ".csv";
+    a.click();
+    toast("Exported " + (P2.length - missing) + " judgments. Send this file to the researchers.");
   }
   function parseCsv(text) {
     var rows = [], row = [], cell = "", q = false;
@@ -287,7 +408,8 @@ var DATA = /*__DATA__*/null;
         seq = Math.max(seq, Number((r[0].match(/(\d+)$/) || [0, 0])[1]));
       });
       if (!confirm("Replace your current work with " + anns.length + " marks from this file?")) return;
-      state = { anns: anns, done: done, seq: seq };
+      state = withPhase2({ anns: anns, done: done, seq: seq });
+      state.p2.exported1 = true; // the file being imported is itself a Phase 1 export
       save(); render(); toast("Imported " + anns.length + " marks.");
     };
     reader.readAsText(file);
@@ -300,7 +422,8 @@ var DATA = /*__DATA__*/null;
     if (!storageWorks()) { $("storageWarn").hidden = false; $("savedAt").textContent = "NOT saved - export CSV"; }
     $("articleSel").innerHTML = DATA.articles.map(function (a, i) { return '<option value="' + i + '"></option>'; }).join("");
     $("techList").innerHTML = techs.map(function (t) {
-      return '<div class="tech" style="border-color:' + t.color + '"><b>' + esc(t.label) + "</b><span>" + esc(t.description) + "</span></div>";
+      return '<div class="tech" style="border-color:' + t.color + '"><b>' + esc(t.label) + "</b><span>" + esc(t.description) + "</span>" +
+        (t.example ? "<i>e.g. " + esc(t.example) + "</i>" : "") + "</div>";
     }).join("");
     $("picker").innerHTML = techs.map(function (t) {
       return '<button data-k="' + t.key + '"><span class="dot" style="background:' + t.color + '"></span>' + esc(t.label) + "</button>";
@@ -312,9 +435,24 @@ var DATA = /*__DATA__*/null;
   $("articleSel").onchange = function () { current = Number(this.value); render(); window.scrollTo(0, 0); };
   $("prevBtn").onclick = function () { if (current > 0) { current--; render(); window.scrollTo(0, 0); } };
   $("nextBtn").onclick = function () { if (current < DATA.articles.length - 1) { current++; render(); window.scrollTo(0, 0); } };
-  $("doneBox").onchange = function () { state.done[DATA.articles[current].id] = this.checked; save(); render(); };
+  $("doneBox").onchange = function () {
+    if (phase1Locked()) { this.checked = !this.checked; return toast("Phase 1 is locked because Phase 2 was opened."); }
+    state.done[DATA.articles[current].id] = this.checked; save(); render();
+  };
   $("exportBtn").onclick = exportCsv;
-  $("importBtn").onclick = function () { $("importFile").click(); };
+  // The same short guide as the start screen, shown again on demand.
+  $("guidePanel").innerHTML = document.querySelector("#start .guide").innerHTML;
+  $("guideBtn").onclick = function () {
+    var open = $("guidePanel").hidden;
+    $("guidePanel").hidden = !open;
+    $("guidePanel").className = "card guide";
+    this.setAttribute("aria-expanded", String(open));
+    this.textContent = open ? "Hide guide" : "Guide";
+  };
+  $("importBtn").onclick = function () { if (phase1Locked()) return toast("Phase 1 is locked because Phase 2 was opened."); $("importFile").click(); };
+  $("p2Btn").onclick = openPhase2;
+  $("p2Export").onclick = exportPhase2;
+  $("p2Back").onclick = closePhase2;
   $("importFile").onchange = function () { if (this.files[0]) importCsv(this.files[0]); this.value = ""; };
   // Mouse: act when the button is released. Touch: the selection is adjusted with handles after
   // the finger lifts, so wait until it has been still for a moment.
