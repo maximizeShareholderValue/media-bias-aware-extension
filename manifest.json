@@ -5,7 +5,6 @@
   "description": "Detects phrase-level linguistic bias in news articles in real time, entirely client-side, and shows outlet-level transparency metadata.",
   "permissions": [
     "activeTab",
-    "scripting",
     "storage"
   ],
   "optional_permissions": [],
