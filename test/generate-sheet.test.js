@@ -54,7 +54,7 @@ test("--pipeline-only output feeds score.js end to end", () => {
     "--articles", path.join(g.dir, "articles"), "--detections", path.join(g.out, "detections.json"),
     "--phase1", path.join(g.dir, "v1.csv"), path.join(g.dir, "v2.csv"), path.join(g.dir, "v3.csv"),
     "--phase2", path.join(g.dir, "phase2.csv"), "--key", path.join(g.out, "key.json")], { encoding: "utf8" });
-  assert.match(stdout, /Reference spans \(>= 2 of 3 validators\): 1 /);
+  assert.match(stdout, /Reference spans \(>= 2 of 3 validators, IoU >= 0\.50\): 1 /);
   assert.match(stdout, /Phase 2: \d+ highlights rated by all 3/);
   fs.rmSync(g.dir, { recursive: true, force: true });
 });
