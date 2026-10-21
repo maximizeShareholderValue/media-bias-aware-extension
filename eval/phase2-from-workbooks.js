@@ -4,8 +4,9 @@
  *
  *   node eval/phase2-from-workbooks.js <v1.csv> <v2.csv> <v3.csv> [--ids eval/out/phrase-ids.json] [--out phase2.csv]
  *
- * Each <vN.csv> is the validator's "Phase 2" tab downloaded as CSV (File > Download > CSV). The tab
- * has a title and instructions above a header row with "Phrase ID", "Article ID" and "Judgment".
+ * Each <vN.csv> is either the validator's "Phase 2 CSV" exported from annotator.html (Vn-phase2-<date>.csv)
+ * or their workbook's "Phase 2" tab downloaded as CSV (File > Download > CSV). Both have a header row
+ * with "Phrase ID", "Article ID" and "Judgment" (the workbook tab has a title and instructions above it).
  * Phrase IDs (P001...) are mapped back to the itemId in key.json through phrase-ids.json.
  * Output columns: itemId, articleId, phraseId, validator1, validator2, validator3.
  * Stops with a list of problems when a phrase is missing, its article does not match, a judgment

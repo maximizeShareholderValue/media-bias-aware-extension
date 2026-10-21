@@ -47,6 +47,13 @@ test("problems: bad judgment, wrong article, missing and unknown phrases", () =>
   assert.match(text, /V3 P099: not in phrase-ids\.json/);
 });
 
+test("reads the annotator's Phase 2 CSV (header on the first row)", () => {
+  const exported = (j) => tab(1, j, "Valid").slice(3); // the annotator export has no title rows
+  const r = P.build([exported("Valid"), exported("Not Valid"), exported("Valid")], IDS);
+  assert.deepEqual(r.problems, []);
+  assert.deepEqual(r.rows[1].slice(3), ["Valid", "Not Valid", "Valid"]);
+});
+
 test("a tab without the header is reported", () => {
   const r = P.build([[["nothing here"]], tab(2, "Valid", "Valid"), tab(3, "Valid", "Valid")], IDS);
   assert.match(r.problems.join(" "), /V1: no header row/);
