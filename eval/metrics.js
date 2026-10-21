@@ -13,7 +13,7 @@
  */
 "use strict";
 
-var GATES = { kappaMin: 0.6, calibrationFprMax: 0.15, formalPrecisionMin: 0.5 };
+var GATES = { kappaMin: 0.6, calibrationFprMax: 0.15, formalPrecisionMin: 0.5, formalRecallMin: 0.3 };
 
 /** votes: array of booleans (true = Valid). Validated when at least two are Valid. */
 function isValidated(votes) {
