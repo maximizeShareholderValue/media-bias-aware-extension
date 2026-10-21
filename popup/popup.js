@@ -230,7 +230,8 @@
   var ICON_EXTERNAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
   var ICON_SCALE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0z"/><path d="M19 7l-3 7a3 3 0 0 0 6 0z"/></svg>';
   var ICON_NEWS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h13a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2z"/><line x1="8" y1="9" x2="15" y2="9"/><line x1="8" y1="13" x2="15" y2="13"/></svg>';
-  var ICON_LINK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+  var ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>';
+  var ICON_LINK ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
 
   function infoItem(iconSvg, label, value) {
     var div = document.createElement("div");
@@ -280,6 +281,8 @@
     grid.className = "info-grid";
     if (outlet.parentCompany) grid.appendChild(infoItem(ICON_BUILDING, "Parent Company", outlet.parentCompany));
     grid.appendChild(infoItem(ICON_SCALE, "Political Leaning", outlet.ideology || "Not rated"));
+    // FR-CHK-02: MBFC factual reliability tier, as stored in the lookup table (never estimated).
+    grid.appendChild(infoItem(ICON_CHECK, "Factual Reliability", outlet.factualReliability || "Not rated"));
     if (outlet.mediaType) grid.appendChild(infoItem(ICON_NEWS, "Media Type", outlet.mediaType));
     if (outlet.country) grid.appendChild(infoItem(ICON_GLOBE, "Country", outlet.country));
     if (outlet.headquarters) grid.appendChild(infoItem(ICON_GLOBE, "Headquarters", outlet.headquarters));
@@ -298,7 +301,11 @@
 
     var note = document.createElement("p");
     note.className = "source-note";
-    note.textContent = "Leaning rating: Media Bias/Fact Check" + (outlet.ownershipSource ? ". Ownership: curated by the research team." : ".");
+    // A few outlets MBFC does not rate carry an AllSides community leaning and no factual rating.
+    var fromAllSides = /AllSides/.test(outlet.sourceNote || "");
+    note.textContent =
+      (fromAllSides ? "Leaning rating: AllSides community rating. Factual reliability: not rated" : "Leaning and factual reliability ratings: Media Bias/Fact Check") +
+      (outlet.ownershipSource ? ". Ownership: curated by the research team." : ".");
     sourceContent.appendChild(note);
 
     // Outlets without an MBFC review page in the dataset fall back to an MBFC search for the outlet name.

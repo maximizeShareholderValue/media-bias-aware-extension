@@ -40,7 +40,7 @@
     "rt.com": { "parentCompany": "TV-Novosti (ANO)", "ownershipType": "State-Affiliated", "ownershipDetail": "Funded by the Russian government." },
     "dw.com": { "parentCompany": "Deutsche Welle", "ownershipType": "State-Affiliated", "ownershipDetail": "Germany's international public broadcaster, funded by the federal budget." },
     "france24.com": { "parentCompany": "France Médias Monde", "ownershipType": "State-Affiliated", "ownershipDetail": "Publicly funded French international broadcaster, owned by the French state." },
-    "abs-cbn.com": { "parentCompany": "ABS-CBN Corporation", "ownershipType": "Corporate Chain", "ownershipDetail": "Owned by ABS-CBN Corporation, controlled by the Lopez family." },
+    "news.abs-cbn.com": { "parentCompany": "ABS-CBN Corporation", "ownershipType": "Corporate Chain", "ownershipDetail": "Owned by ABS-CBN Corporation, controlled by the Lopez family." },
     "gmanetwork.com": { "parentCompany": "GMA Network, Inc.", "ownershipType": "Corporate Chain", "ownershipDetail": "Publicly listed Philippine broadcaster." },
     "inquirer.net": { "parentCompany": "Inquirer Group of Companies (Prieto family)", "ownershipType": "Corporate Chain", "ownershipDetail": "Published by Philippine Daily Inquirer, Inc., controlled by the Prieto family." },
     "philstar.com": { "parentCompany": "Philstar Global Corp.", "ownershipType": "Corporate Chain", "ownershipDetail": "Published by Philstar Global Corp., associated with the Belmonte family." },
