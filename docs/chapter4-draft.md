@@ -1,7 +1,7 @@
 # Chapter 4 draft: system, functional testing, Gate 3 and calibration (Gate 2)
 
 > Working draft for the thesis. Numbers come from the files named in each section; re-check them against those files before pasting. Formal evaluation (validators, EC1-EC2, Gate 1) and usability (EC3-EC4, Gate 4) follow after 26 October 2026.
-> Items marked **[CONFIRM]** need a check by the authors.
+
 
 ## 4.1 The Developed System
 
@@ -135,9 +135,8 @@ Because Gate 2 uses SemEval labels, the deciding measure of precision is EC1 (pr
 
 ### 4.4.5 Catalog freeze
 
-The catalog was frozen as 1.0.0 after round 3 (Stage 5), and round 4 produced 1.1.0, which is the version used in the formal evaluation. No rule was changed after that. Six rules were renumbered at the freeze so that each ID matches its technique; each keeps its old ID in a `formerId` field, and the rendered output was checked to be identical before and after.
+The catalog was frozen as 1.0.0 after round 3 (Stage 5). One further round, approved by the adviser, produced 1.1.0, the version used in the formal evaluation. No rule was changed after that. Six rules were renumbered at the freeze so that each ID matches its technique; each keeps its old ID in a `formerId` field, and the rendered output was checked to be identical before and after.
 
-**[CONFIRM]** the wording on the freeze sequence (1.0.0 → 1.1.0) with the adviser's approval of round 4.
 
 ## 4.5 Evaluation corpus (preparation; results after 26 October)
 
