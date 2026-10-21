@@ -52,6 +52,11 @@ function encodePhase2(phrases) {
   return Buffer.from(JSON.stringify(rows), "utf8").toString("base64");
 }
 
+const OUTLET_SUFFIX = /\s*[-|–—]\s*(UPI(\.com)?|CNN( Business)?|Reuters|BBC( News)?|NPR|The Epoch Times|Epoch Times|Newsweek|TIME|Time|The Hill|NBC News|CBS News|ABC News|The Guardian|HuffPost|Fast Company|Straight Arrow News|The Center Square)\s*$/;
+function stripOutlet(title) {
+  return title.replace(OUTLET_SUFFIX, "").trim();
+}
+
 function buildData(articlesDir, exportsDir, catalog, phrases) {
   const articles = fs
     .readdirSync(articlesDir)
@@ -63,7 +68,9 @@ function buildData(articlesDir, exportsDir, catalog, phrases) {
       let meta = {};
       const exp = exportsDir && path.join(exportsDir, id + ".json");
       if (exp && fs.existsSync(exp)) meta = JSON.parse(fs.readFileSync(exp, "utf8"));
-      return { id: id, title: meta.title || "", url: meta.url || "", text: text };
+      // Thesis 7.4: the validators' copies carry no outlet name, logo or URL, so the URL is left out
+      // and an outlet suffix in the title ("... - UPI.com", "... | CNN Business") is removed.
+      return { id: id, title: stripOutlet(meta.title || ""), text: text };
     });
   const techniques = Object.keys(catalog.techniques).map((k) => ({
     key: k,
@@ -106,4 +113,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { buildData: buildData, render: render, GUIDE: GUIDE };
+module.exports = { buildData: buildData, render: render, GUIDE: GUIDE, stripOutlet: stripOutlet };
