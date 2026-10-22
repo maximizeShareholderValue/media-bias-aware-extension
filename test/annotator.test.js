@@ -41,7 +41,7 @@ test("render injects the data safely and never includes rule triggers", () => {
   const html = B.render(fs.readFileSync(path.join(__dirname, "../eval/annotator-template.html"), "utf8"), d);
   assert.ok(!html.includes("/*__DATA__*/null"));
   assert.ok(!/<\/script> there/.test(html), "article text cannot close the script tag");
-  const json = html.match(/var DATA = (\{.*?\});\n/s)[1];
+  const json = html.match(/var DATA = (\{.*?\});\r?\n/s)[1];
   assert.equal(JSON.parse(json).articles[0].text, "A smear here.\n\nAnother smear </script> there.\n");
   assert.ok(!html.includes("lexicalTrigger") && !html.includes("sourceExample"), "no rule internals");
   fs.rmSync(dir, { recursive: true, force: true });
