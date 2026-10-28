@@ -95,3 +95,15 @@ test("keyword extractor returns short topic keywords, never a sentence", () => {
   assert.deepEqual(CompareUtils.sanitizeKeywords(kws), kws, "extractor output must already pass the privacy guard");
   assert.ok(kws.some((k) => /trump|europe|diesel|export/.test(k)), "should pick up headline topics: " + kws);
 });
+
+test("keyword extractor leaves out the page's own outlet name", () => {
+  const text =
+    "A new CNN poll shows Democrats ahead of the GOP. CNN found that voters blame the GOP for prices. " +
+    "Democrats lead the CNN poll among independents, and the GOP trails Democrats in the CNN poll.";
+  const title = "It's getting no better for Trump one week from midterms";
+  const without = KeywordExtractor.extract(title, text, 4);
+  const withExclude = KeywordExtractor.extract(title, text, 4, ["cnn"]);
+  assert.ok(without.some((k) => /\bcnn\b/.test(k)), "the sample text should otherwise yield a cnn keyword: " + without);
+  assert.ok(!withExclude.some((k) => /\bcnn\b/.test(k)), "cnn should be excluded: " + withExclude);
+  assert.ok(withExclude.length >= 2, "other topics remain: " + withExclude);
+});
