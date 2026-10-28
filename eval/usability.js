@@ -6,17 +6,17 @@
  *   node eval/usability.js <sheet.csv> [--out <dir>]     scores a filled sheet
  *
  * One row per participant: Participant, T1..T4 (task completed without assistance: Yes / No),
- * Q1..Q14 (rating 5 = Excellent ... 1 = Poor; ISO 9241-161:2025 questionnaire, Appendix 1).
+ * Q1..Q15 (rating 5 = Excellent ... 1 = Poor; ISO 9241-161:2025 questionnaire, Appendix 1).
  * Element groups (8.6): Highlights Q1-Q3, Tooltips Q4-Q6, Popup Panels Q7-Q9,
- * Comparison View Q10-Q11, Overall Q12-Q14.
+ * Comparison View Q10-Q12, Overall Q13-Q15.
  *
  * Reports (descriptive only):
  *  - EC4: completion rate per task (target >= 80%).
  *  - Mean (9.4) and sample standard deviation (9.5) per item and per group; a group's score
  *    for a participant is the mean of their items in it. SD < 1.0 = fairly uniform,
  *    SD > 1.5 = considerable disagreement (flagged for follow-up).
- *  - Cronbach's alpha (9.6) once over all 14 items, over participants who answered every item
- *    (the groups have only 2-3 items each, too few for a stable alpha per group).
+ *  - Cronbach's alpha (9.6) once over all 15 items, over participants who answered every item
+ *    (the groups have only 3 items each, too few for a stable alpha per group).
  *  - Gate 4 / EC3: every group mean >= 3.50 and alpha >= 0.70.
  * Writes usability-results.json and usability-results.md.
  */
@@ -27,13 +27,13 @@ const path = require("path");
 const csv = require("./csv.js");
 
 const TASKS = ["T1", "T2", "T3", "T4"];
-const ITEMS = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14"];
+const ITEMS = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14", "Q15"];
 const CONSTRUCTS = [
   { name: "Highlights", items: ["Q1", "Q2", "Q3"] },
   { name: "Tooltips", items: ["Q4", "Q5", "Q6"] },
   { name: "Popup Panels", items: ["Q7", "Q8", "Q9"] },
-  { name: "Comparison View", items: ["Q10", "Q11"] },
-  { name: "Overall", items: ["Q12", "Q13", "Q14"] }
+  { name: "Comparison View", items: ["Q10", "Q11", "Q12"] },
+  { name: "Overall", items: ["Q13", "Q14", "Q15"] }
 ];
 const TARGETS = { taskCompletionMin: 0.8, constructMeanMin: 3.5, alphaMin: 0.7, sdUniform: 1.0, sdDisagreement: 1.5 };
 const PARTICIPANTS = 15;
@@ -130,7 +130,7 @@ function score(rows) {
   return {
     participants: people.length, problems: problems, tasks: tasks, items: items, constructs: constructs, alpha: alpha, targets: TARGETS,
     ec4: { pass: tasks.every((t) => t.meetsEC4), note: "every task completed without assistance by at least 80% of participants" },
-    gate4: { pass: constructs.every((c) => c.meetsMean) && alpha.meetsAlpha, note: "every group mean >= 3.50 and Cronbach's alpha over all 14 items >= 0.70" }
+    gate4: { pass: constructs.every((c) => c.meetsMean) && alpha.meetsAlpha, note: "every group mean >= 3.50 and Cronbach's alpha over all 15 items >= 0.70" }
   };
 }
 
@@ -148,7 +148,7 @@ function toMarkdown(r) {
   L.push("", "Spread: SD < 1.00 uniform; 1.00-1.50 moderate; > 1.50 considerable disagreement (9.5).", "");
   L.push("## Element groups (EC3, Gate 4)", "", "| Group | Items | n | Mean | SD | Mean >= 3.50 |", "|---|---|---|---|---|---|");
   r.constructs.forEach((c) => L.push("| " + [c.construct, c.items[0] + "-" + c.items[c.items.length - 1], c.n, f2(c.mean), f2(c.sd), yn(c.meetsMean)].join(" | ") + " |"));
-  L.push("", "Cronbach's alpha over all 14 items: " + f2(r.alpha.value) + " (n = " + r.alpha.n + "; >= 0.70: " + yn(r.alpha.meetsAlpha) + ").");
+  L.push("", "Cronbach's alpha over all 15 items: " + f2(r.alpha.value) + " (n = " + r.alpha.n + "; >= 0.70: " + yn(r.alpha.meetsAlpha) + ").");
   L.push("", "Gate 4: " + (r.gate4.pass ? "met" : "not met") + " (" + r.gate4.note + "). Alpha is unstable with " + r.participants + " participants and is interpreted cautiously (8.6).");
   const excluded = r.constructs.filter((c) => c.excludedIncomplete);
   if (excluded.length) L.push("", excluded.map((c) => c.construct + ": " + c.excludedIncomplete + " participant(s) with a missing item left out of the group score.").join(" "));
@@ -168,7 +168,7 @@ function main() {
   const ti = args.indexOf("--template");
   if (ti >= 0) {
     fs.writeFileSync(args[ti + 1], template());
-    console.log("Wrote a blank sheet for " + PARTICIPANTS + " participants: " + args[ti + 1] + "\nT1-T4: Yes / No (completed without assistance). Q1-Q14: 5 Excellent ... 1 Poor.");
+    console.log("Wrote a blank sheet for " + PARTICIPANTS + " participants: " + args[ti + 1] + "\nT1-T4: Yes / No (completed without assistance). Q1-Q15: 5 Excellent ... 1 Poor.");
     return;
   }
   const file = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--out");
