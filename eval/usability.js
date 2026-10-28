@@ -6,16 +6,18 @@
  *   node eval/usability.js <sheet.csv> [--out <dir>]     scores a filled sheet
  *
  * One row per participant: Participant, T1..T4 (task completed without assistance: Yes / No),
- * Q1..Q10 (Likert 1 = strongly disagree ... 5 = strongly agree). Constructs (8.6):
- * Usability = Q1-Q5, Perceived Usefulness = Q6-Q10.
+ * Q1..Q14 (rating 5 = Excellent ... 1 = Poor; ISO 9241-161:2025 questionnaire, Appendix 1).
+ * Element groups (8.6): Highlights Q1-Q3, Tooltips Q4-Q6, Popup Panels Q7-Q9,
+ * Comparison View Q10-Q11, Overall Q12-Q14.
  *
  * Reports (descriptive only):
  *  - EC4: completion rate per task (target >= 80%).
- *  - Mean (9.4) and sample standard deviation (9.5) per item and per construct; a construct's
- *    score for a participant is the mean of their items in it. SD < 1.0 = fairly uniform,
+ *  - Mean (9.4) and sample standard deviation (9.5) per item and per group; a group's score
+ *    for a participant is the mean of their items in it. SD < 1.0 = fairly uniform,
  *    SD > 1.5 = considerable disagreement (flagged for follow-up).
- *  - Cronbach's alpha per construct (9.6) over participants who answered every item of it.
- *  - Gate 4 / EC3: construct mean >= 3.50 and alpha >= 0.70.
+ *  - Cronbach's alpha (9.6) once over all 14 items, over participants who answered every item
+ *    (the groups have only 2-3 items each, too few for a stable alpha per group).
+ *  - Gate 4 / EC3: every group mean >= 3.50 and alpha >= 0.70.
  * Writes usability-results.json and usability-results.md.
  */
 "use strict";
@@ -25,10 +27,13 @@ const path = require("path");
 const csv = require("./csv.js");
 
 const TASKS = ["T1", "T2", "T3", "T4"];
-const ITEMS = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10"];
+const ITEMS = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14"];
 const CONSTRUCTS = [
-  { name: "Usability", items: ["Q1", "Q2", "Q3", "Q4", "Q5"] },
-  { name: "Perceived Usefulness", items: ["Q6", "Q7", "Q8", "Q9", "Q10"] }
+  { name: "Highlights", items: ["Q1", "Q2", "Q3"] },
+  { name: "Tooltips", items: ["Q4", "Q5", "Q6"] },
+  { name: "Popup Panels", items: ["Q7", "Q8", "Q9"] },
+  { name: "Comparison View", items: ["Q10", "Q11"] },
+  { name: "Overall", items: ["Q12", "Q13", "Q14"] }
 ];
 const TARGETS = { taskCompletionMin: 0.8, constructMeanMin: 3.5, alphaMin: 0.7, sdUniform: 1.0, sdDisagreement: 1.5 };
 const PARTICIPANTS = 15;
@@ -112,18 +117,20 @@ function score(rows) {
     const complete = people.filter((p) => c.items.every((q) => p.items[q] !== null));
     const scores = complete.map((p) => mean(c.items.map((q) => p.items[q])));
     const m = mean(scores);
-    const alpha = cronbachAlpha(complete.map((p) => c.items.map((q) => p.items[q])));
     return {
       construct: c.name, items: c.items, n: complete.length, excludedIncomplete: people.length - complete.length,
-      mean: m, sd: sd(scores), alpha: alpha,
-      meetsMean: m !== null && m >= TARGETS.constructMeanMin, meetsAlpha: alpha !== null && alpha >= TARGETS.alphaMin
+      mean: m, sd: sd(scores), meetsMean: m !== null && m >= TARGETS.constructMeanMin
     };
   });
 
+  const completeAll = people.filter((p) => ITEMS.every((q) => p.items[q] !== null));
+  const alphaValue = cronbachAlpha(completeAll.map((p) => ITEMS.map((q) => p.items[q])));
+  const alpha = { value: alphaValue, n: completeAll.length, excludedIncomplete: people.length - completeAll.length, meetsAlpha: alphaValue !== null && alphaValue >= TARGETS.alphaMin };
+
   return {
-    participants: people.length, problems: problems, tasks: tasks, items: items, constructs: constructs, targets: TARGETS,
+    participants: people.length, problems: problems, tasks: tasks, items: items, constructs: constructs, alpha: alpha, targets: TARGETS,
     ec4: { pass: tasks.every((t) => t.meetsEC4), note: "every task completed without assistance by at least 80% of participants" },
-    gate4: { pass: constructs.every((c) => c.meetsMean && c.meetsAlpha), note: "each construct mean >= 3.50 and Cronbach's alpha >= 0.70" }
+    gate4: { pass: constructs.every((c) => c.meetsMean) && alpha.meetsAlpha, note: "every group mean >= 3.50 and Cronbach's alpha over all 14 items >= 0.70" }
   };
 }
 
@@ -139,11 +146,13 @@ function toMarkdown(r) {
   L.push("## Items (mean and standard deviation)", "", "| Item | n | Mean | SD | Spread |", "|---|---|---|---|---|");
   r.items.forEach((x) => L.push("| " + [x.item, x.n, f2(x.mean) + (x.belowTarget ? " (below 3.50)" : ""), f2(x.sd), x.spread || "n/a"].join(" | ") + " |"));
   L.push("", "Spread: SD < 1.00 uniform; 1.00-1.50 moderate; > 1.50 considerable disagreement (9.5).", "");
-  L.push("## Constructs (EC3, Gate 4)", "", "| Construct | Items | n | Mean | SD | Cronbach's alpha | Mean >= 3.50 | Alpha >= 0.70 |", "|---|---|---|---|---|---|---|---|");
-  r.constructs.forEach((c) => L.push("| " + [c.construct, c.items[0] + "-" + c.items[c.items.length - 1], c.n, f2(c.mean), f2(c.sd), f2(c.alpha), yn(c.meetsMean), yn(c.meetsAlpha)].join(" | ") + " |"));
+  L.push("## Element groups (EC3, Gate 4)", "", "| Group | Items | n | Mean | SD | Mean >= 3.50 |", "|---|---|---|---|---|---|");
+  r.constructs.forEach((c) => L.push("| " + [c.construct, c.items[0] + "-" + c.items[c.items.length - 1], c.n, f2(c.mean), f2(c.sd), yn(c.meetsMean)].join(" | ") + " |"));
+  L.push("", "Cronbach's alpha over all 14 items: " + f2(r.alpha.value) + " (n = " + r.alpha.n + "; >= 0.70: " + yn(r.alpha.meetsAlpha) + ").");
   L.push("", "Gate 4: " + (r.gate4.pass ? "met" : "not met") + " (" + r.gate4.note + "). Alpha is unstable with " + r.participants + " participants and is interpreted cautiously (8.6).");
   const excluded = r.constructs.filter((c) => c.excludedIncomplete);
-  if (excluded.length) L.push("", excluded.map((c) => c.construct + ": " + c.excludedIncomplete + " participant(s) with a missing item left out of the construct score and alpha.").join(" "));
+  if (excluded.length) L.push("", excluded.map((c) => c.construct + ": " + c.excludedIncomplete + " participant(s) with a missing item left out of the group score.").join(" "));
+  if (r.alpha.excludedIncomplete) L.push("", r.alpha.excludedIncomplete + " participant(s) with a missing item left out of alpha.");
   return L.join("\n") + "\n";
 }
 
@@ -159,7 +168,7 @@ function main() {
   const ti = args.indexOf("--template");
   if (ti >= 0) {
     fs.writeFileSync(args[ti + 1], template());
-    console.log("Wrote a blank sheet for " + PARTICIPANTS + " participants: " + args[ti + 1] + "\nT1-T4: Yes / No (completed without assistance). Q1-Q10: 1-5.");
+    console.log("Wrote a blank sheet for " + PARTICIPANTS + " participants: " + args[ti + 1] + "\nT1-T4: Yes / No (completed without assistance). Q1-Q14: 5 Excellent ... 1 Poor.");
     return;
   }
   const file = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--out");
