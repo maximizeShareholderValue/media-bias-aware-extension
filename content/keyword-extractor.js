@@ -92,10 +92,16 @@
    * @param {string} title - page/article title (used only locally, to weight keywords).
    * @param {string} text - article body text.
    * @param {number} [max=4] - maximum number of keywords to return.
+   * @param {string[]} [exclude] - words that must not appear in a keyword, such as the page's own
+   *   outlet name ("cnn" on cnn.com), which describes the source rather than the topic.
    * @returns {string[]} lower-case keywords, best first.
    */
-  function extract(title, text, max) {
+  function extract(title, text, max, exclude) {
     max = max || 4;
+    var excluded = {};
+    (exclude || []).forEach(function (w) {
+      excluded[clean(w)] = true;
+    });
     var scores = {};
     var body = (text || "").slice(0, MAX_ANALYZED_CHARS);
     if (body) addCandidates(scores, nlpFn(body), 1);
@@ -116,6 +122,7 @@
     for (var i = 0; i < ranked.length && chosen.length < max; i++) {
       var tokens = tokenSet(ranked[i]);
       var redundant = false;
+      for (var w in tokens) if (excluded[w]) redundant = true;
       for (var j = 0; j < chosen.length; j++) {
         if (isSubsetOf(tokens, tokenSet(chosen[j])) || isSubsetOf(tokenSet(chosen[j]), tokens)) {
           redundant = true;
