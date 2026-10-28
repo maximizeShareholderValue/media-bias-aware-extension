@@ -1,6 +1,6 @@
 # Defense slides outline (facts only)
 
-> For building the defense deck (Nov 9-13). Every number comes from the file named next to it. Slides marked **[after results]** wait for the validator and usability results; do not fill them with estimates.
+> For building the defense deck (Nov 9-13). Every number comes from the file named next to it. Validator results are filled in (scored 28 October 2026; Ch 4 4.4-4.5). The slide marked **[after results]** waits for the usability results; do not fill it with estimates.
 
 1. **Title**: Development of a Media Bias-Aware Browser Extension for Balanced News Consumption; Kobi P. Pareja, Orchard Hernandez; adviser Ms. Julie Ann C. Lontoc; CvSU.
 2. **Problem**: rating sites (AllSides, MBFC) label whole outlets but do not show which phrases in an article carry bias; most NLP bias models are not explainable to everyday readers (Ch 1).
@@ -12,10 +12,11 @@
 8. **Functional testing**: 14/14 techniques on reference examples, 39/39 rules; sentence boundaries 13/15; POS 28/30; extraction 8/8 paragraphs on 6 layouts; highlights and tooltips pass [`eval/reports/functional-test-log.md`, `eval/reports/browser-tests.md`].
 9. **Performance (Gate 3) and memory**: 310 runs, median 67 ms, max 252 ms (budget 3,000 ms); 6 stress scenarios all under 3,000 ms (max 409 ms); memory about +5.3 MB per page [`eval/reports/gate3-timing.md`, `eval/reports/browser-tests.md`].
 10. **Evaluation corpus**: 30 hard-news articles, 10 Left / 10 Center / 10 Right (AllSides), Jan-Sep 2026, 21,271 words; 3 validators; 19 highlights from the extension [`eval/corpus-manifest.json`, `eval/out/summary.json`].
-11. **[after results] Detection results (EC1)**: precision and recall with counts (n = 19 highlights), strict and lenient, vs keyword baseline.
-12. **[after results] Validator agreement (RQ2, Gate 1)**: Fleiss' kappa, percent agreement, Gwet's AC1.
-13. **[after results] Error analysis**: main false-positive causes by technique.
-14. **[after results] Usability (RQ3, RQ4)**: construct means, Cronbach's alpha, task completion T1-T4.
-15. **Cross-outlet framing (8.7)**: framing set of 5 events x L/C/R: 7 highlights in total (Left 4, Center 2, Right 1); 10 of 15 articles none; descriptive only [`eval/reports/framing-comparison.md`].
-16. **Limitations**: English only; small samples; SemEval label sparsity; quoted speech not analyzed; late-loading pages not scanned; plain local pages for timing; outlet labels are contextual anchors [Ch 5 outline 5.4].
-17. **Conclusions and recommendations** [Ch 5].
+11. **Validator annotations (Phase 1)**: 114 annotations (V1 14 in 3 articles, V2 44 in 21, V3 56 in 26); reference set (at least 2 of 3, IoU ≥ 0.50) only 4 spans same technique, 7 any technique; none marked by all three; mean pairwise span F1 0.031 [Ch 4 4.4.2, Table 25].
+12. **Detection results (EC1, not met)**: 19 highlights, 1 match ("lambasted", L01). Strict: precision 5.3% (1 of 19), recall 25.0% (1 of 4), F1 0.087, FPR 94.7%; lenient recall 14.3% (1 of 7). Keyword baseline: 69 flagged, same 1 match, precision 1.4%, FPR 98.6%: the S and C conditions removed 50 of its 68 false positives. With 4 reference spans, one match moves recall by 25 points [Ch 4 4.4.4, Tables 27-28].
+13. **Validator agreement (RQ2, Gate 1 not met)**: Fleiss' κ = −0.218 (target ≥ 0.60); Po 47.4%, Pe 56.8%; Gwet's AC1 0.073 (not a prevalence effect). Valid judgments: V1 4, V2 16, V3 19 of 19; unanimous on 4; at least 2 Valid on 16. No recalibration round: validators not available in time; Phase 2 used only descriptively [Ch 4 4.4.3, Table 26]. Be ready to explain why 2-of-3 = 16/19 but κ is negative (most items split 2-1; pairs agree less than chance).
+14. **Error analysis**: 4 rules gave 15 of 19 highlights (LL-011 "slammed/blasted/lambasted" 6, NC-005 "regime" 5, LL-016 "acknowledged/revealed" 2, DB-004 "claimed" 2). V1's comments: reporting verbs read as description ("interpretive"), "regime" accepted in journalism, neutral verbs; one boundary error ("communist regime"). No POS error. Missed: "sweeping", "most significant loss", "one of the most important in the nation's history" (+3 lenient): no catalog trigger [Ch 4 4.5, Table 29].
+15. **[after results] Usability (RQ3, RQ4)**: element-group means (target ≥ 3.50), Cronbach's alpha, task completion T1-T4 (target ≥ 80%). Questionnaire based on ISO 9241-161:2025 if the adviser approves; 15 CvSU students; test article: CNN analysis, 27 Oct 2026.
+16. **Cross-outlet framing (8.7)**: framing set of 5 events x L/C/R: 7 highlights in total (Left 4, Center 2, Right 1); 10 of 15 articles none; descriptive only [`eval/reports/framing-comparison.md`, Ch 4 4.7, Tables 30-31].
+17. **Limitations**: English only; small samples; validator agreement below chance and only 4 strict reference spans, no recalibration round; SemEval label sparsity; quoted speech not analyzed; late-loading pages not scanned; plain local pages for timing; outlet labels are contextual anchors [Ch 5 outline 5.4].
+18. **Conclusions and recommendations** [Ch 5]: fast, private and more precise than keyword matching, but most highlights were not confirmed; revise LL-011, LL-016, NC-005; add evaluative adjectives and superlatives; calibrate validators before Phase 1 [Ch 5 outline 5.3 items 8-9].
