@@ -21,10 +21,10 @@ test("Cronbach's alpha matches a hand-worked example (9.6)", () => {
 
 const ITEMS = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14", "Q15"];
 const HEAD = ["Participant", "T1", "T2", "T3", "T4"].concat(ITEMS);
-// groups: Highlights Q1-3, Tooltips Q4-6, Popup Panels Q7-9, Comparison View Q10-12, Overall Q13-15
+// constructs: System Usability and Interface Clarity Q1-10, Perceived Utility and News Literacy Support Q11-15
 const row = (id, tasks, h, t, p, c, o) => [id].concat(tasks, h, t, p, c, o).map(String);
 
-test("tasks, items, element groups, alpha and Gate 4 on a small sheet", () => {
+test("tasks, items, constructs, alpha and Gate 4 on a small sheet", () => {
   const rows = [
     HEAD,
     row("P01", ["Yes", "Yes", "Yes", "No"], [4, 4, 4], [5, 5, 5], [4, 4, 4], [5, 5, 5], [4, 4, 4]),
@@ -43,27 +43,27 @@ test("tasks, items, element groups, alpha and Gate 4 on a small sheet", () => {
   close(r.items[0].mean, 4.2);
   close(r.items[0].sd, 0.836660);
   assert.equal(r.items[0].spread, "uniform");
-  assert.deepEqual(r.constructs.map((c) => c.construct), ["Highlights", "Tooltips", "Popup Panels", "Comparison View", "Overall"]);
-  // Highlights scores: 4, 5, 3, 4.333, 4.667 -> mean 4.2.
-  close(r.constructs[0].mean, 4.2);
-  // Tooltips: 5, 4, 4.667, 2, 4 -> mean 3.9333.
-  close(r.constructs[1].mean, 3.933333);
-  // Comparison View: 5, 4, 4, 2, 4 -> mean 3.8.
-  close(r.constructs[3].mean, 3.8);
+  assert.deepEqual(r.constructs.map((c) => c.construct), ["System Usability and Interface Clarity", "Perceived Utility and News Literacy Support"]);
+  assert.deepEqual(r.constructs.map((c) => c.items.length), [10, 5]);
+  // Construct 1 (Q1-Q10) scores: 4.4, 4.6, 3.6, 3.4, 4.4 -> mean 4.08.
+  close(r.constructs[0].mean, 4.08);
+  // Construct 2 (Q11-Q15) scores: 4.4, 4.6, 3.4, 3.2, 4.6 -> mean 4.04.
+  close(r.constructs[1].mean, 4.04);
   assert.ok(r.constructs.every((c) => c.meetsMean));
   assert.equal(r.alpha.n, 5);
   assert.equal(typeof r.alpha.value, "number");
   assert.equal(r.gate4.pass, r.alpha.meetsAlpha);
 });
 
-test("a group mean below 3.50 fails Gate 4 even with a high alpha", () => {
-  const low = (id, v) => row(id, ["Yes", "Yes", "Yes", "Yes"], [v, v, v], [v, v, v], [v, v, v], [2, 2, 2], [v, v, v]);
+test("a construct mean below 3.50 fails Gate 4 even with a high alpha", () => {
+  const low = (id, v) => row(id, ["Yes", "Yes", "Yes", "Yes"], [v, v, v], [v, v, v], [v, v, v], [v, 2, 2], [2, 2, 2]);
   const r = U.score([HEAD, low("P01", 5), low("P02", 4), low("P03", 5)]);
-  assert.equal(r.constructs[3].meetsMean, false);
+  assert.equal(r.constructs[0].meetsMean, true);
+  assert.equal(r.constructs[1].meetsMean, false);
   assert.equal(r.gate4.pass, false);
 });
 
-test("bad cells are reported and left out; incomplete participants are left out of the group and alpha only", () => {
+test("bad cells are reported and left out; incomplete participants are left out of the construct and alpha only", () => {
   const rows = [
     HEAD,
     row("P01", ["yes", "maybe", "Yes", "Yes"], [4, 4, 6], [5, 5, 5], [4, 4, 4], [5, 5, 5], [4, 4, 4]),
