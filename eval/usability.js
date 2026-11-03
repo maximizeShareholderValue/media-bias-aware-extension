@@ -2,21 +2,23 @@
 /**
  * Scores the user-centered usability evaluation (thesis 8.6, 9.4-9.6; EC3, EC4, Gate 4).
  *
- *   node eval/usability.js --template <sheet.csv>        writes a blank recording sheet (15 rows)
+ *   node eval/usability.js --template <sheet.csv>        writes a blank recording sheet (15 participants)
  *   node eval/usability.js <sheet.csv> [--out <dir>]     scores a filled sheet
  *
  * One row per participant: Participant, T1..T4 (task completed without assistance: Yes / No),
- * Q1..Q15 (rating 5 = Excellent ... 1 = Poor; ISO 9241-161:2025 questionnaire, Appendix 1).
- * Constructs (8.6): System Usability and Interface Clarity = Q1-Q10 (highlights Q1-Q3,
- * tooltips Q4-Q6, popup panels Q7-Q9, general ease of use Q10); Perceived Utility and News
- * Literacy Support = Q11-Q15 (comparison view Q11-Q13, usefulness Q14, intention to use Q15).
+ * Q1..Q25 (rating 5 = Excellent ... 1 = Poor; ISO/IEC 25010:2023 questionnaire, Appendix 1).
+ * Constructs (8.6): System Usability and Interface Clarity = Q1-Q20 (Performance Efficiency
+ * Q1-Q3, Compatibility Q4-Q5, Interaction Capability Q6-Q10, Reliability Q11-Q13, Security
+ * Q14-Q16, Maintainability Q17-Q18, Flexibility Q19-Q20); Perceived Utility and News Literacy
+ * Support = Q21-Q25 (Functional Suitability Q21-Q23, Safety Q24-Q25).
  *
  * Reports (descriptive only):
  *  - EC4: completion rate per task (target >= 80%).
- *  - Mean (9.4) and sample standard deviation (9.5) per item and per construct; a construct's score
+ *  - Mean (9.4) and sample standard deviation (9.5) per item, per quality characteristic and per
+ *    construct; a characteristic's or construct's score
  *    for a participant is the mean of their items in it. SD < 1.0 = fairly uniform,
  *    SD > 1.5 = considerable disagreement (flagged for follow-up).
- *  - Cronbach's alpha (9.6) once over all 15 items, over participants who answered every item.
+ *  - Cronbach's alpha (9.6) once over all 25 items, over participants who answered every item.
  *  - Gate 4 / EC3: each construct mean >= 3.50 and alpha >= 0.70.
  * Writes usability-results.json and usability-results.md.
  */
@@ -27,10 +29,22 @@ const path = require("path");
 const csv = require("./csv.js");
 
 const TASKS = ["T1", "T2", "T3", "T4"];
-const ITEMS = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14", "Q15"];
+const ITEMS = Array.from({ length: 25 }, (_, i) => "Q" + (i + 1));
+const range = (a, b) => ITEMS.slice(a - 1, b);
+const CHARACTERISTICS = [
+  { name: "Performance Efficiency", items: range(1, 3) },
+  { name: "Compatibility", items: range(4, 5) },
+  { name: "Interaction Capability", items: range(6, 10) },
+  { name: "Reliability", items: range(11, 13) },
+  { name: "Security", items: range(14, 16) },
+  { name: "Maintainability", items: range(17, 18) },
+  { name: "Flexibility", items: range(19, 20) },
+  { name: "Functional Suitability", items: range(21, 23) },
+  { name: "Safety", items: range(24, 25) }
+];
 const CONSTRUCTS = [
-  { name: "System Usability and Interface Clarity", items: ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9", "Q10"] },
-  { name: "Perceived Utility and News Literacy Support", items: ["Q11", "Q12", "Q13", "Q14", "Q15"] }
+  { name: "System Usability and Interface Clarity", items: range(1, 20) },
+  { name: "Perceived Utility and News Literacy Support", items: range(21, 25) }
 ];
 const TARGETS = { taskCompletionMin: 0.8, constructMeanMin: 3.5, alphaMin: 0.7, sdUniform: 1.0, sdDisagreement: 1.5 };
 const PARTICIPANTS = 15;
@@ -110,24 +124,24 @@ function score(rows) {
     return { item: q, n: xs.length, mean: mean(xs), sd: s, spread: s === null ? null : s < TARGETS.sdUniform ? "uniform" : s > TARGETS.sdDisagreement ? "disagreement" : "moderate", belowTarget: xs.length ? mean(xs) < TARGETS.constructMeanMin : null };
   });
 
-  const constructs = CONSTRUCTS.map((c) => {
-    const complete = people.filter((p) => c.items.every((q) => p.items[q] !== null));
-    const scores = complete.map((p) => mean(c.items.map((q) => p.items[q])));
+  /** Mean and SD of the participants' mean over a group of items; participants missing one of them are left out. */
+  const group = (g) => {
+    const complete = people.filter((p) => g.items.every((q) => p.items[q] !== null));
+    const scores = complete.map((p) => mean(g.items.map((q) => p.items[q])));
     const m = mean(scores);
-    return {
-      construct: c.name, items: c.items, n: complete.length, excludedIncomplete: people.length - complete.length,
-      mean: m, sd: sd(scores), meetsMean: m !== null && m >= TARGETS.constructMeanMin
-    };
-  });
+    return { items: g.items, n: complete.length, excludedIncomplete: people.length - complete.length, mean: m, sd: sd(scores), meetsMean: m !== null && m >= TARGETS.constructMeanMin };
+  };
+  const characteristics = CHARACTERISTICS.map((c) => Object.assign({ characteristic: c.name }, group(c)));
+  const constructs = CONSTRUCTS.map((c) => Object.assign({ construct: c.name }, group(c)));
 
   const completeAll = people.filter((p) => ITEMS.every((q) => p.items[q] !== null));
   const alphaValue = cronbachAlpha(completeAll.map((p) => ITEMS.map((q) => p.items[q])));
   const alpha = { value: alphaValue, n: completeAll.length, excludedIncomplete: people.length - completeAll.length, meetsAlpha: alphaValue !== null && alphaValue >= TARGETS.alphaMin };
 
   return {
-    participants: people.length, problems: problems, tasks: tasks, items: items, constructs: constructs, alpha: alpha, targets: TARGETS,
+    participants: people.length, problems: problems, tasks: tasks, items: items, characteristics: characteristics, constructs: constructs, alpha: alpha, targets: TARGETS,
     ec4: { pass: tasks.every((t) => t.meetsEC4), note: "every task completed without assistance by at least 80% of participants" },
-    gate4: { pass: constructs.every((c) => c.meetsMean) && alpha.meetsAlpha, note: "each construct mean >= 3.50 and Cronbach's alpha over all 15 items >= 0.70" }
+    gate4: { pass: constructs.every((c) => c.meetsMean) && alpha.meetsAlpha, note: "each construct mean >= 3.50 and Cronbach's alpha over all " + ITEMS.length + " items >= 0.70" }
   };
 }
 
@@ -143,9 +157,12 @@ function toMarkdown(r) {
   L.push("## Items (mean and standard deviation)", "", "| Item | n | Mean | SD | Spread |", "|---|---|---|---|---|");
   r.items.forEach((x) => L.push("| " + [x.item, x.n, f2(x.mean) + (x.belowTarget ? " (below 3.50)" : ""), f2(x.sd), x.spread || "n/a"].join(" | ") + " |"));
   L.push("", "Spread: SD < 1.00 uniform; 1.00-1.50 moderate; > 1.50 considerable disagreement (9.5).", "");
+  L.push("## ISO/IEC 25010:2023 quality characteristics", "", "| Characteristic | Items | n | Mean | SD | Mean >= 3.50 |", "|---|---|---|---|---|---|");
+  r.characteristics.forEach((c) => L.push("| " + [c.characteristic, c.items[0] + "-" + c.items[c.items.length - 1], c.n, f2(c.mean), f2(c.sd), yn(c.meetsMean)].join(" | ") + " |"));
+  L.push("");
   L.push("## Constructs (EC3, Gate 4)", "", "| Construct | Items | n | Mean | SD | Mean >= 3.50 |", "|---|---|---|---|---|---|");
   r.constructs.forEach((c) => L.push("| " + [c.construct, c.items[0] + "-" + c.items[c.items.length - 1], c.n, f2(c.mean), f2(c.sd), yn(c.meetsMean)].join(" | ") + " |"));
-  L.push("", "Cronbach's alpha over all 15 items: " + f2(r.alpha.value) + " (n = " + r.alpha.n + "; >= 0.70: " + yn(r.alpha.meetsAlpha) + ").");
+  L.push("", "Cronbach's alpha over all " + r.items.length + " items: " + f2(r.alpha.value) + " (n = " + r.alpha.n + "; >= 0.70: " + yn(r.alpha.meetsAlpha) + ").");
   L.push("", "Gate 4: " + (r.gate4.pass ? "met" : "not met") + " (" + r.gate4.note + "). Alpha is unstable with " + r.participants + " participants and is interpreted cautiously (8.6).");
   const excluded = r.constructs.filter((c) => c.excludedIncomplete);
   if (excluded.length) L.push("", excluded.map((c) => c.construct + ": " + c.excludedIncomplete + " participant(s) with a missing item left out of the construct score.").join(" "));
@@ -165,7 +182,7 @@ function main() {
   const ti = args.indexOf("--template");
   if (ti >= 0) {
     fs.writeFileSync(args[ti + 1], template());
-    console.log("Wrote a blank sheet for " + PARTICIPANTS + " participants: " + args[ti + 1] + "\nT1-T4: Yes / No (completed without assistance). Q1-Q15: 5 Excellent ... 1 Poor.");
+    console.log("Wrote a blank sheet for " + PARTICIPANTS + " participants: " + args[ti + 1] + "\nT1-T4: Yes / No (completed without assistance). Q1-Q25: 5 Excellent ... 1 Poor.");
     return;
   }
   const file = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--out");
