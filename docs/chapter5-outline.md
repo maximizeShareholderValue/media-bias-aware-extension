@@ -38,7 +38,7 @@ Conclusion to write: the three validators did not agree, either on which phrases
 
 ### RQ3: Do users find the extension usable, interpretable and useful?
 
-- **[after results]** 15-item questionnaire based on ISO 9241-161:2025 (approved by the adviser 29 October 2026), rated 5 Excellent to 1 Poor: System Usability and Interface Clarity (Q1-Q10) and Perceived Utility and News Literacy Support (Q11-Q15): construct means (target ≥ 3.50) and SDs; one Cronbach's α over all 15 items (target ≥ 0.70) (Gate 4, EC3) [`eval/usability.js`]. Note the small sample (15 CvSU students) and α instability (Ch 3 8.6).
+- **[after results]** 25-item questionnaire based on ISO/IEC 25010:2023 (3 November 2026, replacing ISO 9241-161), rated 5 Excellent to 1 Poor: System Usability and Interface Clarity (Q1-Q20: Performance Efficiency, Compatibility, Interaction Capability, Reliability, Security, Maintainability, Flexibility) and Perceived Utility and News Literacy Support (Q21-Q25: Functional Suitability, Safety): construct means (target ≥ 3.50), characteristic means and SDs; one Cronbach's α over all 25 items (target ≥ 0.70) (Gate 4, EC3) [`eval/usability.js`]. Note the small sample (15 CvSU students) and α instability (Ch 3 8.6).
 
 ### RQ4: Can users complete the guided tasks?
 
