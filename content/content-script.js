@@ -256,6 +256,15 @@
     return null;
   }
 
+  // The site's own name ("cnn" on edition.cnn.com, "foxnews" on www.foxnews.com): the outlet,
+  // not the topic, so it is kept out of the comparison keywords.
+  function outletWords() {
+    var labels = location.hostname.toLowerCase().split(".");
+    var i = labels.length - 2;
+    if (i > 0 && /^(co|com|org|net|gov|edu)$/.test(labels[i]) && labels[i + 1].length === 2) i--;
+    return i >= 0 ? [labels[i]] : [];
+  }
+
   // Topic keywords for comparative reporting (FR-AVD-01). Computed on demand so the
   // detection pipeline stays fast, and only these keywords ever leave the page.
   function getKeywords() {
@@ -266,7 +275,7 @@
           return p.textContent;
         })
         .join(" ");
-      keywordsCache = KeywordExtractor.extract(lastArticle.title, body, 4);
+      keywordsCache = KeywordExtractor.extract(lastArticle.title, body, 4, outletWords());
     }
     return keywordsCache;
   }
